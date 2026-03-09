@@ -83,7 +83,7 @@ body {
 }
 .shield-img {
     width: 240px; z-index: 10;
-    content: url('imagen/tec.png'); 
+    content: url('../imagen/tec.png'); 
     filter: brightness(0) drop-shadow(0 0 12px var(--gold)); 
     transition: 0.7s cubic-bezier(0.16, 1, 0.3, 1);
 }
