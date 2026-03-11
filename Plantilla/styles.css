@@ -1,0 +1,120 @@
+body{
+margin:0;
+font-family:Arial;
+}
+
+/* BARRA SUPERIOR */
+
+.topbar{
+position:fixed;
+top:0;
+left:0;
+width:100%;
+height:70px;
+background:#2b6671;
+display:flex;
+align-items:center;
+justify-content:space-between;
+padding:0 40px;
+color:white;
+}
+
+/* logo + ISIC */
+
+.logo-area{
+display:flex;
+align-items:center;
+gap:20px;
+}
+
+.logo{
+height:45px;
+}
+
+/* palabra ISIC */
+
+.isic{
+position: relative;
+left: 90px;
+font-size: 40px;
+font-weight: bold;
+
+}
+
+/* casa */
+
+.home{
+font-size:25px;
+margin-right:40px; /* mueve la casita hacia la izquierda */
+cursor:pointer;
+}
+
+
+/* CONTENEDOR */
+
+.container{
+display:flex;
+margin-top:70px;
+height:calc(100vh - 70px);
+}
+
+
+/* BARRA IZQUIERDA */
+
+.sidebar{
+width:220px;
+background:#255b68;
+color:white;
+position:fixed;
+top:70px;
+bottom:0;
+}
+
+.user{
+padding:15px;
+border-bottom:2px solid #ccc;
+}
+
+.sidebar ul{
+list-style:none;
+padding:0;
+margin:0;
+}
+
+.sidebar li{
+padding:15px;
+border-bottom:2px solid #ccc;
+cursor:pointer;
+font-weight:bold;
+}
+
+.sidebar li:hover{
+background:#1e4d58;
+}
+
+
+/* CONTENIDO */
+
+.contenido{
+margin-left:220px;
+width:100%;
+background:#0f3145;
+display:flex;
+align-items:center;
+justify-content:center;
+position:relative;
+}
+
+
+/* VENTANAS */
+
+.ventana{
+display:none;
+color:white;
+font-size:80px;
+font-weight:bold;
+}
+
+.active{
+display:block;
+}

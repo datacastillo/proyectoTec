@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+<meta charset="UTF-8">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Sistema Alumno</title>
+
+<link rel="stylesheet" href="styles.css">
+
+</head>
+
+<body>
+
+<header class="topbar">
+
+<div class="menu-btn" onclick="toggleMenu()">☰</div>
+
+<img src="Imagenes/logoTec.png" class="logo">
+
+<h1 class="isic">ISIC</h1>
+
+<div class="home">🏠</div>
+
+</header>
+
+
+<div class="container">
+
+<!-- BARRA IZQUIERDA -->
+<aside class="sidebar">
+
+<div class="user">👤 00000000</div>
+
+<ul class="menu">
+
+<li onclick="toggleMaterias()">MATERIAS ▼</li>
+
+<ul id="materiasLista" class="submenu">
+
+<li onclick="mostrarMateria('calculo')">CALCULO</li>
+<li onclick="mostrarMateria('poo')">POO</li>
+<li onclick="mostrarMateria('bd')">BD</li>
+<li onclick="mostrarMateria('ilog')">ILOG</li>
+<li onclick="mostrarMateria('gps')">GPS</li>
+
+</ul>
+
+<li>CALIFICACIONES</li>
+<li>TAREAS</li>
+<li>KARDEX</li>
+
+</ul>
+
+</aside>
+
+
+<!-- PANTALLA PRINCIPAL -->
+<main class="contenido" id="contenido">
+
+<h1>ALUMNO</h1>
+
+</main>
+
+</div>
+
+<script src="script.js"></script>
+
+</body>
+</html>
