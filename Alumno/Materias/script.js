@@ -70,6 +70,57 @@ de sistemas informáticos modernos.
 
 }
 
+if(materia === "ilog"){
+
+titulo = "ILOG";
+profesor = "PROF. CARLOS MARTINEZ";
+info = "ING. SISTEMAS COMPUTACIONALES<br>CMARTINEZ@TEC.COM";
+imagen = "../img/profesor4.png";
+
+descripcion = `
+La ingeniería logística (ILOG) se enfoca en la planeación,
+organización y control eficiente del flujo de productos,
+información y recursos dentro de una empresa. Permite
+optimizar procesos de transporte, almacenamiento y
+distribución para mejorar la productividad y reducir costos.
+`;
+
+}
+
+if(materia === "ilog"){
+
+titulo = "ILOG";
+profesor = "PROF. CARLOS MARTINEZ";
+info = "ING. SISTEMAS COMPUTACIONALES<br>CMARTINEZ@TEC.COM";
+imagen = "../img/profesor4.png";
+
+descripcion = `
+La ingeniería logística (ILOG) se enfoca en la planeación,
+organización y control eficiente del flujo de productos,
+información y recursos dentro de una empresa. Permite
+optimizar procesos de transporte, almacenamiento y
+distribución para mejorar la productividad y reducir costos.
+`;
+
+}
+if(materia === "gps"){
+
+titulo = "GPS";
+profesor = "PROF. ANA GARCIA";
+info = "ING. SISTEMAS<br>AGARCIA@TEC.COM";
+imagen = "../img/profesor5.png";
+
+descripcion = `
+La materia de GPS aborda el uso de tecnologías de
+posicionamiento global para determinar la ubicación
+geográfica de objetos o personas en tiempo real.
+Se estudian aplicaciones en navegación, monitoreo
+de transporte, mapas digitales y sistemas de
+localización en diferentes plataformas tecnológicas.
+`;
+
+}
+
 
 contenido.innerHTML = `
 

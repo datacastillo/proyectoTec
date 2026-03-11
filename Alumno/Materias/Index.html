@@ -3,9 +3,7 @@
 
 <head>
 <meta charset="UTF-8">
-
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
 <title>Sistema Alumno</title>
 
 <link rel="stylesheet" href="styles.css">
@@ -18,9 +16,7 @@
 
 <div class="menu-btn" onclick="toggleMenu()">☰</div>
 
-<img src="Imagenes/logoTec.png" class="logo">
-
-<h1 class="isic">ISIC</h1>
+<img src="../img/logoTec.png" class="logo" alt="Logo Tec">
 
 <div class="home">🏠</div>
 
@@ -32,7 +28,14 @@
 <!-- BARRA IZQUIERDA -->
 <aside class="sidebar">
 
-<div class="user">👤 00000000</div>
+<div class="user">
+
+<img src="../img/user.png" class="user-img" alt="Usuario">
+
+<span class="user-id">00000000</span>
+
+</div>
+
 
 <ul class="menu">
 
@@ -47,6 +50,8 @@
 <li onclick="mostrarMateria('gps')">GPS</li>
 
 </ul>
+
+</li>
 
 <li>CALIFICACIONES</li>
 <li>TAREAS</li>
@@ -69,4 +74,4 @@
 <script src="script.js"></script>
 
 </body>
-</html>
+</html> 
