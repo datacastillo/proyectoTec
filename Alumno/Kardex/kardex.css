@@ -1,0 +1,179 @@
+.home{
+color:white;
+text-decoration:none;
+font-size:24px;
+cursor:pointer;
+}
+
+/* CONTENEDOR */
+
+.contenedor-tabla{
+
+display:flex;
+flex-direction:column;
+align-items:center;
+gap:30px;
+
+}
+
+
+/* TABLA */
+
+.tabla-kardex{
+
+border-collapse:collapse;
+
+color:white;
+
+font-size:16px;
+
+margin-top: 50px;
+
+}
+
+
+/* CELDAS */
+
+.tabla-kardex th,
+.tabla-kardex td{
+
+border:2px solid #d0d6da;
+
+width:130px;
+height:80px;
+
+text-align:center;
+
+}
+
+
+/* ENCABEZADOS */
+
+.tabla-kardex th{
+
+background:#255a68;
+
+font-weight:bold;
+
+}
+
+
+/* GRUPO */
+
+.grupo{
+
+background:#255a68;
+
+font-weight:bold;
+
+}
+
+
+/* COLUMNA IZQUIERDA */
+
+.materia{
+
+background:#255a68;
+
+}
+
+
+/* BOTON DESCARGAR */
+
+.btn-descargar{
+
+background:#c7c7c7;
+
+border:none;
+
+padding:10px 20px;
+
+border-radius:20px;
+
+cursor:pointer;
+
+font-weight:bold;
+
+}
+
+.btn-descargar:hover{
+
+background:#b0b0b0;
+
+}
+
+/* =========================
+   SCROLL TABLA MOVIL
+========================= */
+
+.tabla-scroll{
+width:100%;
+overflow-x:auto;
+}
+
+
+/* =========================
+   RESPONSIVE MOVIL
+========================= */
+
+@media (max-width:768px){
+
+/* mostrar boton hamburguesa */
+
+.menu-btn{
+display:block;
+}
+
+
+/* sidebar oculto */
+
+.sidebar{
+position:fixed;
+left:-220px;
+top:70px;
+height:100%;
+width:220px;
+background:#2b6671;
+transition:0.3s;
+z-index:1000;
+}
+
+.sidebar.active{
+left:0;
+}
+
+
+/* layout vertical */
+
+.container{
+flex-direction:column;
+}
+
+
+/* contenido adaptable */
+
+.contenido{
+padding:20px;
+align-items:center;
+}
+
+
+/* tabla más pequeña */
+
+.tabla-kardex th,
+.tabla-kardex td{
+
+width:100px;
+height:70px;
+font-size:14px;
+
+}
+
+
+/* boton centrado */
+
+.btn-descargar{
+margin-top:20px;
+}
+
+}
