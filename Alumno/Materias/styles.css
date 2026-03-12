@@ -1,10 +1,13 @@
 body{
 margin:0;
-font-family:Arial;
+font-family:Arial, Helvetica, sans-serif;
 background:#0f3145;
 }
 
-/* barra superior */
+
+/* =========================
+   BARRA SUPERIOR
+========================= */
 
 .topbar{
 height:70px;
@@ -16,34 +19,36 @@ padding:0 20px;
 color:white;
 }
 
-/* boton hamburguesa */
+
+/* BOTON HAMBURGUESA */
 
 .menu-btn{
 display:none;
 font-size:30px;
 cursor:pointer;
-margin-right:15px;
 }
 
-/* logo */
+
+/* LOGO */
 
 .logo{
 height:45px;
 }
 
-.isic{
-font-size:40px;
-margin-left:10px;
-}
 
-/* layout */
+/* =========================
+   LAYOUT GENERAL
+========================= */
 
 .container{
 display:flex;
 height:calc(100vh - 70px);
 }
 
-/* barra izquierda */
+
+/* =========================
+   BARRA LATERAL
+========================= */
 
 .sidebar{
 width:220px;
@@ -52,6 +57,35 @@ color:white;
 transition:0.3s;
 }
 
+
+/* =========================
+   USUARIO
+========================= */
+
+.user{
+display:flex;
+align-items:center;
+gap:15px;
+padding:20px;
+border-bottom:1px solid white;
+}
+
+.user-img{
+width:35px;
+height:35px;
+border-radius:50%;
+}
+
+.user-id{
+font-size:18px;
+font-weight:bold;
+}
+
+
+/* =========================
+   MENU
+========================= */
+
 .sidebar ul{
 list-style:none;
 padding:0;
@@ -59,37 +93,132 @@ margin:0;
 }
 
 .sidebar li{
-padding:15px;
+padding:18px;
 border-bottom:1px solid white;
 cursor:pointer;
+transition:0.2s;
 }
 
 .sidebar li:hover{
-background:#214f58;
+background:#2b6671;
 }
+
+
+/* =========================
+   SUBMENU MATERIAS
+========================= */
 
 .submenu{
 display:none;
-background:#214f58;
 }
 
 .submenu li{
-padding-left:30px;
-font-size:14px;
+padding:18px;
+border-bottom:1px solid white;
+cursor:pointer;
+font-size:16px;
+padding-left:40px;
+background:#2b6671;
 }
 
-/* pantalla principal */
+.submenu li:hover{
+background:#214f58;
+}
+
+
+/* =========================
+   CONTENIDO PRINCIPAL
+========================= */
 
 .contenido{
 flex:1;
 display:flex;
-align-items:center;
+align-items:flex-start;
 justify-content:center;
 color:white;
 font-size:60px;
 }
 
-/* RESPONSIVE */
+
+/* =========================
+   CONTENIDO DE MATERIAS
+========================= */
+
+.materia-container{
+display:flex;
+flex-direction:column;
+align-items:center;
+margin-top:40px;
+width:100%;
+}
+
+/* TITULO */
+
+.titulo-materia{
+font-size:42px;
+margin-bottom:20px;
+font-weight:bold;
+}
+
+/* BLOQUE PROFESOR */
+
+.profesor-info{
+display:flex;
+align-items:center;
+justify-content:center;
+position:relative;
+margin-bottom:5px;
+}
+
+/* FOTO PROFESOR */
+
+.foto-profesor{
+width:120px;
+height:120px;
+border-radius:50%;
+border:8px solid purple;
+object-fit:cover;
+position:absolute;
+left:-140px;
+top:-10px;
+}
+
+/* BARRA PROFESOR */
+
+.barra-profesor{
+background:#255a68;
+padding:10px 30px;
+border:2px solid black;
+text-align:center;
+min-width:500px;
+}
+
+.barra-profesor h3{
+margin:0;
+font-size:20px;
+}
+
+.barra-profesor p{
+margin:0;
+font-size:14px;
+}
+
+/* DESCRIPCION */
+
+.descripcion{
+background:#255a68;
+padding:15px;
+margin-top:5px;
+width:420px;
+font-size:18px;
+line-height:1.4;
+text-align:left;
+}
+
+
+/* =========================
+   RESPONSIVE
+========================= */
 
 @media (max-width:768px){
 
@@ -102,6 +231,7 @@ position:fixed;
 left:-220px;
 top:70px;
 height:100%;
+z-index:1000;
 }
 
 .sidebar.active{
@@ -116,4 +246,19 @@ flex-direction:column;
 font-size:40px;
 }
 
+.materia-container{
+margin-top:20px;
+}
+
+}
+
+/* FORZAR COLOR DE LOS LINKS DEL MENU */
+
+.sidebar li a,
+.sidebar li a:visited,
+.sidebar li a:hover,
+.sidebar li a:active,
+.sidebar li a:focus{
+color:white !important;
+text-decoration:none !important;
 }

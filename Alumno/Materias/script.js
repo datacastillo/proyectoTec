@@ -27,13 +27,12 @@ if(materia === "calculo"){
 titulo = "CALCULO";
 profesor = "PROF. INOCENCIO JIRAEFALES";
 info = "ING. VECINDAD DEL CHAVO<br>JIRAEFALES@VECINDAD.COM";
-imagen = "Imagenes/profesor1.png";
+imagen = "../img/profesor1.png";
 
 descripcion = `
 El cálculo no es solo una rama de la matemática; es el lenguaje
 del cambio y el movimiento. Mientras que el álgebra se ocupa de lo
-estático, el cálculo nos permite modelar la realidad dinámica:
-desde la trayectoria de un cohete hasta la propagación de una epidemia.
+estático, el cálculo nos permite modelar la realidad dinámica.
 `;
 
 }
@@ -44,12 +43,11 @@ if(materia === "poo"){
 titulo = "POO";
 profesor = "PROF. JUAN PEREZ";
 info = "ING. SISTEMAS<br>JUANPEREZ@TEC.COM";
-imagen = "Imagenes/profesor2.png";
+imagen = "../img/profesor2.png";
 
 descripcion = `
 La programación orientada a objetos permite organizar el software
-en clases y objetos, facilitando la reutilización del código y
-la creación de sistemas más estructurados y mantenibles.
+en clases y objetos, facilitando la reutilización del código.
 `;
 
 }
@@ -60,12 +58,41 @@ if(materia === "bd"){
 titulo = "BASE DE DATOS";
 profesor = "PROF. MARIA LOPEZ";
 info = "ING. BASES DE DATOS<br>MARIA@TEC.COM";
-imagen = "Imagenes/profesor3.png";
+imagen = "../img/profesor3.png";
 
 descripcion = `
-Las bases de datos permiten almacenar, organizar y consultar
-grandes cantidades de información de forma eficiente dentro
-de sistemas informáticos modernos.
+Las bases de datos permiten almacenar y consultar grandes cantidades
+de información dentro de sistemas informáticos.
+`;
+
+}
+
+
+if(materia === "ilog"){
+
+titulo = "ILOG";
+profesor = "PROF. CARLOS MARTINEZ";
+info = "ING. SISTEMAS COMPUTACIONALES<br>CMARTINEZ@TEC.COM";
+imagen = "../img/profesor4.png";
+
+descripcion = `
+La ingeniería logística optimiza el flujo de productos,
+información y recursos dentro de una empresa.
+`;
+
+}
+
+
+if(materia === "gps"){
+
+titulo = "GPS";
+profesor = "PROF. ANA GARCIA";
+info = "ING. SISTEMAS<br>AGARCIA@TEC.COM";
+imagen = "../img/profesor5.png";
+
+descripcion = `
+El GPS permite determinar la ubicación geográfica en tiempo real
+mediante satélites y sistemas de posicionamiento global.
 `;
 
 }
@@ -97,15 +124,6 @@ ${descripcion}
 
 </div>
 `;
-
-
-/* cerrar menu en celular cuando seleccionan materia */
-
-let sidebar = document.querySelector(".sidebar");
-
-if(window.innerWidth <= 768){
-sidebar.classList.remove("active");
-}
 
 }
 
