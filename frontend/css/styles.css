@@ -100,6 +100,20 @@ body {
     text-shadow: 0 0 20px var(--gold-glow);
 }
 
+.btn-group {
+    display: flex;
+    flex-direction: row; 
+    gap: 20px;          
+    justify-content: flex-start; 
+    margin-top: 25px;
+}
+
+.btn-access {
+    min-width: 160px;    
+    padding: 12px 25px;
+    text-align: center;
+}
+
 /* ANIMACIONES */
 @keyframes cycleText { 0%, 20% { transform: translateY(0); } 25%, 45% { transform: translateY(-75px); } 50%, 70% { transform: translateY(-150px); } 75%, 95% { transform: translateY(-225px); } 100% { transform: translateY(0); } }
 @keyframes breatheAura { from { transform: scale(0.8); opacity: 0.2; } to { transform: scale(1.3); opacity: 0.5; } }
