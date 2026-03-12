@@ -251,3 +251,14 @@ margin-top:20px;
 }
 
 }
+
+/* FORZAR COLOR DE LOS LINKS DEL MENU */
+
+.sidebar li a,
+.sidebar li a:visited,
+.sidebar li a:hover,
+.sidebar li a:active,
+.sidebar li a:focus{
+color:white !important;
+text-decoration:none !important;
+}
