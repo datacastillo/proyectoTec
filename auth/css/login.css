@@ -1,0 +1,103 @@
+/* General y Reseteo */
+body, html {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+    font-family: Arial, sans-serif;
+    overflow: hidden; 
+    background-color: #000;
+}
+
+.universo {
+    height: 100vh;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+    /* Degradado galaxia */
+    background: radial-gradient(circle at 50% 50%, #1a1a2e 0%, #000 100%);
+}
+
+.universo::before {
+    content: "";
+    position: absolute;
+    width: 200%;
+    height: 200%;
+    /* estrellas */
+    background-image: 
+        radial-gradient(1px 1px at 30px 40px, #fff, rgba(0,0,0,0)),
+        radial-gradient(1.5px 1.5px at 60px 80px, #fff, rgba(0,0,0,0)),
+        radial-gradient(1px 1px at 100px 150px, #ddd, rgba(0,0,0,0));
+    background-size: 250px 250px;
+    opacity: 0.4;
+    z-index: 0;
+    animation: estrellasParpadeo 6s linear infinite;
+}
+
+@keyframes estrellasParpadeo {
+    0%, 100% { opacity: 0.4; }
+    50% { opacity: 0.6; }
+}
+
+.caja-login {
+    background-color: #C5A059; 
+    width: 330px;
+    padding: 40px;
+    border-radius: 10px;
+    text-align: center;
+    position: relative;
+    z-index: 10;
+    box-shadow: 0 0 45px rgba(94, 74, 53, 0.7); 
+}
+
+.logo {
+    width: 160px;
+    margin-bottom: 30px;
+    /* Sombra oscura fuerte detrás del logo para separar el rojo del dorado */
+    filter: drop-shadow(0 4px 6px rgba(0, 0, 0, 0.6));
+}
+
+.campo {
+    display: block;
+    width: 100%;
+    margin-bottom: 12px;
+    padding: 12px 15px;
+    border: none;
+    border-radius: 6px;
+    font-size: 14px;
+    box-sizing: border-box; 
+    color: #333;
+}
+
+.campo:focus {
+    outline: 2px solid #5E4A35; /* Borde */
+}
+
+.boton-entrar {
+    width: 100%;
+    padding: 12px 15px;
+    background-color: white; 
+    color: black; 
+    border: none;
+    border-radius: 6px;
+    font-weight: bold;
+    cursor: pointer;
+    display: flex;
+    justify-content: space-between; /* Texto a la izquierda, flecha a la derecha */
+    align-items: center;
+    margin-top: 10px;
+    font-size: 15px;
+    text-transform: uppercase; 
+    transition: all 0.3s ease;
+}
+
+.flecha {
+    font-size: 1.2em;
+    margin-left: 10px;
+}
+
+.boton-entrar:hover {
+    background-color: #f2f2f2;
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+}
