@@ -51,44 +51,48 @@ body {
     z-index: 10;
 }
 
-/*  BRANDING (IZQUIERDA)  */
+/* --- ESTILO DEL LOGO CENTRADO --- */
 .branding {
     display: flex;
     flex-direction: column;
-    justify-content: center;
+    align-items: center; /* Centra todo el bloque */
+    text-align: center;
 }
 
 .branding h1 {
-    font-weight: 900;
-    font-size: clamp(45px, 5vw, 90px); 
-    line-height: 0.85;
-    letter-spacing: -2px; 
-    text-transform: uppercase;
-    transform: scaleX(1.1); 
-    transform-origin: left;
-    text-shadow: 0 10px 30px rgba(0,0,0,0.5);
+    font-family: 'Orbitron', sans-serif;
+    font-size: 4.5rem;
+    color: white;
+    display: flex;
+    flex-direction: column; /* Pone PEDRO debajo de TEC SAN */
+    align-items: center;    /* Centra PEDRO respecto a TEC SAN */
+    line-height: 0.9;      /* Pega un poco más las palabras */
+    letter-spacing: 5px;
+    margin-bottom: 20px;
 }
 
 .branding h1 span {
-    display: block; 
-    color: var(--gold); 
-    font-size: 0.3em; 
-    letter-spacing: 12px; 
-    font-weight: 400; 
+    color: #D4AF37;         /* Tu color dorado */
+    font-size: 3.2rem;      /* Más pequeño para contraste */
+    letter-spacing: 18px;   /* Estira PEDRO para que se alinee visualmente */
+    display: block;
     margin-top: 10px;
-    transform: scaleX(1);
+    text-indent: 18px;      /* Compensa el último espacio de letra para centrado real */
 }
 
+/* --- ESTILO DE BOTONES EN NIVELES --- */
 .btn-group {
     display: flex;
-    flex-direction: row; 
-    gap: 15px; /* Espacio entre botones */
-    margin-top: 40px; /* Separación del título */
-    width: fit-content; 
+    flex-wrap: wrap;        /* Permite el salto de línea */
+    justify-content: center;
+    gap: 20px;
+    max-width: 500px;       /* Forzamos que el tercer botón baje */
+    margin: 40px auto 0 auto;
 }
 
 .btn-access {
-    min-width: 180px; 
+    flex: 1 1 calc(50% - 20px); /* Los primeros dos ocupan la mitad */
+    min-width: 180px;
     padding: 14px 20px;
     background: transparent;
     border: 1px solid rgba(212, 175, 55, 0.6); 
@@ -98,20 +102,73 @@ body {
     letter-spacing: 3px; 
     text-transform: uppercase; 
     cursor: pointer;
+    transition: 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    backdrop-filter: blur(5px);
+    border-radius: 2px;
+}
+
+/* El botón de ACCEDER (el último) ocupa toda la línea de abajo */
+.btn-access:last-child {
+    flex: 0 1 220px; /* Tamaño fijo para que no sea gigante */
+}
+
+.btn-access:hover { 
+    background: #D4AF37; 
+    color: black; 
+    box-shadow: 0 0 30px rgba(212, 175, 55, 0.4);
+}
+
+/* 1. Contenedor del grupo de botones */
+.btn-group {
+    display: flex;
+    flex-direction: row; 
+    justify-content: center; /* Centra los botones */
+    align-items: center;
+    gap: 20px;               /* Espacio entre botones */
+    margin-top: 40px; 
+    width: 100%;             
+    flex-wrap: wrap;         /* PERMITE QUE LOS BOTONES SE ACOMODEN EN NIVELES */
+    max-width: 600px;        /* Limitamos el ancho para forzar el salto del tercer botón */
+    margin-left: auto;
+    margin-right: auto;
+}
+
+/* 2. Estilo base del botón */
+.btn-access {
+    flex: 1 1 calc(50% - 20px); /* Ocupan el 50% del contenedor (2 por línea) */
+    min-width: 180px;        
+    padding: 14px 10px;      
+    background: transparent;
+    border: 1px solid rgba(212, 175, 55, 0.6); 
+    color: white;
+    font-family: 'Orbitron', sans-serif; 
+    font-size: 0.7rem;       
+    letter-spacing: 2px;     
+    text-transform: uppercase; 
+    cursor: pointer;
     position: relative; 
     transition: 0.4s cubic-bezier(0.16, 1, 0.3, 1);
     overflow: hidden;
     backdrop-filter: blur(5px);
     border-radius: 2px;
+    text-align: center;
 }
 
+/* 3. Ajuste especial para el botón "ACCEDER" (El tercero) */
+/* Esto hace que el tercer botón ocupe una línea propia y se centre */
+.btn-access:last-child {
+    flex: 0 1 250px; /* No se estira tanto como los de arriba */
+    margin-top: 10px; /* Separación extra del nivel superior */
+}
+
+/* 4. Hover */
 .btn-access:hover { 
-    background: var(--gold); 
+    background: #D4AF37; 
     color: black; 
-    box-shadow: 0 0 30px var(--gold-glow);
-    border-color: var(--gold);
+    box-shadow: 0 0 25px rgba(212, 175, 55, 0.5); 
+    border-color: #D4AF37;
+    transform: translateY(-2px);
 }
-
 /*  CENTRO  */
 .core { 
     display: flex; 
