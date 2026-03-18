@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Inscripción Oficial | Tec de San Pedro</title>
+    <link rel="stylesheet" href="css/inscripcion.css">
+</head>
+<body>
+
+    <div id="modal-validacion" class="modal-split">
+        
+        <div class="split-form">
+            <img src="../imagen/teclogo.png" class="logo-marca-agua" alt="">
+            
+            <div class="form-container fade-in">
+                <div class="form-header">
+                    <h2>Inscripción</h2>
+                    <p class="subtitle">Ingresa tus credenciales para comenzar</p>
+                </div>
+                
+                <div class="form-body">
+                    <div class="campo">
+                        <label>Folio de Aspirante</label>
+                        <input type="text" id="folio-input" placeholder="Ej: TEC-2026-001">
+                    </div>
+                    
+                    <div class="campo">
+                        <label>CURP</label>
+                        <input type="text" id="curp-input" placeholder="18 CARACTERES" style="text-transform: uppercase;">
+                    </div>
+                    
+                    <button class="btn-entrar" onclick="validarAcceso()">
+                        VERIFICAR DATOS
+                    </button>
+                    </div>
+            </div>
+        </div>
+
+        <div class="split-visual gris-style">
+            <div class="overlay-visual-gris">
+                <div class="top-logo-area">
+                    <img src="../imagen/teclogo.png" class="logo-white-top" alt="Logo">
+                </div>
+
+                <div class="welcome-text-centered">
+                    <h1>Tu Carrera <br><span>Inicia Aquí</span></h1>
+                    <p>Bienvenido al sistema de inscripción oficial del Tec San Pedro</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="contenido-principal" style="display:none;">
+        <div class="contenedor-expediente">
+            <header class="header-expediente">
+                <div class="brand">
+                    <img src="../imagen/teclogo.png" width="50" style="filter: brightness(0) invert(1);">
+                    <h1>Expediente Digital de Inscripción</h1>
+                </div>
+            </header>
+            
+            <div class="info-alumno-bar">
+                <p><strong>Aspirante:</strong> <span id="nombre-alumno"></span></p>
+                <p><strong>Carrera:</strong> <span id="carrera-alumno"></span></p>
+            </div>
+
+            <table class="tabla-materias">
+                <thead>
+                    <tr>
+                        <th>Estado</th>
+                        <th>Clave</th>
+                        <th>Asignatura</th>
+                        <th>Créditos</th>
+                    </tr>
+                </thead>
+                <tbody id="lista-materias"></tbody>
+            </table>
+
+            <footer class="footer-expediente">
+                <button class="btn-finalizar" onclick="finalizarInscripcion()">CONFIRMAR E INSCRIBIR</button>
+            </footer>
+        </div>
+    </div>
+
+    <script src="js/inscripcion.js"></script>
+</body>
+</html>

@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Registro de Aspirantes - Tec San Pedro</title>
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="css/tramitar_ficha.css">
+</head>
+<body>
+
+    <div class="top-bar"></div>
+
+    <div class="container">
+        <div class="registration-card">
+            
+            <div class="card-header no-print">
+                <img src="../imagen/teclogo.png" alt="Tec San Pedro" class="logo-min">
+                <h1 id="title-text">Admisiones 2026</h1>
+                <p id="subtitle-text">Tecnológico Nacional de México - San Pedro</p>
+            </div>
+
+            <form id="form-ficha" class="form-content" novalidate>
+                <div class="instruction-box">
+                    <span>SOLICITUD DE FICHA</span>
+                    <p>Ingrese sus datos para generar su folio de aspirante.</p>
+                </div>
+
+                <div class="input-row">
+                    <div class="input-group">
+                        <label>Nombre(s) *</label>
+                        <input type="text" id="nombre" placeholder="Ej. Juan Carlos">
+                    </div>
+                    <div class="input-group">
+                        <label>Apellidos *</label>
+                        <input type="text" id="apellido" placeholder="Ej. Castillo Hernandez">
+                    </div>
+                </div>
+
+                <div class="input-row">
+                    <div class="input-group">
+                        <label>CURP *</label>
+                        <input type="text" id="curp" maxlength="18" oninput="this.value = this.value.toUpperCase().replace(/\s/g, '')" placeholder="18 caracteres">
+                    </div>
+                    <div class="input-group">
+                        <label>Correo Electrónico *</label>
+                        <input type="email" id="correo" oninput="this.value = this.value.toLowerCase().replace(/\s/g, '')" placeholder="ejemplo@correo.com">
+                    </div>
+                </div>
+
+                <div class="input-group">
+                    <label>Carrera deseada *</label>
+                    <select id="carrera">
+                        <option value="" disabled selected>Seleccione una ingeniería...</option>
+                        <option value="ISC">Ingeniería en Sistemas Computacionales</option>
+                        <option value="IIND">Ingeniería Industrial</option>
+                        <option value="IGEM">Ingeniería en Gestión Empresarial</option>
+                    </select>
+                </div>
+
+                <div class="form-actions">
+                    <button type="button" class="btn-back" onclick="location.href='../index.html'">Volver</button>
+                    <button type="button" class="btn-submit" onclick="procesarRegistro()">Generar Registro</button>
+                </div>
+            </form>
+
+            <div id="success-screen" style="display: none;">
+                <div class="ficha-limpia-print">
+                    
+                    <div class="header-oficial-print">
+                        <img src="../imagen/teclogo.png" alt="Logo" class="logo-print">
+                        <div class="header-text-print">
+                            <h2>INSTITUTO TECNOLÓGICO DE SAN PEDRO</h2>
+                            <p>Servicios Escolares | Admisiones 2026</p>
+                        </div>
+                    </div>
+
+                    <div class="folio-box-limpio">
+                        <small>FOLIO DE SEGUIMIENTO</small>
+                        <h1 id="display-folio">TEC-2026-001</h1>
+                    </div>
+
+                    <div class="datos-aspirante">
+                        <div class="dato-item"><span class="tit">NOMBRE:</span> <span id="res-nombre"></span></div>
+                        <div class="dato-item"><span class="tit">CURP:</span> <span id="res-curp"></span></div>
+                        <div class="dato-item"><span class="tit">CARRERA:</span> <span id="res-carrera"></span></div>
+                        <div class="dato-item"><span class="tit">FECHA:</span> <span id="res-fecha"></span></div>
+                    </div>
+
+                    <div class="firma-container">
+                        <div class="firma-linea">
+                            <p>FIRMA DEL ASPIRANTE</p>
+                        </div>
+                        <div class="firma-linea">
+                            <p>SELLO DE RECEPCIÓN</p>
+                            <small>Servicios Escolares</small>
+                        </div>
+                    </div>
+
+                    <div class="footer-oficial-print">
+                        <p>Calzada del Tecnológico #53 C.P. 27800. San Pedro, Coahuila.</p>
+                        <p>Tel: (872) 77 2 88 07 | www.tecsanpedro.edu.mx</p>
+                    </div>
+                </div>
+
+                <div class="form-actions no-print" style="justify-content: center;">
+                    <button class="btn-print" onclick="window.print()">DESCARGAR PDF</button>
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <script src="js/ficha.js"></script>
+</body>
+</html>

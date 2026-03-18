@@ -1,0 +1,261 @@
+:root {
+    --gold: #d4af37;
+    --gold-glow: rgba(212, 175, 55, 0.4);
+    --black: #050403;
+    --border: rgba(212, 175, 55, 0.15);
+}
+
+
+* { 
+    margin: 0; 
+    padding: 0; 
+    box-sizing: border-box; 
+    cursor: crosshair; 
+}
+
+body { 
+    background: var(--black); 
+    color: white; 
+    font-family: 'Montserrat', sans-serif; 
+    overflow: hidden; 
+    height: 100vh; 
+}
+
+/* FONDO */
+.universe {
+    position: fixed; 
+    width: 100%; 
+    height: 100%;
+    background: radial-gradient(circle at center, #1a120b 0%, var(--black) 100%);
+    z-index: -3;
+}
+#particle-canvas { 
+    position: fixed; 
+    top: 0; 
+    left: 0; 
+    width: 100%; 
+    height: 100%; 
+    z-index: -1; 
+    pointer-events: none; 
+}
+
+/*  DISEÑO DE INTERFAZ */
+.viewport {
+    display: grid; 
+    grid-template-columns: 1.2fr 1.2fr 1fr; 
+    height: 100vh; 
+    width: 100vw; 
+    align-items: center; 
+    padding: 0 6%;
+    position: relative; 
+    z-index: 10;
+}
+
+/* --- ESTILO DEL LOGO CENTRADO --- */
+.branding {
+    display: flex;
+    flex-direction: column;
+    align-items: center; /* Centra todo el bloque */
+    text-align: center;
+}
+
+.branding h1 {
+    font-family: 'Orbitron', sans-serif;
+    font-size: 4.5rem;
+    color: white;
+    display: flex;
+    flex-direction: column; /* Pone PEDRO debajo de TEC SAN */
+    align-items: center;    /* Centra PEDRO respecto a TEC SAN */
+    line-height: 0.9;      /* Pega un poco más las palabras */
+    letter-spacing: 5px;
+    margin-bottom: 20px;
+}
+
+.branding h1 span {
+    color: #D4AF37;         /* Tu color dorado */
+    font-size: 3.2rem;      /* Más pequeño para contraste */
+    letter-spacing: 18px;   /* Estira PEDRO para que se alinee visualmente */
+    display: block;
+    margin-top: 10px;
+    text-indent: 18px;      /* Compensa el último espacio de letra para centrado real */
+}
+
+/* --- ESTILO DE BOTONES EN NIVELES --- */
+.btn-group {
+    display: flex;
+    flex-wrap: wrap;        /* Permite el salto de línea */
+    justify-content: center;
+    gap: 20px;
+    max-width: 500px;       /* Forzamos que el tercer botón baje */
+    margin: 40px auto 0 auto;
+}
+
+.btn-access {
+    flex: 1 1 calc(50% - 20px); /* Los primeros dos ocupan la mitad */
+    min-width: 180px;
+    padding: 14px 20px;
+    background: transparent;
+    border: 1px solid rgba(212, 175, 55, 0.6); 
+    color: white;
+    font-family: 'Orbitron', sans-serif; 
+    font-size: 0.75rem; 
+    letter-spacing: 3px; 
+    text-transform: uppercase; 
+    cursor: pointer;
+    transition: 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    backdrop-filter: blur(5px);
+    border-radius: 2px;
+}
+
+/* El botón de ACCEDER (el último) ocupa toda la línea de abajo */
+.btn-access:last-child {
+    flex: 0 1 220px; /* Tamaño fijo para que no sea gigante */
+}
+
+.btn-access:hover { 
+    background: #D4AF37; 
+    color: black; 
+    box-shadow: 0 0 30px rgba(212, 175, 55, 0.4);
+}
+
+/* 1. Contenedor del grupo de botones */
+.btn-group {
+    display: flex;
+    flex-direction: row; 
+    justify-content: center; /* Centra los botones */
+    align-items: center;
+    gap: 20px;               /* Espacio entre botones */
+    margin-top: 40px; 
+    width: 100%;             
+    flex-wrap: wrap;         /* PERMITE QUE LOS BOTONES SE ACOMODEN EN NIVELES */
+    max-width: 600px;        /* Limitamos el ancho para forzar el salto del tercer botón */
+    margin-left: auto;
+    margin-right: auto;
+}
+
+/* 2. Estilo base del botón */
+.btn-access {
+    flex: 1 1 calc(50% - 20px); /* Ocupan el 50% del contenedor (2 por línea) */
+    min-width: 180px;        
+    padding: 14px 10px;      
+    background: transparent;
+    border: 1px solid rgba(212, 175, 55, 0.6); 
+    color: white;
+    font-family: 'Orbitron', sans-serif; 
+    font-size: 0.7rem;       
+    letter-spacing: 2px;     
+    text-transform: uppercase; 
+    cursor: pointer;
+    position: relative; 
+    transition: 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+    overflow: hidden;
+    backdrop-filter: blur(5px);
+    border-radius: 2px;
+    text-align: center;
+}
+
+/* 3. Ajuste especial para el botón "ACCEDER" (El tercero) */
+/* Esto hace que el tercer botón ocupe una línea propia y se centre */
+.btn-access:last-child {
+    flex: 0 1 250px; /* No se estira tanto como los de arriba */
+    margin-top: 10px; /* Separación extra del nivel superior */
+}
+
+/* 4. Hover */
+.btn-access:hover { 
+    background: #D4AF37; 
+    color: black; 
+    box-shadow: 0 0 25px rgba(212, 175, 55, 0.5); 
+    border-color: #D4AF37;
+    transform: translateY(-2px);
+}
+/*  CENTRO  */
+.core { 
+    display: flex; 
+    justify-content: center; 
+    align-items: center; 
+    perspective: 1200px; 
+}
+
+.emblem-structure { 
+    width: clamp(300px, 30vw, 450px); 
+    height: clamp(300px, 30vw, 450px); 
+    position: relative; 
+}
+
+.glass-orb {
+    width: 100%; 
+    height: 100%;
+    background: radial-gradient(circle, #22180f 0%, #000 85%);
+    border-radius: 50%; 
+    border: 1px solid var(--border);
+    display: flex; 
+    justify-content: center; 
+    align-items: center;
+    position: relative; 
+    box-shadow: 0 0 100px rgba(0,0,0,1);
+    backdrop-filter: blur(10px);
+}
+
+.glass-orb::before {
+    content: ''; position: absolute; width: 60%; height: 60%;
+    background: var(--gold); border-radius: 50%; filter: blur(60px);
+    opacity: 0.3; z-index: 1; animation: breatheAura 4s infinite alternate ease-in-out;
+}
+
+.shield-img {
+    width: 55%; 
+    z-index: 10;
+    content: url('../imagen/tec.png'); 
+    filter: brightness(0.8) drop-shadow(0 0 12px var(--gold)); 
+    transition: 0.7s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.emblem-structure:hover .shield-img { 
+    filter: brightness(1) drop-shadow(0 0 35px var(--gold)); 
+    transform: scale(1.05); 
+}
+
+/*  DERECHA (MENÚ LATERAL)  */
+.monitor { 
+    border-left: 1px solid rgba(212, 175, 55, 0.2); 
+    padding-left: 40px;
+    height: 150px;
+    display: flex;
+    align-items: center;
+}
+
+.monitor-track { 
+    height: 60px; 
+    overflow: hidden; 
+}
+
+.monitor-content div {
+    height: 60px; 
+    display: flex; 
+    align-items: center;
+    font-family: 'Cinzel', serif; 
+    font-size: 1.8rem;
+    letter-spacing: 5px; 
+    text-transform: uppercase; 
+    color: rgba(255,255,255,0.9);
+}
+
+/* ANIMACIONES */
+@keyframes cycleText { 
+    0%, 20% { transform: translateY(0); } 
+    25%, 45% { transform: translateY(-60px); } 
+    50%, 70% { transform: translateY(-120px); } 
+    75%, 95% { transform: translateY(-180px); } 
+    100% { transform: translateY(0); } 
+}
+
+@keyframes breatheAura { 
+    from { transform: scale(0.8); opacity: 0.15; } 
+    to { transform: scale(1.2); opacity: 0.4; } 
+}
+
+/* Ajuste de animación del monitor para coincidir con laa altura */
+.monitor-content { 
+    animation: cycleText 12s infinite cubic-bezier(0.76, 0, 0.24, 1); 
+}

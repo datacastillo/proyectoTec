@@ -1,0 +1,128 @@
+:root {
+    --rojo-tec: #a31d24;
+    --rojo-oscuro: #82141a;
+    --blanco: #ffffff;
+    --gris-fondo: #f8fafc;
+    --negro-grisaceo: rgba(30, 30, 30, 0.9);
+}
+
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+body {
+    font-family: 'Segoe UI', Roboto, sans-serif;
+    background-color: var(--gris-fondo);
+}
+
+.modal-split {
+    position: fixed;
+    top: 0; left: 0; width: 100%; height: 100%;
+    display: flex;
+    z-index: 1000;
+}
+
+/* --- LADO IZQUIERDO PULIDO --- */
+.split-form {
+    flex: 1;
+    background: var(--blanco);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    overflow: hidden;
+}
+
+.logo-marca-agua {
+    position: absolute;
+    width: 70%;
+    opacity: 0.04;
+    left: -10%;
+    top: 5%;
+    pointer-events: none;
+}
+
+.form-container { width: 100%; max-width: 380px; z-index: 10; }
+.form-header h2 { color: var(--rojo-tec); font-size: 2.5rem; font-weight: 800; margin-bottom: 5px; }
+.subtitle { color: #64748b; margin-bottom: 30px; font-size: 0.95rem; }
+
+.campo { margin-bottom: 20px; }
+.campo label { display: block; font-weight: 700; color: #334155; font-size: 0.8rem; margin-bottom: 8px; text-transform: uppercase; }
+.campo input {
+    width: 100%; padding: 16px; border: 2px solid #e2e8f0; border-radius: 12px;
+    font-size: 1rem; background: #fdfdfd; transition: 0.3s;
+}
+.campo input:focus { border-color: var(--rojo-tec); outline: none; box-shadow: 0 4px 12px rgba(163, 29, 36, 0.1); }
+
+.btn-entrar {
+    width: 100%; padding: 18px; background: var(--rojo-tec); color: white;
+    border: none; border-radius: 12px; font-weight: 800; cursor: pointer; transition: 0.3s;
+    border-bottom: 4px solid var(--rojo-oscuro); text-transform: uppercase;
+}
+.btn-entrar:hover { background: var(--rojo-oscuro); transform: translateY(-2px); }
+
+/* --- LADO DERECHO (REUBICACIÓN LOGO) --- */
+.split-visual.gris-style {
+    flex: 1;
+    background-image: url('../../imagen/tec2.jpg'); /* Asegúrate que la ruta sea correcta */
+    background-size: cover;
+    background-position: center;
+    filter: grayscale(100%);
+    position: relative;
+}
+
+.overlay-visual-gris {
+    position: absolute;
+    top: 0; left: 0; width: 100%; height: 100%;
+    background: linear-gradient(to bottom, rgba(0,0,0,0.3), var(--negro-grisaceo));
+    display: flex;
+    flex-direction: column;
+    padding: 60px 10% 10% 10%; /* Ajuste de padding superior para el logo */
+    color: white;
+    filter: grayscale(0%);
+}
+
+/* Área del logo superior */
+.top-logo-area {
+    width: 100%;
+    display: flex;
+    justify-content: flex-end; /* Alinea a la derecha */
+    margin-bottom: 40px; /* Espacio antes del texto centrado */
+}
+
+.logo-white-top { 
+    width: 70px; /* Un poco más pequeño para la esquina */
+    filter: brightness(0) invert(1); 
+}
+
+/* Texto centrado verticalmente */
+.welcome-text-centered {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+}
+
+.welcome-text-centered h1 { font-size: 3.5rem; line-height: 1.1; font-weight: 800; }
+.welcome-text-centered h1 span { color: var(--blanco); opacity: 0.8; }
+.welcome-text-centered p { margin-top: 15px; font-size: 1.1rem; color: #cbd5e1; max-width: 400px; }
+
+/* --- EXPEDIENTE --- */
+.contenedor-expediente {
+    max-width: 900px; margin: 40px auto; background: white;
+    border-radius: 20px; overflow: hidden; box-shadow: 0 20px 50px rgba(0,0,0,0.1);
+}
+.header-expediente { background: var(--rojo-tec); color: white; padding: 30px; text-align: center; }
+.info-alumno-bar { display: flex; justify-content: space-around; padding: 20px; background: #f1f5f9; border-bottom: 1px solid #e2e8f0; }
+.tabla-materias { width: 100%; border-collapse: collapse; }
+.tabla-materias th { padding: 20px; background: #fff; text-align: left; color: var(--rojo-tec); border-bottom: 2px solid #e2e8f0; }
+.tabla-materias td { padding: 20px; border-bottom: 1px solid #f1f5f9; }
+
+.btn-finalizar {
+    background: #22c55e; color: white; border: none; padding: 18px 35px;
+    border-radius: 12px; font-weight: 800; cursor: pointer; transition: 0.3s;
+}
+.btn-finalizar:hover { background: #16a34a; transform: scale(1.02); }
+
+.fade-in { animation: fadeIn 0.8s ease-out; }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+
+@media (max-width: 900px) { .split-visual { display: none; } }
