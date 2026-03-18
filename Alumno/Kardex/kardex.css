@@ -177,3 +177,29 @@ margin-top:20px;
 }
 
 }
+
+/* TOPBAR DERECHA */
+.top-actions {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+/* CAMPANA */
+.notificacion-container {
+    position: relative;
+    font-size: 22px;
+    cursor: pointer;
+}
+
+/* PUNTO */
+.notif-dot {
+    position: absolute;
+    top: 0px;
+    right: -2px;
+    width: 8px;
+    height: 8px;
+    background: red;
+    border-radius: 50%;
+    display: none;
+}s

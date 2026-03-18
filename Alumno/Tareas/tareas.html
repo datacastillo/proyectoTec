@@ -21,7 +21,18 @@
 
 <img src="../img/logoTec.png" class="logo">
 
+<!-- DERECHA -->
+<div class="top-actions">
+
 <a href="../../frontend/index.html" class="home">🏠</a>
+
+<!-- CAMPANA -->
+<div class="notificacion-container" onclick="toggleNotificaciones()">
+    🔔
+    <span id="notif-dot" class="notif-dot"></span>
+</div>
+
+</div>
 
 </header>
 
@@ -29,15 +40,11 @@
 <div class="container">
 
 <!-- SIDEBAR -->
-
 <aside class="sidebar">
 
 <div class="user">
-
 <img src="../img/user.png" class="user-img">
-
 <span class="user-id">00000000</span>
-
 </div>
 
 <ul class="menu">
@@ -53,9 +60,7 @@
 </li>
 
 <li>
-<a href="../Kardex/kardex.html">
-KARDEX ◀
-</a>
+<a href="../Kardex/kardex.html">KARDEX ◀</a>
 </li>
 
 </ul>
@@ -64,14 +69,11 @@ KARDEX ◀
 
 
 <!-- CONTENIDO -->
-
 <main class="contenido">
 
 <div class="cards-container">
 
-
 <!-- CARD 1 -->
-
 <div class="flip-card">
 <div class="flip-card-inner">
 
@@ -82,19 +84,13 @@ KARDEX ◀
 
 <div class="flip-card-back">
 <p>Fecha: 10/06</p>
-
-<button class="btn-subir" onclick="abrirModal()">
-Subir PDF
-</button>
-
+<button class="btn-subir" onclick="abrirModal()">Subir PDF</button>
 </div>
 
 </div>
 </div>
-
 
 <!-- CARD 2 -->
-
 <div class="flip-card">
 <div class="flip-card-inner">
 
@@ -105,19 +101,13 @@ Subir PDF
 
 <div class="flip-card-back">
 <p>Fecha: 12/06</p>
-
-<button class="btn-subir" onclick="abrirModal()">
-Subir PDF
-</button>
-
+<button class="btn-subir" onclick="abrirModal()">Subir PDF</button>
 </div>
 
 </div>
 </div>
-
 
 <!-- CARD 3 -->
-
 <div class="flip-card">
 <div class="flip-card-inner">
 
@@ -128,16 +118,11 @@ Subir PDF
 
 <div class="flip-card-back">
 <p>Fecha: 15/06</p>
-
-<button class="btn-subir" onclick="abrirModal()">
-Subir PDF
-</button>
-
+<button class="btn-subir" onclick="abrirModal()">Subir PDF</button>
 </div>
 
 </div>
 </div>
-
 
 </div>
 
@@ -146,8 +131,7 @@ Subir PDF
 </div>
 
 
-<!-- MODAL SUBIR PDF -->
-
+<!-- MODAL -->
 <div id="modalPDF" class="modal">
 
 <div class="modal-content">
@@ -157,11 +141,8 @@ Subir PDF
 <input type="file" accept="application/pdf">
 
 <div class="modal-botones">
-
 <button class="btn-enviar">Subir</button>
-
 <button class="btn-cancelar" onclick="cerrarModal()">Cancelar</button>
-
 </div>
 
 </div>
@@ -171,31 +152,36 @@ Subir PDF
 
 <script>
 
+/* MODAL */
 function abrirModal(){
-document.getElementById("modalPDF").style.display="flex";
+    document.getElementById("modalPDF").style.display="flex";
 }
 
 function cerrarModal(){
-document.getElementById("modalPDF").style.display="none";
+    document.getElementById("modalPDF").style.display="none";
 }
 
-function abrirModal(){
-document.getElementById("modalPDF").style.display="flex";
-}
-
-function cerrarModal(){
-document.getElementById("modalPDF").style.display="none";
-}
-
-/* ABRIR Y CERRAR MENU HAMBURGUESA */
-
+/* MENU */
 function toggleMenu(){
-
-let sidebar = document.querySelector(".sidebar");
-
-sidebar.classList.toggle("active");
-
+    document.querySelector(".sidebar").classList.toggle("active");
 }
+
+/* NOTIFICACIONES */
+function activarNotificacion() {
+    document.getElementById("notif-dot").style.display = "block";
+}
+
+function limpiarNotificacion() {
+    document.getElementById("notif-dot").style.display = "none";
+}
+
+function toggleNotificaciones() {
+    alert("Aquí van las notificaciones 🔔");
+    limpiarNotificacion();
+}
+
+/* SIMULACIÓN */
+activarNotificacion();
 
 </script>
 

@@ -21,7 +21,18 @@
 
 <img src="../img/logoTec.png" class="logo">
 
+<!-- CONTENEDOR DERECHA -->
+<div class="top-actions">
+
 <a href="../../frontend/index.html" class="home">🏠</a>
+
+<!-- CAMPANA -->
+<div class="notificacion-container" onclick="toggleNotificaciones()">
+    🔔
+    <span id="notif-dot" class="notif-dot"></span>
+</div>
+
+</div>
 
 </header>
 
@@ -29,15 +40,11 @@
 <div class="container">
 
 <!-- SIDEBAR -->
-
 <aside class="sidebar">
 
 <div class="user">
-
 <img src="../img/user.png" class="user-img">
-
 <span class="user-id">00000000</span>
-
 </div>
 
 <ul class="menu">
@@ -62,7 +69,6 @@
 
 
 <!-- CONTENIDO -->
-
 <main class="contenido">
 
 <div class="contenedor-tabla">
@@ -91,29 +97,17 @@
 
 <tr>
 <td class="materia"></td>
-<td></td>
-<td></td>
-<td></td>
-<td></td>
-<td></td>
+<td></td><td></td><td></td><td></td><td></td>
 </tr>
 
 <tr>
 <td class="materia"></td>
-<td></td>
-<td></td>
-<td></td>
-<td></td>
-<td></td>
+<td></td><td></td><td></td><td></td><td></td>
 </tr>
 
 <tr>
 <td class="materia"></td>
-<td></td>
-<td></td>
-<td></td>
-<td></td>
-<td></td>
+<td></td><td></td><td></td><td></td><td></td>
 </tr>
 
 </table>
@@ -129,22 +123,37 @@
 </div>
 
 
-<!-- LIBRERIAS PARA PDF -->
-
+<!-- LIBRERIAS -->
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
-
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
 
 <script>
 
+/* MENU */
 function toggleMenu(){
-document.querySelector(".sidebar").classList.toggle("active");
+    document.querySelector(".sidebar").classList.toggle("active");
 }
 
+/* NOTIFICACIONES */
+function activarNotificacion() {
+    document.getElementById("notif-dot").style.display = "block";
+}
 
-/* GENERAR PDF */
+function limpiarNotificacion() {
+    document.getElementById("notif-dot").style.display = "none";
+}
 
+function toggleNotificaciones() {
+    alert("Aquí van las notificaciones 🔔");
+    limpiarNotificacion();
+}
+
+/* SIMULAR NOTIFICACIÓN */
+activarNotificacion();
+
+
+/* PDF */
 const { jsPDF } = window.jspdf;
 
 document.getElementById("btnDescargar").addEventListener("click", function(){

@@ -16,7 +16,18 @@
 
 <img src="../img/logoTec.png" class="logo" alt="Logo Tec">
 
+<!-- CONTENEDOR DERECHA -->
+<div class="top-actions">
+
 <a href="../../frontend/index.html" class="home">🏠</a>
+
+<!-- CAMPANA -->
+<div class="notificacion-container" onclick="toggleNotificaciones()">
+    🔔
+    <span id="notif-dot" class="notif-dot"></span>
+</div>
+
+</div>
 
 </header>
 
@@ -70,47 +81,27 @@
 
 <tr>
 <td class="materia">CALCULO</td>
-<td></td>
-<td></td>
-<td></td>
-<td></td>
-<td></td>
+<td></td><td></td><td></td><td></td><td></td>
 </tr>
 
 <tr>
 <td class="materia">POO</td>
-<td></td>
-<td></td>
-<td></td>
-<td></td>
-<td></td>
+<td></td><td></td><td></td><td></td><td></td>
 </tr>
 
 <tr>
 <td class="materia">BD</td>
-<td></td>
-<td></td>
-<td></td>
-<td></td>
-<td></td>
+<td></td><td></td><td></td><td></td><td></td>
 </tr>
 
 <tr>
 <td class="materia">ILOG</td>
-<td></td>
-<td></td>
-<td></td>
-<td></td>
-<td></td>
+<td></td><td></td><td></td><td></td><td></td>
 </tr>
 
 <tr>
 <td class="materia">GPS</td>
-<td></td>
-<td></td>
-<td></td>
-<td></td>
-<td></td>
+<td></td><td></td><td></td><td></td><td></td>
 </tr>
 
 </table>
@@ -124,8 +115,25 @@
 
 <script>
 function toggleMenu(){
-document.querySelector(".sidebar").classList.toggle("active");
+    document.querySelector(".sidebar").classList.toggle("active");
 }
+
+/* NOTIFICACIONES */
+function activarNotificacion() {
+    document.getElementById("notif-dot").style.display = "block";
+}
+
+function limpiarNotificacion() {
+    document.getElementById("notif-dot").style.display = "none";
+}
+
+function toggleNotificaciones() {
+    alert("Aquí van las notificaciones 🔔");
+    limpiarNotificacion();
+}
+
+/* EJEMPLO (simula notificación al cargar) */
+activarNotificacion();
 </script>
 
 </body>
