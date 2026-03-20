@@ -1,18 +1,12 @@
 <?php
-// Configuración de la base de datos
-$host     = "localhost";
-$user     = "root";     
-$password = "";          
-$dbname   = "control_escolar";
+$host = "localhost";
+$user = "root";
+$pass = "";
+$db   = "control_escolar";
 
-// conexión
-$conn = new mysqli($host, $user, $password, $dbname);
+$conexion = mysqli_connect($host, $user, $pass, $db);
 
-
-if ($conn->connect_error) {
-    die("Error de conexión: " . $conn->connect_error);
+if (!$conexion) {
+    die("Error de conexión: " . mysqli_connect_error());
 }
-
-// caracteres a UTF-8 
-$conn->set_charset("utf8");
 ?>

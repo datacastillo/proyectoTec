@@ -2,17 +2,37 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Login - Tec San Pedro</title>
+    
     <link rel="stylesheet" href="css/login.css">
 </head>
 <body>
     <div class="universo">
+        <div class="estrellas"></div>
+        
         <div class="caja-login">
-            <img src="assets/logo-tec.png" alt="Logo" class="logo">
+            <div class="encabezado-login">
+                <img src="assets/logo-tec.png" alt="Logo Tec San Pedro" class="logo">
+                
+                <div class="titulos">
+                    <h1>INICIAR SESION</h1>
+                    <p>Tec San Pedro</p>
+                </div>
+            </div>
             
-            <form>
-                <input type="email" placeholder="Correo electrónico" class="campo" required>
-                <input type="password" placeholder="Contraseña" class="campo" required>
+            <form action="login_proceso.php" method="POST">
+                <h2>INICIAR SESIÓN</h2>
+                
+                <div class="grupo-campo">
+                    <label>Correo Institucional</label>
+                    <input type="email" name="email" placeholder="ejemplo@tecsanpedro.edu.mx" class="campo" required>
+                </div>
+
+                <div class="grupo-campo">
+                    <label>Contraseña</label>
+                    <input type="password" name="password" placeholder="••••••••" class="campo" required>
+                </div>
 
                 <button type="submit" class="boton-entrar">
                     <span>ENTRAR</span>

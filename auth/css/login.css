@@ -1,116 +1,161 @@
-/* General y Reseteo */
 body, html {
     margin: 0;
     padding: 0;
     height: 100%;
-    font-family: 'Montserrat', sans-serif;
+    font-family: Arial, Helvetica, sans-serif;
     overflow: hidden; 
-    background-color: #000;
+    background-color: #020205; 
 }
 
 .universo {
     height: 100vh;
     display: flex;
-    justify-content: center; /* Centra la caja horizontalmente */
-    align-items: center;     /* Centra la caja verticalmente */
+    justify-content: center;
+    align-items: center;
     position: relative;
-    background: radial-gradient(circle at 50% 50%, #1a1a2e 0%, #000 100%);
 }
 
-/* Estrellas animadas */
-.universo::before {
-    content: "";
+.estrellas {
     position: absolute;
-    top: 0; left: 0;
     width: 100%;
     height: 100%;
     background-image: 
-        radial-gradient(1px 1px at 30px 40px, #fff, rgba(0,0,0,0)),
-        radial-gradient(1.5px 1.5px at 60px 80px, #fff, rgba(0,0,0,0)),
-        radial-gradient(1px 1px at 100px 150px, #ddd, rgba(0,0,0,0));
-    background-size: 250px 250px;
-    opacity: 0.4;
-    z-index: 1;
-    animation: estrellasParpadeo 6s linear infinite;
+        radial-gradient(1px 1px at 20px 30px, #fff, rgba(0,0,0,0)),
+        radial-gradient(1.5px 1.5px at 50px 70px, #fff, rgba(0,0,0,0)),
+        radial-gradient(1px 1px at 100px 140px, #ddd, rgba(0,0,0,0)),
+        radial-gradient(2px 2px at 150px 200px, rgba(197, 160, 89, 0.4), rgba(0,0,0,0)); 
+    background-size: 300px 300px;
+    opacity: 0.6;
+    animation: estrellasParpadeo 8s linear infinite;
 }
 
 @keyframes estrellasParpadeo {
-    0%, 100% { opacity: 0.4; }
-    50% { opacity: 0.7; }
+    0%, 100% { opacity: 0.5; }
+    50% { opacity: 0.8; }
 }
 
 .caja-login {
-    background-color: #C5A059; 
     width: 100%;
-    max-width: 360px; 
-    padding: 50px 40px;
-    border-radius: 20px; 
-    text-align: center;
+    max-width: 400px;
+    padding: 40px;
+    border-radius: 24px;
     position: relative;
     z-index: 10;
-    box-shadow: 0 15px 50px rgba(0, 0, 0, 0.5); 
-    margin: 20px; /* Margen de seguridad para celulares */
+    
+    background: rgba(10, 10, 15, 0.8);
+    backdrop-filter: blur(10px); 
+    
+    border: 2px solid #C5A059;
+    
+    box-shadow: 0 0 30px rgba(197, 160, 89, 0.3);
+    
+    margin: 20px;
+    box-sizing: border-box;
+}
+
+/* --- ENCABEZADO Y LOGO --- */
+.encabezado-login {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 15px;
+    margin-bottom: 30px;
 }
 
 .logo {
-    width: 140px; 
+    width: 70px; 
     height: auto;
-    margin-bottom: 35px;
-    filter: drop-shadow(0 6px 10px rgba(0, 0, 0, 0.4));
+}
+
+.titulos h1 {
+    color: #fff;
+    font-size: 18px;
+    margin: 0;
+    font-weight: bold;
+    letter-spacing: 1px;
+}
+
+.titulos p {
+    color: #C5A059; 
+    font-size: 10px;
+    margin: 3px 0 0 0;
+    font-weight: bold;
+    text-transform: uppercase;
+}
+
+/* --- FORMULARIO --- */
+form h2 {
+    color: #fff;
+    font-size: 20px;
+    margin: 0 0 25px 0;
+    font-weight: bold;
+    text-align: center;
+}
+
+.grupo-campo {
+    margin-bottom: 20px;
+}
+
+.grupo-campo label {
+    display: block;
+    font-size: 11px;
+    font-weight: bold;
+    margin-bottom: 8px;
+    color: #aaa; 
+    text-align: left;
+    text-transform: uppercase;
 }
 
 .campo {
-    display: block;
     width: 100%;
-    margin-bottom: 15px;
-    padding: 14px 20px;
-    border: none;
-    border-radius: 8px;
+    padding: 14px 18px;
+    border: 1px solid rgba(197, 160, 89, 0.2); 
+    border-radius: 12px;
+    
+    background-color: rgba(0, 0, 0, 0.3);
+    color: #fff; 
+    
     font-size: 14px;
-    box-sizing: border-box; 
-    background-color: #f5f5f5;
-    color: #333;
-    font-family: 'Montserrat', sans-serif;
-    transition: all 0.3s ease;
+    font-family: Arial, Helvetica, sans-serif;
+    box-sizing: border-box;
+    transition: 0.3s ease;
 }
 
 .campo:focus {
     outline: none;
-    background-color: #fff;
-    box-shadow: 0 0 0 3px rgba(94, 74, 53, 0.3);
+    border-color: #C5A059; 
+    background-color: rgba(0, 0, 0, 0.5);
+    box-shadow: 0 0 10px rgba(197, 160, 89, 0.2);
 }
 
 .boton-entrar {
     width: 100%;
-    padding: 14px 25px;
-    background-color: #000; 
-    color: #fff; 
-    border: none;
-    border-radius: 8px;
-    font-weight: 700;
+    padding: 16px;
+    
+    background-color: #000;
+    color: #C5A059;
+    
+    border: 2px solid #C5A059; 
+    border-radius: 12px;
+    font-weight: bold;
     cursor: pointer;
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-top: 15px;
+    margin-top: 25px;
     font-size: 14px;
-    text-transform: uppercase;
-    letter-spacing: 1.5px;
-    font-family: 'Orbitron', sans-serif; 
+    letter-spacing: 1px;
+    font-family: Arial, Helvetica, sans-serif;
     transition: all 0.3s ease;
 }
 
 .boton-entrar:hover {
-    background-color: #1a1a1a;
-    transform: translateY(-3px);
-    box-shadow: 0 8px 20px rgba(0,0,0,0.3);
+    background-color: #C5A059;
+    color: #000; 
+    transform: translateY(-2px);
+    box-shadow: 0 10px 20px rgba(197, 160, 89, 0.3);
 }
 
 .flecha {
-    font-size: 1.3rem;
-    transition: transform 0.3s ease;
-}
-
-.boton-entrar:hover .flecha {
-    transform: translateX(5px); 
+    font-size: 1.2rem;
 }
