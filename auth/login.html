@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Login - Tec San Pedro</title>
+    <link rel="stylesheet" href="css/login.css">
+</head>
+<body>
+    <div class="universo">
+        <div class="caja-login">
+            <img src="assets/logo-tec.png" alt="Logo" class="logo">
+            
+            <form onsubmit="event.preventDefault(); iniciarSesion()">
+                <input type="email" id="correo" placeholder="Correo electrónico" class="campo" required>
+                <input type="password" id="password" placeholder="Contraseña" class="campo" required>
+
+                <p id="mensaje-error" class="mensaje-error"></p>
+
+                <button type="submit" class="boton-entrar">
+                    <span>ENTRAR</span>
+                    <span class="flecha">&#10132;</span>
+                </button>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        async function iniciarSesion() {
+            const correo   = document.getElementById('correo').value;
+            const password = document.getElementById('password').value;
+            const msgEl    = document.getElementById('mensaje-error');
+
+            msgEl.textContent = '';
+
+            try {
+                const res  = await fetch('login.php', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+                    body: `correo=${encodeURIComponent(correo)}&password=${encodeURIComponent(password)}`
+                });
+
+                const data = await res.json();
+
+                if (data.success) {
+                    window.location.href = data.redirect;
+                } else {
+                    msgEl.textContent = data.message;
+                }
+            } catch (e) {
+                msgEl.textContent = 'Error de conexión. Intenta de nuevo.';
+            }
+        }
+    </script>
+</body>
+</html>

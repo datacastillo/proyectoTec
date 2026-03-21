@@ -1,0 +1,26 @@
+/* =========================
+   DOCENTE
+========================= */
+
+.docente{
+
+display:flex;
+
+justify-content:center;
+align-items:center;
+
+height:100%;
+
+}
+
+.docente h1{
+
+font-size:120px;
+
+color:#d9d9d9;
+
+font-weight:bold;
+
+letter-spacing:5px;
+
+}

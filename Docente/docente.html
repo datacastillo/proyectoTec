@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Docente</title>
+
+<link rel="stylesheet" href="../Plantilla/styles.css">
+
+</head>
+
+<body>
+
+<header class="topbar">
+
+<div class="menu-btn" onclick="toggleMenu()">☰</div>
+
+<img src="../img/logoTec.png" class="logo">
+
+<div class="isic">ISIC</div>
+
+<a href="../../frontend/index.html" class="home">🏠</a>
+
+</header>
+
+
+<div class="container">
+
+<!-- SIDEBAR -->
+
+<aside class="sidebar">
+
+<div class="user">
+
+<img src="../img/user.png" class="user-img">
+
+<span class="user-id">00000000</span>
+
+</div>
+
+<ul class="menu">
+
+<li>
+<a href="../Materias/index.html">MATERIAS ◀</a>
+</li>
+
+<li>
+<a href="../Calificaciones/calificaciones.html">CALIFICACIONES ◀</a>
+</li>
+
+<li>
+<a href="../Tareas/tareas.html">TAREAS ◀</a>
+</li>
+
+<li>
+<a href="../Kardex/kardex.html">KARDEX ◀</a>
+</li>
+
+</ul>
+
+</aside>
+
+
+<!-- CONTENIDO -->
+
+<main class="contenido docente">
+
+<h1>DOCENTE</h1>
+
+</main>
+
+</div>
+
+
+<script>
+
+function toggleMenu(){
+document.querySelector(".sidebar").classList.toggle("active");
+}
+
+</script>
+
+</body>
+</html>

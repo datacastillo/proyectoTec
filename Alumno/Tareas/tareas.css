@@ -1,0 +1,327 @@
+.home{
+color:white;
+text-decoration:none;
+font-size:24px;
+cursor:pointer;
+}
+
+/* =========================
+   CONTENEDOR DE CARDS
+========================= */
+
+.cards-container{
+
+display:flex;
+gap:40px;
+
+padding:60px;
+
+justify-content:flex-start;
+
+flex-wrap:wrap;
+
+}
+
+
+/* =========================
+   CARD
+========================= */
+
+.flip-card {
+
+width:200px;
+height:250px;
+
+perspective:1000px;
+
+}
+
+/* TITULO DE LA CARD */
+
+.flip-card-front h3,
+.flip-card-back h3{
+
+font-size:24px;
+
+}
+
+
+/* TEXTO DE LA CARD */
+
+.flip-card-front p,
+.flip-card-back p{
+
+font-size:16px;
+
+}
+
+
+/* =========================
+   ANIMACION
+========================= */
+
+.flip-card-inner {
+
+position:relative;
+
+width:100%;
+height:100%;
+
+transition:transform 0.8s;
+
+transform-style:preserve-3d;
+
+}
+
+.flip-card:hover .flip-card-inner{
+
+transform:rotateY(180deg);
+
+}
+
+
+/* =========================
+   CARA FRONTAL Y TRASERA
+========================= */
+
+.flip-card-front,
+.flip-card-back{
+
+position:absolute;
+
+width:100%;
+height:100%;
+
+display:flex;
+
+flex-direction:column;
+
+justify-content:center;
+
+align-items:center;
+
+border-radius:12px;
+
+backface-visibility:hidden;
+
+box-shadow:0 8px 14px rgba(0,0,0,0.2);
+
+}
+
+
+/* FRONT */
+
+.flip-card-front{
+
+background:#a9c7d3;
+
+color:#12384d;
+
+}
+
+
+/* BACK */
+
+.flip-card-back{
+
+background:#2b6671;
+
+color:white;
+
+transform:rotateY(180deg);
+
+}
+
+/* BOTON SUBIR PDF */
+
+.btn-subir{
+
+background:#12384d;
+color:white;
+
+border:none;
+
+padding:8px 15px;
+
+border-radius:6px;
+
+cursor:pointer;
+
+margin-top:10px;
+
+}
+
+.btn-subir:hover{
+
+background:#1f4f66;
+
+}
+
+
+/* MODAL */
+
+.modal{
+
+display:none;
+
+position:fixed;
+
+top:0;
+left:0;
+
+width:100%;
+height:100%;
+
+background:rgba(0,0,0,0.5);
+
+justify-content:center;
+align-items:center;
+
+}
+
+
+/* CONTENIDO DEL MODAL */
+
+.modal-content{
+
+background:white;
+
+padding:30px;
+
+border-radius:10px;
+
+display:flex;
+
+flex-direction:column;
+
+gap:20px;
+
+width:300px;
+
+text-align:center;
+
+}
+
+
+/* BOTONES DEL MODAL */
+
+.modal-botones{
+
+display:flex;
+
+justify-content:space-between;
+
+}
+
+.btn-enviar{
+
+background:#2b6671;
+
+color:white;
+
+border:none;
+
+padding:8px 16px;
+
+border-radius:6px;
+
+cursor:pointer;
+
+}
+
+.btn-cancelar{
+
+background:#999;
+
+color:white;
+
+border:none;
+
+padding:8px 16px;
+
+border-radius:6px;
+
+cursor:pointer;
+
+}
+
+/* =========================
+   BOTON HAMBURGUESA
+========================= */
+
+.menu-btn{
+display:none;
+font-size:28px;
+cursor:pointer;
+color:white;
+}
+
+
+/* =========================
+   RESPONSIVE MOVIL
+========================= */
+
+@media (max-width:768px){
+
+/* mostrar botón hamburguesa */
+.menu-btn{
+display:block;
+}
+
+/* sidebar oculto */
+.sidebar{
+position:fixed;
+left:-220px;
+top:70px;
+height:100%;
+z-index:1000;
+transition:0.3s;
+}
+
+/* sidebar visible */
+.sidebar.active{
+left:0;
+}
+
+/* layout vertical */
+.container{
+flex-direction:column;
+}
+
+/* contenido adaptable */
+.contenido{
+padding:20px;
+align-items:center;
+}
+
+/* cards centradas en móvil */
+.cards-container{
+flex-direction:column;
+align-items:center;
+padding:20px;
+gap:25px;
+}
+
+/* cards un poco más grandes para móvil */
+.flip-card{
+width:230px;
+height:260px;
+}
+
+/* modal adaptable */
+.modal-content{
+width:90%;
+max-width:320px;
+}
+
+.modal-botones{
+flex-direction:column;
+gap:10px;
+}
+
+.btn-enviar,
+.btn-cancelar{
+width:100%;
+}
+
+}

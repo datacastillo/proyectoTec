@@ -1,0 +1,12 @@
+# Carpetas pesadas
+node_modules/
+bin/
+obj/
+
+# Archivos de configuración local
+.env
+
+# Archivos temporales de sistema
+.DS_Store
+Thumbs.db
+desktop.ini

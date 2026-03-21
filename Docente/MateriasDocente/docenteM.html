@@ -1,0 +1,130 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Panel Docente</title>
+<link rel="stylesheet" href="docenteM.css">
+</head>
+
+<body>
+
+<div class="wrapper">
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+        
+        <div class="sidebar-header">
+            <img src="../../Alumno/img/logoTec.png" class="logo-tec">
+
+            <div class="user-info">
+                <img src="../img/user-icon.png">
+                <span>00000000</span>
+            </div>
+        </div>
+
+        <nav class="sidebar-nav">
+
+            <div class="menu-header" onclick="toggleSubmenu()">
+                MATERIAS <span class="arrow">▼</span>
+            </div>
+
+            <ul class="submenu">
+                <li class="sub-active" onclick="cambiarMateria('CALCULO', this)">
+                    CALCULO <span class="dot-yellow"></span>
+                </li>
+                <li onclick="cambiarMateria('ESPAÑOL', this)">
+                    ESPAÑOL <span class="dot-yellow"></span>
+                </li>
+                <li onclick="cambiarMateria('HISTORIA', this)">
+                    HISTORIA <span class="dot-yellow"></span>
+                </li>
+            </ul>
+
+            <li>
+            <a href="../TareasDocente/docenteT.html">TAREAS <span>▼</span></a>
+            </li>
+
+        </nav>
+
+    </aside>
+
+    <!-- MAIN -->
+    <main class="main-content">
+
+        <header class="topbar">
+            <a href="../../frontend/index.html" class="home-btn">🏠</a>
+            <div class="menu-toggle" onclick="toggleMenu()">☰</div>
+        </header>
+
+        <div class="content-body">
+
+            <!-- GRUPOS -->
+            <div class="grupo-selector">
+                <div class="grupo-btn active" onclick="cambiarGrupo('6A')" id="btn6A">6 A</div>
+                <div class="grupo-btn" onclick="cambiarGrupo('6B')" id="btn6B">6 B</div>
+            </div>
+
+            <!-- TABLA -->
+            <table class="calificaciones-table">
+                <thead>
+                    <tr>
+                        <th class="header-impact">6 A</th>
+                        <th>U1</th>
+                        <th>U2</th>
+                        <th>U3</th>
+                        <th>U4</th>
+                        <th>UF</th>
+                    </tr>
+                </thead>
+                <tbody id="tablaAlumnos"></tbody>
+            </table>
+
+        </div>
+
+    </main>
+
+</div>
+
+<!-- MODAL -->
+<div id="modalCalificacion" class="modal">
+    <div class="modal-content-gris">
+
+        <label>Calificacion Anterioir</label>
+        <div class="decor-line"></div>
+        <input type="text" id="calAnterior" disabled>
+
+        <label>Nueva Calificacion</label>
+        <div class="decor-line"></div>
+        <input type="number" id="calNueva">
+
+        <label>Motivo del cambio</label>
+        <div class="input-with-icon">
+
+            <!-- TOOLTIP -->
+            <div class="alert-container">
+                <input type="text" class="pill-input">
+                <span class="alert-icon">⚠</span>
+
+                <div class="tooltip">
+                    ⚠<br>
+                    AVISAR AL ALUMNO<br>
+                    QUE ESTA EN RIESGO<br>
+                    DE REPROBACION
+                </div>
+            </div>
+
+        </div>
+
+        <div class="modal-actions">
+            <button class="btn-aceptar" onclick="guardarCalificacion()">ACEPTAR</button>
+            <button class="btn-cancelar" onclick="cerrarModal()">CANCELAR</button>
+        </div>
+
+    </div>
+</div>
+
+<script src="docenteM.js"></script>
+
+</body>
+</html>

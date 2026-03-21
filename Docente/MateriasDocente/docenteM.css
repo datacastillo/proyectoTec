@@ -1,0 +1,370 @@
+:root {
+    --bg-dark: #0d2c3d;
+    --sidebar-bg: #24555e;
+    --cell-bg: #133847;
+    --name-bg: #2b6671;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: sans-serif;
+}
+
+body {
+    background: var(--bg-dark);
+    color: white;
+    height: 100vh;
+}
+
+/* LAYOUT */
+.wrapper {
+    display: flex;
+    height: 100%;
+}
+
+/* SIDEBAR */
+.sidebar {
+    width: 260px;
+    background: var(--sidebar-bg);
+}
+
+.sidebar-header {
+    padding: 20px;
+    border-bottom: 3px solid rgba(255,255,255,0.4);
+}
+
+.logo-tec {
+    width: 50%;
+}
+
+.user-info {
+    display: flex;
+    gap: 10px;
+    margin-top: 10px;
+    background: var(--name-bg);
+    padding: 8px;
+    border-radius: 20px;
+}
+
+.user-info img {
+    width: 30px;
+}
+
+/* MENU */
+.menu-header {
+    padding: 15px;
+    display: flex;
+    justify-content: space-between;
+    cursor: pointer;
+    font-weight: bold;
+    border-top: 3px solid rgba(255,255,255,0.4);
+    border-bottom: 3px solid rgba(255,255,255,0.4);
+}
+
+.submenu {
+    list-style: none;
+}
+
+.submenu li {
+    padding: 12px 25px;
+    display: flex;
+    justify-content: space-between;
+    cursor: pointer;
+    font-weight: bold;
+    border-bottom: 3px solid rgba(255,255,255,0.4);
+}
+
+.sub-active {
+    color: yellow;
+}
+
+.dot-yellow {
+    width: 8px;
+    height: 8px;
+    background: yellow;
+    border-radius: 50%;
+    display: none;
+}
+
+.sub-active .dot-yellow {
+    display: inline-block;
+}
+
+.sidebar-nav li {
+    list-style: none;
+}
+
+.sidebar-nav li a {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px;
+    text-decoration: none;
+    color: white;
+    font-weight: bold;
+    border-top: 3px solid rgba(255,255,255,0.4);
+    border-bottom: 3px solid rgba(255,255,255,0.4);
+}
+
+.sidebar-nav li a:visited,
+.sidebar-nav li a:hover,
+.sidebar-nav li a:active {
+    color: white;
+}
+
+.submenu li:hover,
+.sidebar-nav li a:hover {
+    background: rgba(255,255,255,0.1);
+}
+
+/* MAIN */
+.main-content {
+    flex: 1;
+}
+
+/* BOTÓN MENU (OCULTO EN PC) */
+.menu-toggle {
+    display: none;
+}
+
+.topbar {
+    height: 70px;
+    background: #123847;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 20px;
+}
+
+.isic-box {
+    border: 2px solid white;
+    padding: 5px 15px;
+}
+
+.content-body {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 80px;
+    height: calc(100% - 70px);
+}
+
+/* GRUPOS */
+.grupo-selector {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+}
+
+.grupo-btn {
+    border: 2px solid white;
+    padding: 20px;
+    font-family: Impact;
+    font-size: 40px;
+    opacity: 0.6;
+    cursor: pointer;
+}
+
+.grupo-btn.active {
+    opacity: 1;
+    background: rgba(255,255,255,0.1);
+}
+
+/* TABLA */
+.calificaciones-table {
+    border-collapse: collapse;
+}
+
+th, td {
+    border: 1px solid white;
+    width: 110px;
+    height: 80px;
+    text-align: center;
+    position: relative;
+}
+
+.header-impact {
+    font-family: Impact;
+    font-size: 55px;
+}
+
+td {
+    background: var(--cell-bg);
+}
+
+.student-name {
+    background: var(--name-bg);
+}
+
+/* ICONOS */
+.icon-check {
+    position: absolute;
+    bottom: 10px;
+    left: 10px;
+}
+
+.icon-edit {
+    position: absolute;
+    bottom: 10px;
+    right: 10px;
+    cursor: pointer;
+}
+
+/* MODAL */
+.modal {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.7);
+    justify-content: center;
+    align-items: center;
+}
+
+.modal-content-gris {
+    background: #bdc3c7;
+    padding: 25px;
+    border-radius: 20px;
+    width: 300px;
+    color: black;
+}
+
+.decor-line {
+    height: 2px;
+    background: #555;
+    width: 60%;
+    margin-bottom: 10px;
+}
+
+input {
+    width: 100%;
+    padding: 8px;
+    margin-bottom: 10px;
+}
+
+.pill-input {
+    border-radius: 20px;
+}
+
+/* TOOLTIP */
+.alert-container {
+    position: relative;
+    width: 100%;
+}
+
+.alert-icon {
+    position: absolute;
+    right: 10px;
+    top: 10px;
+    cursor: pointer;
+}
+
+.tooltip {
+    position: absolute;
+    bottom: 120%;
+    left: 50%;
+    transform: translateX(-50%);
+    background: #ecf0f1;
+    color: black;
+    padding: 15px;
+    border-radius: 20px;
+    width: 200px;
+    text-align: center;
+    display: none;
+}
+
+.alert-container:hover .tooltip {
+    display: block;
+}
+
+/* BOTONES */
+.modal-actions {
+    display: flex;
+    justify-content: space-between;
+}
+
+.btn-aceptar {
+    background: lime;
+    border: none;
+    padding: 10px;
+    border-radius: 20px;
+}
+
+.btn-cancelar {
+    background: red;
+    color: white;
+    border: none;
+    padding: 10px;
+    border-radius: 20px;
+}
+
+.home-btn {
+    text-decoration: none;
+    font-size: 20px;
+    color: black;
+    background: white;
+    padding: 8px 12px;
+    border-radius: 5px;
+}
+
+/* ================= MOBILE ================= */
+@media (max-width: 768px) {
+
+    /* SIDEBAR OCULTO */
+    .sidebar {
+        position: fixed;
+        left: -260px;
+        top: 0;
+        height: 100%;
+        z-index: 1000;
+        transition: 0.3s;
+    }
+
+    .sidebar.active {
+        left: 0;
+    }
+
+    /* BOTÓN ☰ SOLO EN MÓVIL */
+    .menu-toggle {
+        display: block;
+        font-size: 25px;
+        cursor: pointer;
+        background: white;
+        color: black;
+        padding: 5px 10px;
+        border-radius: 5px;
+    }
+
+    /* TOPBAR */
+    .topbar {
+        justify-content: space-between;
+    }
+
+    /* CONTENIDO */
+    .content-body {
+        flex-direction: column;
+        gap: 20px;
+        padding: 20px;
+    }
+
+    /* TABLA SCROLL */
+    .calificaciones-table {
+        display: block;
+        overflow-x: auto;
+        width: 100%;
+    }
+
+    /* MODAL */
+    .modal-content-gris {
+        width: 90%;
+    }
+}
+
+/* ================= PC FIX ================= */
+@media (min-width: 769px) {
+    .sidebar {
+        position: relative;
+        left: 0 !important;
+    }
+}

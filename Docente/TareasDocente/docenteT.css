@@ -1,0 +1,251 @@
+body {
+    margin: 0;
+    font-family: sans-serif;
+    background: #0d2c3d;
+    color: white;
+}
+
+.wrapper {
+    display: flex;
+    height: 100vh;
+}
+
+/* SIDEBAR */
+.sidebar {
+    width: 250px;
+    background: #24555e;
+}
+
+.logo-box {
+    padding: 15px;
+    border-bottom: 2px solid rgba(255,255,255,0.3);
+}
+
+.logo-tec {
+    width: 100px;
+}
+
+.user-box {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 10px;
+    border-bottom: 2px solid rgba(255,255,255,0.3);
+}
+
+/* MENU */
+.menu {
+    margin-top: 10px;
+}
+
+.menu li {
+    list-style: none;
+}
+
+.menu li a {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px;
+    text-decoration: none;
+    color: white;
+    font-weight: bold;
+    letter-spacing: 1px;
+    background: #24555e;
+    border-bottom: 2px solid rgba(255,255,255,0.3);
+}
+
+.menu li a:hover {
+    background: #2b6671;
+}
+
+.menu li a span {
+    font-size: 14px;
+}
+
+/* MAIN */
+.main {
+    flex: 1;
+}
+
+.topbar {
+    height: 70px;
+    background: #123847;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 20px;
+}
+
+/* BOTÓN MENU (OCULTO EN PC) */
+.menu-toggle {
+    display: none;
+}
+
+/* ISIC */
+.isic {
+    border: 2px solid white;
+    padding: 5px 15px;
+}
+
+/* ACCIONES */
+.top-actions {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.add-btn {
+    font-size: 25px;
+    cursor: pointer;
+}
+
+/* CASA */
+.home-btn {
+    text-decoration: none;
+    font-size: 18px;
+    color: black;
+    background: white;
+    padding: 6px 10px;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+}
+
+.home-btn:hover {
+    background: #ddd;
+}
+
+/* CARDS */
+.cards {
+    padding: 40px;
+    display: flex;
+    gap: 20px;
+}
+
+.card {
+    background: #bdc3c7;
+    color: black;
+    width: 180px;
+    height: 120px;
+    text-align: center;
+    position: relative;
+    border-radius: 10px;
+    padding-top: 20px;
+    cursor: pointer;
+}
+
+.delete-btn {
+    position: absolute;
+    right: 10px;
+    top: 5px;
+    color: red;
+}
+
+.edit-btn {
+    position: absolute;
+    left: 10px;
+    top: 5px;
+}
+
+/* TABLA */
+.hidden {
+    display: none;
+}
+
+.tabla-tarea {
+    width: 80%;
+    margin: 40px auto;
+    border-collapse: collapse;
+}
+
+.tabla-tarea th,
+.tabla-tarea td {
+    border: 1px solid white;
+    padding: 15px;
+    text-align: center;
+}
+
+.check { color: lime; }
+.cross { color: red; }
+
+/* MODAL */
+.modal {
+    display: none;
+    position: fixed;
+    inset: 0;
+    background: rgba(0,0,0,0.7);
+    justify-content: center;
+    align-items: center;
+}
+
+.modal-box {
+    background: #bdc3c7;
+    padding: 20px;
+    color: black;
+    border-radius: 10px;
+}
+
+/* ================= MOBILE ================= */
+@media (max-width: 768px) {
+
+    /* SIDEBAR OCULTO */
+    .sidebar {
+        position: fixed;
+        left: -260px;
+        top: 0;
+        height: 100%;
+        z-index: 1000;
+        transition: 0.3s;
+    }
+
+    .sidebar.active {
+        left: 0;
+    }
+
+    /* BOTÓN ☰ SOLO EN MÓVIL */
+    .menu-toggle {
+        display: block;
+        font-size: 25px;
+        cursor: pointer;
+        background: white;
+        color: black;
+        padding: 5px 10px;
+        border-radius: 5px;
+    }
+
+    /* TOPBAR */
+    .topbar {
+        justify-content: space-between;
+    }
+
+    /* CARDS */
+    .cards {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    .card {
+        width: 90%;
+    }
+
+    /* MODAL */
+    .modal-box {
+        width: 90%;
+    }
+
+    /* TABLA SCROLL */
+    .tabla-tarea {
+        display: block;
+        overflow-x: auto;
+        width: 100%;
+    }
+}
+
+/* ================= PC FIX ================= */
+@media (min-width: 769px) {
+    .sidebar {
+        position: relative;
+        left: 0 !important;
+    }
+}
