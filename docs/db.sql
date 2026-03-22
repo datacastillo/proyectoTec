@@ -202,3 +202,6 @@ VALUES (2, 'EMP-001', 'Ingeniería de Software');
 
 INSERT INTO alumnos (usuario_id, carrera_id, matricula, fecha_ingreso) 
 VALUES (3, 1, '221000118', CURDATE());
+
+ALTER TABLE usuarios 
+ADD COLUMN foto_perfil VARCHAR(255) DEFAULT 'default.png' AFTER rol;
