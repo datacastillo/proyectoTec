@@ -1,5 +1,6 @@
 <?php
 session_start();
+// Ruta para llegar a config desde Alumno/Materias/
 require_once '../../config/db.php'; 
 
 if (!isset($_SESSION['rol']) || $_SESSION['rol'] != 'alumno') {
@@ -11,14 +12,23 @@ $id_usuario = $_SESSION['id_usuario'];
 $nombreAlumno = $_SESSION['nombre'];
 $matricula = $_SESSION['matricula'];
 
-// --- NUEVA CONSULTA: Traer materias de la carrera del alumno ---
-// Buscamos la carrera_id del alumno y luego sus materias
+/**
+ * CONSULTA CORREGIDA SEGÚN TU BD:
+ * En tu script, las materias no tienen carrera_id.
+ * Se encuentran mediante la tabla de 'inscripciones'.
+ */
 $query_materias = "SELECT m.nombre, m.clave 
                    FROM materias m
-                   JOIN alumnos a ON m.carrera_id = a.carrera_id
+                   INNER JOIN grupos g ON m.id = g.materia_id
+                   INNER JOIN inscripciones i ON g.id = i.grupo_id
+                   INNER JOIN alumnos a ON i.alumno_id = a.id
                    WHERE a.usuario_id = '$id_usuario'";
 
+// Usamos $conexion que es como se llama en tu db.php
 $res_materias = mysqli_query($conexion, $query_materias);
+
+// Si Nahomi no tiene materias inscritas todavía, esta consulta fallará 
+// o saldrá vacía. No te preocupes, el código de abajo lo maneja.
 ?>
 <!DOCTYPE html>
 <html lang="es">
@@ -40,40 +50,56 @@ $res_materias = mysqli_query($conexion, $query_materias);
     <div class="container">
         <aside class="sidebar">
             <div class="user">
-                <img src="../img/user.png" class="user-img" alt="Usuario">
+                <img src="../img/user.png" class="user-img" alt="Usuario" onerror="this.src='https://ui-avatars.com/api/?name=<?php echo $nombreAlumno; ?>'">
                 <span class="user-id"><?php echo $matricula; ?></span>
             </div>
 
             <ul class="menu">
-                <li onclick="toggleMaterias()">MIS MATERIAS ▼</li>
+                <li onclick="toggleMaterias()" style="cursor:pointer; font-weight:bold; color: white; list-style: none; padding: 10px;">
+                    MIS MATERIAS ▼
+                </li>
 
-                <ul id="materiasLista" class="submenu">
+                <ul id="materiasLista" class="submenu" style="display: none; padding-left: 20px;">
                     <?php 
-                    // Generamos la lista automáticamente desde la BD
-                    if(mysqli_num_rows($res_materias) > 0) {
+                    if($res_materias && mysqli_num_rows($res_materias) > 0) {
                         while($materia = mysqli_fetch_assoc($res_materias)) {
                             $nom = $materia['nombre'];
                             $clave = $materia['clave'];
-                            echo "<li onclick=\"mostrarMateria('$clave')\">" . strtoupper($nom) . "</li>";
+                            echo "<li onclick=\"mostrarMateria('$clave')\" style='cursor:pointer; color: #ccc; padding: 5px 0; list-style: none;'>" . strtoupper($nom) . "</li>";
                         }
                     } else {
-                        echo "<li>Sin materias asignadas</li>";
+                        echo "<li style='color: #888; list-style: none; font-size: 0.8em;'>Sin materias inscritas</li>";
                     }
                     ?>
                 </ul>
 
-                <li><a href="../Calificaciones/calificaciones.php" class="menu-link">CALIFICACIONES ▼</a></li>
-                <li><a href="../Tareas/tareas.php" class="menu-link">TAREAS ▼</a></li>
-                <li><a href="../Kardex/kardex.php" class="menu-link">KARDEX ▼</a></li>
+                <li style="list-style: none;"><a href="../Calificaciones/calificaciones.php" class="menu-link" style="text-decoration: none; color: white; display: block; padding: 10px;">CALIFICACIONES</a></li>
+                <li style="list-style: none;"><a href="../Tareas/tareas.php" class="menu-link" style="text-decoration: none; color: white; display: block; padding: 10px;">TAREAS</a></li>
+                <li style="list-style: none;"><a href="../Kardex/kardex.php" class="menu-link" style="text-decoration: none; color: white; display: block; padding: 10px;">KARDEX</a></li>
             </ul>
         </aside>
 
         <main class="contenido" id="contenido">
-            <h1>BIENVENIDO, <br><span><?php echo strtoupper($nombreAlumno); ?></span></h1>
-            <p style="margin-top: 15px; color: #666;">Selecciona una materia del menú para ver tu avance académico.</p>
+            <h1>BIENVENIDO, <br><span style="color: #0044cc;"><?php echo strtoupper($nombreAlumno); ?></span></h1>
+            <p style="margin-top: 15px; color: #666;">Selecciona una materia del menú lateral para ver tu avance académico.</p>
         </main>
     </div>
 
-    <script src="script.js"></script>
+    <script>
+        // Función para abrir/cerrar el menú de materias
+        function toggleMaterias() {
+            var lista = document.getElementById("materiasLista");
+            if (lista.style.display === "none" || lista.style.display === "") {
+                lista.style.display = "block";
+            } else {
+                lista.style.display = "none";
+            }
+        }
+
+        // Función para cuando hagas clic en una materia (puedes programar la carga de datos aquí)
+        function mostrarMateria(clave) {
+            document.getElementById('contenido').innerHTML = "<h1>Cargando materia: " + clave + "</h1><p>Aquí aparecerán las unidades y tareas de esta materia.</p>";
+        }
+    </script>
 </body>
 </html>
