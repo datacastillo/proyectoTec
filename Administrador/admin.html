@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panel Administrador | ISIC</title>
+
+    <link rel="stylesheet" href="admin.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
+</head>
+
+<body>
+
+<div class="app-container">
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar" id="sidebar">
+
+        <div class="brand-section">
+            <img src="../Alumno/img/logoTec.png" alt="Logo TEC" class="logo-img">
+        </div>
+
+        <div class="user-profile">
+            <i class="fas fa-user-circle user-icon"></i>
+            <span class="user-id">00000000</span>
+        </div>
+
+        <nav class="sidebar-nav">
+            <ul>
+                <li class="nav-item active" onclick="mostrarSeccion('alumnos')">
+                    ALUMNOS
+                </li>
+
+                <li class="nav-item" onclick="mostrarSeccion('docentes')">
+                    DOCENTES
+                </li>
+
+                <li class="nav-item" onclick="mostrarSeccion('fichas')">
+                    FICHAS
+                </li>
+            </ul>
+        </nav>
+
+    </aside>
+
+    <!-- CONTENIDO -->
+    <main class="main-content">
+
+        <!-- HEADER -->
+        <header class="main-header">
+            <div class="header-left">
+                <div class="menu-btn" onclick="toggleMenu()">☰</div>
+            </div>
+
+            <div class="header-right">
+                <a href="../index.html" class="home-icon">🏠</a>
+            </div>
+        </header>
+
+        <!-- ===== ALUMNOS ===== -->
+        <section class="content-body seccion" id="alumnos">
+
+            <div class="page-header">
+                <h2>Alumnos</h2>
+                <button class="btn-primary" onclick="abrirModal('ALUMNO')">+ Nuevo Alumno</button>
+            </div>
+
+            <div class="table-container">
+                <table class="user-table">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>NOMBRE</th>
+                            <th>GRUPO</th>
+                            <th>ACCIONES</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tablaAlumnos"></tbody>
+                </table>
+            </div>
+
+        </section>
+
+        <!-- ===== DOCENTES ===== -->
+        <section class="content-body seccion" id="docentes" style="display:none;">
+
+            <div class="page-header">
+                <h2>Docentes</h2>
+                <button class="btn-primary" onclick="abrirModal('DOCENTE')">+ Nuevo Docente</button>
+            </div>
+
+            <div class="table-container">
+                <table class="user-table">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>NOMBRE</th>
+                            <th>MATERIA</th>
+                            <th>ACCIONES</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tablaDocentes"></tbody>
+                </table>
+            </div>
+
+        </section>
+
+        <!-- ===== FICHAS ===== -->
+        <section class="content-body seccion" id="fichas" style="display:none;">
+
+            <div class="page-header">
+                <h2>Fichas (Solicitudes)</h2>
+            </div>
+
+            <div class="table-container">
+                <table class="user-table">
+                    <thead>
+                        <tr>
+                            <th>NOMBRE</th>
+                            <th>TIPO</th>
+                            <th>ESTADO</th>
+                            <th>ACCIONES</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tablaFichas"></tbody>
+                </table>
+            </div>
+
+        </section>
+
+    </main>
+
+</div>
+
+<!-- ===== MODAL ===== -->
+<div id="userModal" class="modal-overlay">
+
+    <div class="modal-content">
+
+        <div class="modal-header">
+            <h3 id="modalTitle">Nuevo Usuario</h3>
+            <span class="close-modal" onclick="cerrarModal()">&times;</span>
+        </div>
+
+        <form id="userForm">
+
+            <input type="hidden" id="userId">
+
+            <div class="form-group">
+                <label>Nombre Completo</label>
+                <input type="text" id="userName" required>
+            </div>
+
+            <div class="form-group">
+                <label id="extraLabel">Grupo / Materia</label>
+                <input type="text" id="userExtra">
+            </div>
+
+            <div class="modal-footer">
+                <button type="button" class="btn-secondary" onclick="cerrarModal()">CANCELAR</button>
+                <button type="submit" class="btn-primary">GUARDAR</button>
+            </div>
+
+        </form>
+
+    </div>
+
+</div>
+
+<script src="admin.js"></script>
+
+</body>
+</html>
