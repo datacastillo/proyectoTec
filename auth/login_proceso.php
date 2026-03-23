@@ -14,16 +14,16 @@ if (file_exists($path_db)) {
 // 3. Verificamos que los datos lleguen del formulario
 if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['email'])) {
     
-    // Usamos 'email' porque así se llama el campo en tu login.html
+    // Limpiamos el email de espacios accidentales
     $email = trim($_POST['email']);
     $password = $_POST['password']; 
 
-    // 4. Verificamos la variable de conexión de tu db.php ($conexion)
+    // 4. Verificamos la variable de conexión ($conexion) definida en db.php
     if (!isset($conexion)) {
         die("Error: La variable \$conexion no está definida en db.php");
     }
 
-    // 5. Consulta SQL con LEFT JOIN para traer los datos del alumno
+    // 5. Consulta SQL con LEFT JOIN para traer datos de alumno si existen
     $sql = "SELECT u.*, a.id as alumno_id, a.matricula 
             FROM usuarios u 
             LEFT JOIN alumnos a ON u.id = a.usuario_id 
@@ -36,28 +36,37 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['email'])) {
         $usuario = mysqli_fetch_assoc($result);
 
         if ($usuario) {
+            // --- SOLUCIÓN PARA CHAR(60) ---
+            // trim() elimina los espacios en blanco que MySQL añade al final en campos CHAR
             $pass_db = trim($usuario['password']);
 
-            // 6. VALIDACIÓN: Compara texto plano (como el 'pass123' de Nahomi) o Hash
+            // 6. VALIDACIÓN: Compara texto plano (pass123) O Hash encriptado
             if ($password === $pass_db || password_verify($password, $pass_db)) {
                 
-                // Guardamos los datos en la sesión
+                // Guardamos los datos base en la sesión
                 $_SESSION['id_usuario'] = $usuario['id'];
-                $_SESSION['nombre'] = $usuario['nombre_completo'];
-                $_SESSION['rol'] = $usuario['rol'];
+                $_SESSION['nombre']     = $usuario['nombre_completo'];
+                $_SESSION['rol']        = $usuario['rol'];
 
-                // 7. REDIRECCIÓN SEGÚN TU ESTRUCTURA DE CARPETAS
+                // 7. REDIRECCIÓN SEGÚN ROL Y ESTRUCTURA DE PROYECTO
                 if ($usuario['rol'] == 'alumno') {
                     $_SESSION['alumno_id'] = $usuario['alumno_id'];
                     $_SESSION['matricula'] = $usuario['matricula'];
                     
-                    // SEGÚN TU IMAGEN: Redirigimos a Materias/Index.php porque no hay index en la raíz de Alumno
+                    // Ruta corregida a la subcarpeta de Materias
                     header("Location: ../Alumno/Materias/Index.php");
+
+                } elseif ($usuario['rol'] == 'admin') {
+                    // Ruta actualizada según el módulo de tu compañero (Administrador/admin.html)
+                    header("Location: ../Administrador/admin.html");
+
                 } elseif ($usuario['rol'] == 'docente') {
-                    // Ajusta esta ruta si tu docente también tiene subcarpetas
+                    // Ruta estándar para docentes
                     header("Location: ../Docente/index.php");
+
                 } else {
-                    header("Location: ../Admin/index.php");
+                    // Por si existe algún otro rol no definido
+                    header("Location: login.html");
                 }
                 exit();
 
@@ -65,12 +74,12 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['email'])) {
                 echo "<script>alert('Contraseña incorrecta.'); window.location.href='login.html';</script>";
             }
         } else {
-            echo "<script>alert('El correo institucional no está registrado.'); window.location.href='login.html';</script>";
+            echo "<script>alert('El correo institucional no está registrado o el usuario está inactivo.'); window.location.href='login.html';</script>";
         }
         mysqli_stmt_close($stmt);
     }
 } else {
-    // Si intentan entrar directo al archivo, mandarlos al login
+    // Si intentan entrar directo al archivo por URL, mandarlos al login
     header("Location: login.html");
     exit();
 }
