@@ -9,14 +9,16 @@ if (!isset($_SESSION['rol']) || $_SESSION['rol'] != 'alumno') {
 
 $id_usuario = $_SESSION['id_usuario'];
 $matricula = $_SESSION['matricula'];
-$nombreAlumno = $_SESSION['nombre'];
+$nombreAlumno = isset($_SESSION['nombre']) ? $_SESSION['nombre'] : 'Alumno';
 
-// CONSULTA PARA EL KARDEX (Opcional por ahora, pero lista para usar)
-// Traemos las materias de la carrera para llenar la tabla
-$query_kardex = "SELECT m.nombre, m.clave 
-                 FROM materias m
-                 JOIN alumnos a ON m.carrera_id = a.carrera_id
-                 WHERE a.usuario_id = '$id_usuario'";
+$query_kardex = "
+    SELECT m.id AS materia_id, m.nombre, m.clave 
+    FROM materias m
+    JOIN grupos g ON m.id = g.materia_id
+    JOIN inscripciones i ON g.id = i.grupo_id
+    JOIN alumnos a ON i.alumno_id = a.id
+    WHERE a.usuario_id = '$id_usuario'";
+
 $res_kardex = mysqli_query($conexion, $query_kardex);
 ?>
 <!DOCTYPE html>
@@ -38,7 +40,6 @@ $res_kardex = mysqli_query($conexion, $query_kardex);
 
         <div class="top-actions">
             <a href="../../auth/logout.php" class="home" title="Cerrar Sesión">🚪</a>
-
             <div class="notificacion-container" onclick="toggleNotificaciones()">
                 🔔
                 <span id="notif-dot" class="notif-dot"></span>
@@ -47,7 +48,6 @@ $res_kardex = mysqli_query($conexion, $query_kardex);
     </header>
 
     <div class="container">
-
         <aside class="sidebar">
             <div class="user">
                 <img src="../img/user.png" class="user-img">
@@ -64,6 +64,7 @@ $res_kardex = mysqli_query($conexion, $query_kardex);
 
         <main class="contenido">
             <div class="contenedor-tabla">
+                <h2 style="margin-bottom: 10px; color: #333;">Kardex de: <?php echo $nombreAlumno; ?></h2>
                 <div class="tabla-scroll">
                     <table id="tablaKardex" class="tabla-kardex">
                         <thead>
@@ -73,16 +74,34 @@ $res_kardex = mysqli_query($conexion, $query_kardex);
                                 <th>U2</th>
                                 <th>U3</th>
                                 <th>U4</th>
-                                <th>UF</th>
+                                <th>PROM</th>
                             </tr>
                         </thead>
                         <tbody>
                             <?php 
                             if(mysqli_num_rows($res_kardex) > 0) {
                                 while($row = mysqli_fetch_assoc($res_kardex)) {
+                                    $m_id = $row['materia_id'];
                                     echo "<tr>";
-                                    echo "<td class='grupo'>" . strtoupper($row['nombre']) . "</td>";
-                                    echo "<td>-</td><td>-</td><td>-</td><td>-</td><td>-</td>";
+                                    echo "<td class='grupo'><strong>" . strtoupper($row['clave']) . "</strong> - " . strtoupper($row['nombre']) . "</td>";
+                                    
+                                    // Buscar las calificaciones de cada unidad
+                                    for ($i=1; $i <= 4; $i++) { 
+                                        $q_n = "SELECT cu.nota_final 
+                                               FROM calificaciones_unidades cu
+                                               JOIN unidades u ON cu.unidad_id = u.id
+                                               JOIN grupos g ON u.group_id = g.id
+                                               JOIN alumnos a ON cu.alumno_id = a.id
+                                               WHERE a.usuario_id = '$id_usuario' 
+                                               AND g.materia_id = '$m_id' 
+                                               AND u.numero_unit = '$i'";
+                                        
+                                        $r_n = mysqli_query($conexion, $q_n);
+                                        $n = mysqli_fetch_assoc($r_n);
+                                        echo "<td>" . ($n ? $n['nota_final'] : '-') . "</td>";
+                                    }
+                                    
+                                    echo "<td>-</td>"; // Espacio para el promedio final
                                     echo "</tr>";
                                 }
                             } else {
@@ -96,41 +115,19 @@ $res_kardex = mysqli_query($conexion, $query_kardex);
                 </div>
             </div>
         </main>
-
     </div>
 
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
     <script>
-        /* MENU */
         function toggleMenu() {
             document.querySelector(".sidebar").classList.toggle("active");
         }
 
-        /* NOTIFICACIONES */
-        function activarNotificacion() {
-            document.getElementById("notif-dot").style.display = "block";
-        }
-
-        function limpiarNotificacion() {
-            document.getElementById("notif-dot").style.display = "none";
-        }
-
-        function toggleNotificaciones() {
-            alert("Aquí van las notificaciones 🔔");
-            limpiarNotificacion();
-        }
-
-        /* SIMULAR NOTIFICACIÓN */
-        activarNotificacion();
-
-        /* PDF */
         const { jsPDF } = window.jspdf;
-
         document.getElementById("btnDescargar").addEventListener("click", function() {
             let tabla = document.getElementById("tablaKardex");
-
             html2canvas(tabla, { scale: 2 }).then(canvas => {
                 let img = canvas.toDataURL("image/png");
                 let pdf = new jsPDF({
@@ -138,7 +135,6 @@ $res_kardex = mysqli_query($conexion, $query_kardex);
                     unit: "px",
                     format: [canvas.width, canvas.height]
                 });
-
                 pdf.addImage(img, "PNG", 0, 0, canvas.width, canvas.height);
                 pdf.save("kardex_<?php echo $matricula; ?>.pdf");
             });

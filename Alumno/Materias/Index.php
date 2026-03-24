@@ -1,6 +1,5 @@
 <?php
 session_start();
-// Ruta para llegar a config desde Alumno/Materias/
 require_once '../../config/db.php'; 
 
 if (!isset($_SESSION['rol']) || $_SESSION['rol'] != 'alumno') {
@@ -12,11 +11,7 @@ $id_usuario = $_SESSION['id_usuario'];
 $nombreAlumno = $_SESSION['nombre'];
 $matricula = $_SESSION['matricula'];
 
-/**
- * CONSULTA CORREGIDA SEGÚN TU BD:
- * En tu script, las materias no tienen carrera_id.
- * Se encuentran mediante la tabla de 'inscripciones'.
- */
+ 
 $query_materias = "SELECT m.nombre, m.clave 
                    FROM materias m
                    INNER JOIN grupos g ON m.id = g.materia_id
@@ -24,11 +19,8 @@ $query_materias = "SELECT m.nombre, m.clave
                    INNER JOIN alumnos a ON i.alumno_id = a.id
                    WHERE a.usuario_id = '$id_usuario'";
 
-// Usamos $conexion que es como se llama en tu db.php
 $res_materias = mysqli_query($conexion, $query_materias);
 
-// Si Nahomi no tiene materias inscritas todavía, esta consulta fallará 
-// o saldrá vacía. No te preocupes, el código de abajo lo maneja.
 ?>
 <!DOCTYPE html>
 <html lang="es">
@@ -96,7 +88,7 @@ $res_materias = mysqli_query($conexion, $query_materias);
             }
         }
 
-        // Función para cuando hagas clic en una materia (puedes programar la carga de datos aquí)
+        // Función para cuando se haga clic en una materia
         function mostrarMateria(clave) {
             document.getElementById('contenido').innerHTML = "<h1>Cargando materia: " + clave + "</h1><p>Aquí aparecerán las unidades y tareas de esta materia.</p>";
         }
