@@ -1,4 +1,3 @@
-/* VARIABLES INSTITUCIONALES IT SAN PEDRO */
 :root { 
     --blue: #650a0a;    
     --gold: #B38E5D;    
@@ -17,7 +16,6 @@ body {
     min-height: 100vh; 
 }
 
-/* BARRA SUPERIOR */
 .top-bar { 
     width: 100%; 
     height: 5px; 
@@ -27,7 +25,6 @@ body {
     z-index: 1000;
 }
 
-/* TARJETA DE REGISTRO */
 .registration-card { 
     background: white; 
     width: 90%; 
@@ -37,7 +34,6 @@ body {
     box-shadow: 0 10px 25px rgba(0,0,0,0.1); 
 }
 
-/* CABECERA */
 .logo-min { 
     width: 55px; 
     display: block; 
@@ -59,7 +55,6 @@ body {
     margin-top: 5px; 
 }
 
-/* FORMULARIO */
 .instruction-box { 
     border-left: 4px solid var(--gold); 
     background: #fdfdfd; 
@@ -110,7 +105,6 @@ body {
     outline: none;
 }
 
-/* BOTONES */
 .form-actions { 
     display: flex; 
     gap: 12px; 
@@ -155,7 +149,6 @@ body {
     font-size: 1rem;
 }
 
-/*  DISEÑO DE IMPRESIÓN (PDF)  */
 .ficha-limpia-print { 
     text-align: left; 
     display: none; 
@@ -165,7 +158,6 @@ body {
     @page { margin: 1cm; size: letter; }
     body { background: white; }
     
-    /* Ocultar elementos innecesarios */
     .no-print, .top-bar, .card-header, #form-ficha, .btn-print, .system-footer { 
         display: none !important; 
     }
@@ -181,7 +173,6 @@ body {
         display: block !important; 
     }
     
-    /* Encabezado PDF */
     .header-oficial-print { 
         display: flex; 
         align-items: center; 
@@ -208,7 +199,6 @@ body {
         color: #444; 
     }
 
-    /* Caja del Folio */
     .folio-box-limpio { 
         text-align: center; 
         margin-bottom: 40px; 
@@ -230,7 +220,6 @@ body {
         letter-spacing: 2px;
     }
 
-    /* Lista de Datos */
     .dato-item { 
         display: flex; 
         justify-content: space-between; 
@@ -250,7 +239,6 @@ body {
         color: #000;
     }
 
-    /* Footer PDF con Iconos Alineados */
     .footer-oficial-print { 
         margin-top: 80px; 
         text-align: center; 
@@ -264,7 +252,6 @@ body {
         margin: 4px 0;
     }
     
-    /* Firma */
     .firma-container {
         display: flex;
         justify-content: space-around;

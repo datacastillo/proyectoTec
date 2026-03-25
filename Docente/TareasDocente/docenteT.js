@@ -9,17 +9,14 @@ let entregas = {
     LUIS: { entrego: true, cal: 80 }
 };
 
-/* NAVEGACIÓN */
 function ir(pagina) {
     window.location.href = pagina;
 }
 
-/* GUARDAR LOCAL */
 function guardarLocal() {
     localStorage.setItem("docenteT", JSON.stringify(tareas));
 }
 
-/* RENDER CARDS */
 function render() {
     const cont = document.getElementById("cards");
     cont.innerHTML = "";
@@ -35,20 +32,17 @@ function render() {
     });
 }
 
-/* VER TABLA */
 function verTarea() {
     document.getElementById("cards").style.display = "none";
     document.getElementById("vistaTarea").classList.remove("hidden");
     renderTabla();
 }
 
-/* VOLVER */
 function volver() {
     document.getElementById("cards").style.display = "flex";
     document.getElementById("vistaTarea").classList.add("hidden");
 }
 
-/* TABLA */
 function renderTabla() {
     const tbody = document.getElementById("tablaTarea");
     tbody.innerHTML = "";
@@ -66,7 +60,6 @@ function renderTabla() {
     });
 }
 
-/* EDITAR CAL */
 function editarCal(nombre) {
     let nueva = prompt("Nueva calificación:");
     if (nueva) {
@@ -75,7 +68,6 @@ function editarCal(nombre) {
     }
 }
 
-/* MODAL */
 function abrirModal() {
     editIndex = null;
     document.getElementById("modal").style.display = "flex";

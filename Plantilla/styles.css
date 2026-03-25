@@ -3,8 +3,6 @@ margin:0;
 font-family:Arial;
 }
 
-/* BARRA SUPERIOR */
-
 .topbar{
 position:fixed;
 top:0;
@@ -19,8 +17,6 @@ padding:0 40px;
 color:white;
 }
 
-/* logo + ISIC */
-
 .logo-area{
 display:flex;
 align-items:center;
@@ -31,35 +27,24 @@ gap:20px;
 height:45px;
 }
 
-/* palabra ISIC */
-
 .isic{
 position: relative;
 left: 90px;
 font-size: 40px;
 font-weight: bold;
-
 }
-
-/* casa */
 
 .home{
 font-size:25px;
-margin-right:40px; /* mueve la casita hacia la izquierda */
+margin-right:40px; 
 cursor:pointer;
 }
-
-
-/* CONTENEDOR */
 
 .container{
 display:flex;
 margin-top:70px;
 height:calc(100vh - 70px);
 }
-
-
-/* BARRA IZQUIERDA */
 
 .sidebar{
 width:220px;
@@ -92,9 +77,6 @@ font-weight:bold;
 background:#1e4d58;
 }
 
-
-/* CONTENIDO */
-
 .contenido{
 margin-left:220px;
 width:100%;
@@ -104,9 +86,6 @@ align-items:center;
 justify-content:center;
 position:relative;
 }
-
-
-/* VENTANAS */
 
 .ventana{
 display:none;

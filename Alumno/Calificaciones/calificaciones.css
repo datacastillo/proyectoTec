@@ -5,21 +5,11 @@ font-size:24px;
 cursor:pointer;
 }
 
-
-/* =========================
-   ESTILO GENERAL
-========================= */
-
 body{
 margin:0;
 font-family:Arial, Helvetica, sans-serif;
 background:#0f3145;
 }
-
-
-/* =========================
-   BARRA SUPERIOR
-========================= */
 
 .topbar{
 height:70px;
@@ -42,20 +32,10 @@ cursor:pointer;
 color:white;
 }
 
-
-/* =========================
-   LAYOUT GENERAL
-========================= */
-
 .container{
 display:flex;
 height:calc(100vh - 70px);
 }
-
-
-/* =========================
-   SIDEBAR
-========================= */
 
 .sidebar{
 width:220px;
@@ -63,11 +43,6 @@ background:#2b6671;
 color:white;
 transition:0.3s;
 }
-
-
-/* =========================
-   USUARIO
-========================= */
 
 .user{
 display:flex;
@@ -88,11 +63,6 @@ font-size:18px;
 font-weight:bold;
 }
 
-
-/* =========================
-   MENU
-========================= */
-
 .sidebar ul{
 list-style:none;
 padding:0;
@@ -110,9 +80,6 @@ transition:0.2s;
 background:#214f58;
 }
 
-
-/* LINKS MENU */
-
 .sidebar a,
 .sidebar a:visited,
 .sidebar a:hover,
@@ -123,18 +90,10 @@ display:block;
 width:100%;
 }
 
-
-/* OPCION ACTIVA */
-
 .activo{
 background:#214f58;
 font-weight:bold;
 }
-
-
-/* =========================
-   CONTENIDO
-========================= */
 
 .contenido{
 flex:1;
@@ -150,10 +109,6 @@ overflow-x:auto;
 width:720px;
 }
 
-
-/* =========================
-   TABLA CALIFICACIONES
-========================= */
 
 .tabla-calificaciones{
 border-collapse:collapse;
@@ -181,10 +136,6 @@ font-weight:bold;
 width:160px;
 }
 
-
-/* =========================
-   RESPONSIVE MOVIL
-========================= */
 
 @media (max-width:768px){
 
@@ -234,14 +185,12 @@ width:120px;
     gap: 15px;
 }
 
-/* CAMPANA */
 .notificacion-container {
     position: relative;
     font-size: 22px;
     cursor: pointer;
 }
 
-/* PUNTO ROJO */
 .notif-dot {
     position: absolute;
     top: 0px;

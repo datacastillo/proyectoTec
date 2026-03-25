@@ -18,13 +18,11 @@ body {
     height: 100vh;
 }
 
-/* LAYOUT */
 .wrapper {
     display: flex;
     height: 100%;
 }
 
-/* SIDEBAR */
 .sidebar {
     width: 260px;
     background: var(--sidebar-bg);
@@ -52,7 +50,6 @@ body {
     width: 30px;
 }
 
-/* MENU */
 .menu-header {
     padding: 15px;
     display: flex;
@@ -119,12 +116,10 @@ body {
     background: rgba(255,255,255,0.1);
 }
 
-/* MAIN */
 .main-content {
     flex: 1;
 }
 
-/* BOTÓN MENU (OCULTO EN PC) */
 .menu-toggle {
     display: none;
 }
@@ -151,7 +146,6 @@ body {
     height: calc(100% - 70px);
 }
 
-/* GRUPOS */
 .grupo-selector {
     display: flex;
     flex-direction: column;
@@ -172,7 +166,6 @@ body {
     background: rgba(255,255,255,0.1);
 }
 
-/* TABLA */
 .calificaciones-table {
     border-collapse: collapse;
 }
@@ -198,7 +191,6 @@ td {
     background: var(--name-bg);
 }
 
-/* ICONOS */
 .icon-check {
     position: absolute;
     bottom: 10px;
@@ -212,7 +204,6 @@ td {
     cursor: pointer;
 }
 
-/* MODAL */
 .modal {
     display: none;
     position: fixed;
@@ -247,7 +238,6 @@ input {
     border-radius: 20px;
 }
 
-/* TOOLTIP */
 .alert-container {
     position: relative;
     width: 100%;
@@ -278,7 +268,6 @@ input {
     display: block;
 }
 
-/* BOTONES */
 .modal-actions {
     display: flex;
     justify-content: space-between;
@@ -308,10 +297,7 @@ input {
     border-radius: 5px;
 }
 
-/* ================= MOBILE ================= */
 @media (max-width: 768px) {
-
-    /* SIDEBAR OCULTO */
     .sidebar {
         position: fixed;
         left: -260px;
@@ -325,7 +311,6 @@ input {
         left: 0;
     }
 
-    /* BOTÓN ☰ SOLO EN MÓVIL */
     .menu-toggle {
         display: block;
         font-size: 25px;
@@ -336,32 +321,27 @@ input {
         border-radius: 5px;
     }
 
-    /* TOPBAR */
     .topbar {
         justify-content: space-between;
     }
 
-    /* CONTENIDO */
     .content-body {
         flex-direction: column;
         gap: 20px;
         padding: 20px;
     }
 
-    /* TABLA SCROLL */
     .calificaciones-table {
         display: block;
         overflow-x: auto;
         width: 100%;
     }
 
-    /* MODAL */
     .modal-content-gris {
         width: 90%;
     }
 }
 
-/* ================= PC FIX ================= */
 @media (min-width: 769px) {
     .sidebar {
         position: relative;

@@ -11,11 +11,6 @@ font-family:Arial, Helvetica, sans-serif;
 background:#0f3145;
 }
 
-
-/* =========================
-   BARRA SUPERIOR
-========================= */
-
 .topbar{
 height:70px;
 background:#2b6671;
@@ -26,36 +21,20 @@ padding:0 20px;
 color:white;
 }
 
-
-/* BOTON HAMBURGUESA */
-
 .menu-btn{
 display:none;
 font-size:30px;
 cursor:pointer;
 }
 
-
-/* LOGO */
-
 .logo{
 height:45px;
 }
-
-
-/* =========================
-   LAYOUT GENERAL
-========================= */
 
 .container{
 display:flex;
 height:calc(100vh - 70px);
 }
-
-
-/* =========================
-   BARRA LATERAL
-========================= */
 
 .sidebar{
 width:220px;
@@ -63,11 +42,6 @@ background:#2b6671;
 color:white;
 transition:0.3s;
 }
-
-
-/* =========================
-   USUARIO
-========================= */
 
 .user{
 display:flex;
@@ -88,11 +62,6 @@ font-size:18px;
 font-weight:bold;
 }
 
-
-/* =========================
-   MENU
-========================= */
-
 .sidebar ul{
 list-style:none;
 padding:0;
@@ -109,11 +78,6 @@ transition:0.2s;
 .sidebar li:hover{
 background:#2b6671;
 }
-
-
-/* =========================
-   SUBMENU MATERIAS
-========================= */
 
 .submenu{
 display:none;
@@ -132,11 +96,6 @@ background:#2b6671;
 background:#214f58;
 }
 
-
-/* =========================
-   CONTENIDO PRINCIPAL
-========================= */
-
 .contenido{
 flex:1;
 display:flex;
@@ -146,11 +105,6 @@ color:white;
 font-size:60px;
 }
 
-
-/* =========================
-   CONTENIDO DE MATERIAS
-========================= */
-
 .materia-container{
 display:flex;
 flex-direction:column;
@@ -159,15 +113,11 @@ margin-top:40px;
 width:100%;
 }
 
-/* TITULO */
-
 .titulo-materia{
 font-size:42px;
 margin-bottom:20px;
 font-weight:bold;
 }
-
-/* BLOQUE PROFESOR */
 
 .profesor-info{
 display:flex;
@@ -176,8 +126,6 @@ justify-content:center;
 position:relative;
 margin-bottom:5px;
 }
-
-/* FOTO PROFESOR */
 
 .foto-profesor{
 width:120px;
@@ -189,8 +137,6 @@ position:absolute;
 left:-140px;
 top:-10px;
 }
-
-/* BARRA PROFESOR */
 
 .barra-profesor{
 background:#255a68;
@@ -210,8 +156,6 @@ margin:0;
 font-size:14px;
 }
 
-/* DESCRIPCION */
-
 .descripcion{
 background:#255a68;
 padding:15px;
@@ -222,13 +166,7 @@ line-height:1.4;
 text-align:left;
 }
 
-
-/* =========================
-   RESPONSIVE
-========================= */
-
 @media (max-width:768px){
-
 .menu-btn{
 display:block;
 }
@@ -256,10 +194,7 @@ font-size:40px;
 .materia-container{
 margin-top:20px;
 }
-
 }
-
-/* FORZAR COLOR DE LOS LINKS DEL MENU */
 
 .sidebar li a,
 .sidebar li a:visited,

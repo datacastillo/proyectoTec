@@ -1,90 +1,54 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-<meta charset="UTF-8">
-<title>Panel Alumno</title>
-<link rel="stylesheet" href="styles.css">
+    <meta charset="UTF-8">
+    <title>Panel Alumno</title>
+    <link rel="stylesheet" href="styles.css">
 </head>
-
 <body>
 
-<!-- BARRA SUPERIOR -->
-<header class="topbar">
+    <header class="topbar">
+        <div class="logo-area">
+            <img src="/Imagenes/logoTec.png" class="logo">
+            <h1 class="isic">ISIC</h1>
+        </div>
+        <div class="home">🏠</div>
+    </header>
 
-<div class="logo-area">
+    <div class="container">
+        <aside class="sidebar">
+            <div class="user">👤 00000000</div>
+            <ul>
+                <li onclick="cambiar('materias')">MATERIAS</li>
+                <li onclick="cambiar('calificaciones')">CALIFICACIONES</li>
+                <li onclick="cambiar('tareas')">TAREAS</li>
+                <li onclick="cambiar('kardex')">KARDEX</li>
+            </ul>
+        </aside>
 
-<img src="/Imagenes/logoTec.png" class="logo">
+        <main class="contenido">
+            <div id="materias" class="ventana active">
+                <h1>MATERIAS</h1>
+            </div>
+            <div id="calificaciones" class="ventana">
+                <h1>CALIFICACIONES</h1>
+            </div>
+            <div id="tareas" class="ventana">
+                <h1>TAREAS</h1>
+            </div>
+            <div id="kardex" class="ventana">
+                <h1>KARDEX</h1>
+            </div>
+        </main>
+    </div>
 
-<h1 class="isic">ISIC</h1>
-
-</div>
-
-<div class="home">
-🏠
-</div>
-
-</header>
-
-
-<!-- CONTENEDOR -->
-<div class="container">
-
-<!-- BARRA IZQUIERDA -->
-<aside class="sidebar">
-
-<div class="user">
-👤 00000000
-</div>
-
-<ul>
-
-<li onclick="cambiar('materias')">MATERIAS</li>
-<li onclick="cambiar('calificaciones')">CALIFICACIONES</li>
-<li onclick="cambiar('tareas')">TAREAS</li>
-<li onclick="cambiar('kardex')">KARDEX</li>
-
-</ul>
-
-</aside>
-
-
-<!-- VENTANA PRINCIPAL -->
-<main class="contenido">
-
-<div id="materias" class="ventana active">
-<h1>MATERIAS</h1>
-</div>
-
-<div id="calificaciones" class="ventana">
-<h1>CALIFICACIONES</h1>
-</div>
-
-<div id="tareas" class="ventana">
-<h1>TAREAS</h1>
-</div>
-
-<div id="kardex" class="ventana">
-<h1>KARDEX</h1>
-</div>
-
-</main>
-
-</div>
-
-
-<script>
-
-function cambiar(seccion){
-
-let ventanas = document.querySelectorAll(".ventana");
-
-ventanas.forEach(v => v.classList.remove("active"));
-
-document.getElementById(seccion).classList.add("active");
-
-}
-
-</script>
+    <script>
+        function cambiar(seccion){
+            let ventanas = document.querySelectorAll(".ventana");
+            ventanas.forEach(v => v.classList.remove("active"));
+            document.getElementById(seccion).classList.add("active");
+        }
+    </script>
 
 </body>
 </html>

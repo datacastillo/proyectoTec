@@ -8,7 +8,6 @@ let fichas = JSON.parse(localStorage.getItem("fichas")) || [
 let tipoActual = "";
 let editIndex = null;
 
-/* CAMBIO DE SECCIÓN */
 function mostrarSeccion(seccion) {
     document.querySelectorAll(".seccion").forEach(s => s.style.display = "none");
     document.getElementById(seccion).style.display = "block";
@@ -17,7 +16,6 @@ function mostrarSeccion(seccion) {
     event.currentTarget.classList.add("active");
 }
 
-/* RENDER */
 function render() {
 
     // ALUMNOS
@@ -73,7 +71,6 @@ function render() {
     }
 }
 
-/* MODAL */
 function abrirModal(tipo) {
     tipoActual = tipo;
     document.getElementById("userModal").style.display = "flex";
@@ -85,7 +82,6 @@ function cerrarModal() {
     document.getElementById("userExtra").value = "";
 }
 
-/* GUARDAR */
 document.getElementById("userForm").addEventListener("submit", function(e) {
     e.preventDefault();
 
@@ -110,7 +106,6 @@ document.getElementById("userForm").addEventListener("submit", function(e) {
     render();
 });
 
-/* CRUD */
 function eliminar(tipo, index) {
     if (tipo === "alumno") {
         alumnos.splice(index, 1);
@@ -134,7 +129,6 @@ function editar(tipo, index) {
     abrirModal(tipoActual);
 }
 
-/*Icono Hamburguesa*/
 function toggleMenu() {
     document.getElementById("sidebar").classList.toggle("active");
 }
@@ -152,5 +146,4 @@ function rechazar(index) {
     render();
 }
 
-/* INIT */
 render();

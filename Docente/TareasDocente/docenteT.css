@@ -10,7 +10,6 @@ body {
     height: 100vh;
 }
 
-/* SIDEBAR */
 .sidebar {
     width: 250px;
     background: #24555e;
@@ -33,7 +32,6 @@ body {
     border-bottom: 2px solid rgba(255,255,255,0.3);
 }
 
-/* MENU */
 .menu {
     margin-top: 10px;
 }
@@ -63,7 +61,6 @@ body {
     font-size: 14px;
 }
 
-/* MAIN */
 .main {
     flex: 1;
 }
@@ -77,18 +74,15 @@ body {
     padding: 0 20px;
 }
 
-/* BOTÓN MENU (OCULTO EN PC) */
 .menu-toggle {
     display: none;
 }
 
-/* ISIC */
 .isic {
     border: 2px solid white;
     padding: 5px 15px;
 }
 
-/* ACCIONES */
 .top-actions {
     display: flex;
     align-items: center;
@@ -100,7 +94,6 @@ body {
     cursor: pointer;
 }
 
-/* CASA */
 .home-btn {
     text-decoration: none;
     font-size: 18px;
@@ -116,7 +109,6 @@ body {
     background: #ddd;
 }
 
-/* CARDS */
 .cards {
     padding: 40px;
     display: flex;
@@ -148,7 +140,6 @@ body {
     top: 5px;
 }
 
-/* TABLA */
 .hidden {
     display: none;
 }
@@ -169,7 +160,6 @@ body {
 .check { color: lime; }
 .cross { color: red; }
 
-/* MODAL */
 .modal {
     display: none;
     position: fixed;
@@ -186,10 +176,7 @@ body {
     border-radius: 10px;
 }
 
-/* ================= MOBILE ================= */
 @media (max-width: 768px) {
-
-    /* SIDEBAR OCULTO */
     .sidebar {
         position: fixed;
         left: -260px;
@@ -203,7 +190,6 @@ body {
         left: 0;
     }
 
-    /* BOTÓN ☰ SOLO EN MÓVIL */
     .menu-toggle {
         display: block;
         font-size: 25px;
@@ -214,12 +200,10 @@ body {
         border-radius: 5px;
     }
 
-    /* TOPBAR */
     .topbar {
         justify-content: space-between;
     }
 
-    /* CARDS */
     .cards {
         flex-direction: column;
         align-items: center;
@@ -229,12 +213,10 @@ body {
         width: 90%;
     }
 
-    /* MODAL */
     .modal-box {
         width: 90%;
     }
 
-    /* TABLA SCROLL */
     .tabla-tarea {
         display: block;
         overflow-x: auto;
@@ -242,7 +224,6 @@ body {
     }
 }
 
-/* ================= PC FIX ================= */
 @media (min-width: 769px) {
     .sidebar {
         position: relative;

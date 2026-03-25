@@ -25,7 +25,6 @@ body {
     height: 100vh;
 }
 
-/* SIDEBAR */
 .sidebar {
     width: 260px;
     background-color: var(--sidebar-bg);
@@ -62,7 +61,6 @@ body {
     opacity: 0.7;
 }
 
-/* NAV ITEMS */
 .sidebar-nav ul {
     list-style: none;
     margin-top: 10px;
@@ -77,19 +75,16 @@ body {
     font-weight: bold;
 }
 
-/* HOVER UNIFICADO */
 .nav-item:hover {
     background: #2b6671;
     padding-left: 35px;
 }
 
-/* ACTIVO */
 .nav-item.active {
     background: #f1c40f;
     color: black;
 }
 
-/* HEADER */
 .main-content {
     flex: 1;
     display: flex;
@@ -118,7 +113,6 @@ body {
     color: white;
 }
 
-/* CONTENIDO */
 .content-body {
     padding: 40px;
     overflow-y: auto;
@@ -162,7 +156,6 @@ body {
     border-bottom: 1px solid rgba(255,255,255,0.05);
 }
 
-/* BOTONES */
 .btn-primary {
     background: var(--accent-green);
     color: white;
@@ -181,7 +174,6 @@ body {
     margin-left: 5px;
 }
 
-/* MODAL */
 .modal-overlay {
     position: fixed;
     top: 0;
@@ -214,7 +206,6 @@ body {
     color: white;
 }
 
-/* RESPONSIVE */
 @media (max-width: 768px) {
     .menu-btn { display: block; }
 
@@ -228,15 +219,13 @@ body {
     }
 }
 
-/* ===== MOBILE ===== */
+/*Vista mobil*/
 @media (max-width: 768px) {
 
-    /* Mostrar botón hamburguesa */
     .menu-btn {
         display: block;
     }
 
-    /* Sidebar oculto por defecto */
     .sidebar {
         position: fixed;
         left: -260px;
@@ -246,12 +235,10 @@ body {
         transition: left 0.3s ease;
     }
 
-    /* Sidebar visible */
     .sidebar.active {
         left: 0;
     }
 
-    /* Ajustar contenido */
     .main-content {
         width: 100%;
     }
@@ -260,7 +247,6 @@ body {
         padding: 20px;
     }
 
-    /* Tablas con scroll horizontal */
     .table-container {
         overflow-x: auto;
     }
