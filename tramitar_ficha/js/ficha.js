@@ -1,55 +1,65 @@
 function procesarRegistro() {
-    // 1. Obtención de valores
     const nom = document.getElementById('nombre').value.trim();
     const ape = document.getElementById('apellido').value.trim();
     const curp = document.getElementById('curp').value.trim();
     const correo = document.getElementById('correo').value.trim();
-    const carr = document.getElementById('carrera');
+    const carrSelect = document.getElementById('carrera');
+    const carreraId = carrSelect.value;
+    const carreraNombre = carrSelect.options[carrSelect.selectedIndex].text;
 
-    // 2. Validaciones)
+    // 2. Validaciones
     const regexCorreo = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
-    // La CURP debe tener 10 letras iniciales, luego 6 números, luego 2 caracteres finales (total 18)
     const regexCurp = /^[A-Z]{4}[0-9]{6}[A-Z]{6}[0-9A-Z]{2}$/;
 
-    // 3. Verificación de campos vacíos
-    if(!nom || !ape || !curp || !correo || !carr.value) {
-        alert(" Por favor, complete todos los campos obligatorios.");
+    if(!nom || !ape || !curp || !correo || !carreraId) {
+        alert("⚠️ Por favor, complete todos los campos obligatorios.");
         return;
     }
 
-    // 4. Validación de CURP (Longitud y Formato)
     if(curp.length !== 18) {
-        alert(" La CURP debe tener exactamente 18 caracteres.");
+        alert("⚠️ La CURP debe tener exactamente 18 caracteres.");
         return;
     }
-    
-  
-    // 5. Validación de Correo Electrónico
+
     if(!regexCorreo.test(correo)) {
-        alert(" El correo electrónico no tiene un formato válido (ejemplo@correo.com).");
+        alert("⚠️ El correo electrónico no tiene un formato válido.");
         return;
     }
 
-    // 6. Si todo está bien, generar la ficha
-    console.log("Registro exitoso para:", nom);
-    
-    // Folio solicitado
-    document.getElementById('display-folio').innerText = "TEC-2026-001";
-    
-    // Llenado de datos en la ficha de impresión
-    document.getElementById('res-nombre').innerText = (nom + " " + ape).toUpperCase();
-    document.getElementById('res-curp').innerText = curp.toUpperCase();
-    document.getElementById('res-carrera').innerText = carr.options[carr.selectedIndex].text;
-    document.getElementById('res-fecha').innerText = new Date().toLocaleDateString('es-MX', {
-        day: '2-digit',
-        month: '2-digit',
-        year: 'numeric'
-    });
+    // 3. Envío de datos al Servidor (PHP)
+    const datos = new FormData();
+    datos.append('nombre', nom);
+    datos.append('apellido', ape);
+    datos.append('curp', curp);
+    datos.append('correo', correo);
+    datos.append('carrera_id', carreraId);
 
-    // Cambiar vista: Ocultar formulario y mostrar éxito/impresión
-    document.getElementById('form-ficha').style.display = 'none';
-    document.getElementById('success-screen').style.display = 'block';
-    
-    // Subir el scroll al inicio para que vean la ficha
-    window.scrollTo(0, 0);
+    fetch('procesar_ficha.php', {
+        method: 'POST',
+        body: datos
+    })
+    .then(response => response.json())
+    .then(result => {
+        if(result.status === 'success') {
+            // Llenado de datos en la ficha con el FOLIO REAL generado por PHP
+            document.getElementById('display-folio').innerText = result.folio;
+            document.getElementById('res-nombre').innerText = (nom + " " + ape).toUpperCase();
+            document.getElementById('res-curp').innerText = curp.toUpperCase();
+            document.getElementById('res-carrera').innerText = carreraNombre;
+            document.getElementById('res-fecha').innerText = new Date().toLocaleDateString('es-MX', {
+                day: '2-digit', month: '2-digit', year: 'numeric'
+            });
+
+            // Cambiar vista
+            document.getElementById('form-ficha').style.display = 'none';
+            document.getElementById('success-screen').style.display = 'block';
+            window.scrollTo(0, 0);
+        } else {
+            alert("❌ Error en el servidor: " + result.message);
+        }
+    })
+    .catch(error => {
+        console.error("Error:", error);
+        alert("❌ Hubo un fallo en la conexión con el servidor.");
+    });
 }
