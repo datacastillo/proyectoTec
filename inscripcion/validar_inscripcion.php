@@ -1,40 +1,47 @@
 <?php
-include '../config/db.php'; 
+// 1. Conexión a la base de datos (Subimos un nivel para llegar a config)
+require_once '../config/db.php'; 
 
-// Esto es para que el navegador sepa que vamos a responder con datos (JSON)
+// 2. Cabecera para responder en formato JSON
 header('Content-Type: application/json');
 
-// Recibimos los datos que envió el JavaScript
-$folio = $_POST['folio'] ?? '';
-$curp  = $_POST['curp'] ?? '';
+// 3. Recibir y limpiar datos del formulario
+$folio = isset($_POST['folio']) ? trim($_POST['folio']) : '';
+$curp  = isset($_POST['curp']) ? strtoupper(trim($_POST['curp'])) : '';
 
 if (empty($folio) || empty($curp)) {
-    echo json_encode(['success' => false, 'message' => 'Campos vacíos']);
+    echo json_encode(['success' => false, 'message' => 'Por favor, ingresa Folio y CURP.']);
     exit;
 }
 
-// Hacemos un JOIN para traer el nombre de la carrera de la otra tabla
+// 4. Consulta Principal: Buscamos al aspirante y el nombre de su carrera
+// IMPORTANTE: Solo permite entrar si el estatus en la BD es 'aprobada'
 $sql = "SELECT s.nombre, s.apellido, s.carrera_id, c.nombre AS carrera_nombre 
         FROM solicitudes_fichas s 
         JOIN carreras c ON s.carrera_id = c.id 
-        WHERE s.folio = '$folio' AND s.curp = '$curp' AND s.estatus = 'aprobada'";
+        WHERE s.folio = ? AND s.curp = ? AND s.estatus = 'aprobada'";
 
-$result = $conn->query($sql);
+$stmt = mysqli_prepare($conexion, $sql);
+mysqli_stmt_bind_param($stmt, "ss", $folio, $curp);
+mysqli_stmt_execute($stmt);
+$result = mysqli_stmt_get_result($stmt);
 
-if ($result && $result->num_rows > 0) {
-    $row = $result->fetch_assoc();
+if ($row = mysqli_fetch_assoc($result)) {
     $id_carrera = $row['carrera_id'];
 
-    // Buscamos las materias que insertamos para esa carrera_id
-    $sql_m = "SELECT clave, nombre, creditos FROM materias WHERE carrera_id = $id_carrera";
-    $res_m = $conn->query($sql_m);
+    // 5. Consulta de Materias: Traemos las materias cargadas para esa carrera
+    $sql_m = "SELECT clave, nombre, creditos FROM materias WHERE carrera_id = ?";
+    $stmt_m = mysqli_prepare($conexion, $sql_m);
+    mysqli_stmt_bind_param($stmt_m, "i", $id_carrera);
+    mysqli_stmt_execute($stmt_m);
+    $res_m = mysqli_stmt_get_result($stmt_m);
     
     $materias = [];
-    while($m = $res_m->fetch_assoc()) {
+    while($m = mysqli_fetch_assoc($res_m)) {
         $materias[] = $m;
     }
 
-    // Si todo sale bien, mandamos success: true y los datos
+    // 6. Respuesta de éxito con todos los datos necesarios
     echo json_encode([
         'success' => true,
         'nombre' => $row['nombre'] . " " . $row['apellido'],
@@ -43,12 +50,12 @@ if ($result && $result->num_rows > 0) {
     ]);
 
 } else {
-    // Si no lo encuentra o no está aprobado
+    // 7. Respuesta de error si no coincide o no está aprobado aún
     echo json_encode([
         'success' => false, 
-        'message' => 'Aspirante no encontrado o no ha sido aprobado.'
+        'message' => 'Folio/CURP incorrectos o tu ficha aún no ha sido aprobada por la administración.'
     ]);
 }
 
-$conn->close();
+mysqli_close($conexion);
 ?>

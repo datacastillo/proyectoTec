@@ -1,13 +1,20 @@
-// Variable global para guardar el folio actual
+// Variable global para mantener el folio durante toda la sesión de inscripción
 let folioActual = "";
 
+/**
+ * 1. VALIDA EL ACCESO
+ * Se dispara cuando el aspirante ingresa Folio y CURP
+ */
 async function validarAcceso() {
-    const folio = document.getElementById('folio-input').value;
-    const curp = document.getElementById('curp-input').value;
+    const folioInput = document.getElementById('folio-input');
+    const curpInput = document.getElementById('curp-input');
+    
+    const folio = folioInput.value.trim();
+    const curp = curpInput.value.trim();
 
-    // Validar que los campos no estén vacíos antes de enviar
+    // Validar que los campos no estén vacíos
     if (!folio || !curp) {
-        alert("Por favor, ingresa tu Folio y CURP.");
+        alert("Por favor, ingresa tu Folio y CURP para continuar.");
         return;
     }
 
@@ -16,6 +23,7 @@ async function validarAcceso() {
     formData.append('curp', curp);
 
     try {
+        // Petición al validador PHP
         const response = await fetch('validar_inscripcion.php', {
             method: 'POST',
             body: formData
@@ -24,17 +32,18 @@ async function validarAcceso() {
         const data = await response.json();
 
         if (data.success) {
-            folioActual = folio; // Guardamos el folio para uso posterior
+            // Guardamos el folio de forma global para la función de finalizar
+            folioActual = folio; 
             
-            // Efecto visual: Ocultar acceso y mostrar expediente
+            // Transición de Interfaz: Ocultar login, mostrar expediente
             document.getElementById('modal-validacion').style.display = 'none';
             document.getElementById('contenido-principal').style.display = 'block';
             
-            // Llenar datos del encabezado
+            // Llenar datos informativos del alumno
             document.getElementById('nombre-alumno').innerText = data.nombre;
             document.getElementById('carrera-alumno').innerText = data.carrera;
 
-            // Llenar la tabla con el nuevo diseño de etiquetas (Badges)
+            // Renderizar las materias obtenidas de la BD
             const tbody = document.getElementById('lista-materias');
             tbody.innerHTML = data.materias.map(m => `
                 <tr>
@@ -46,27 +55,58 @@ async function validarAcceso() {
             `).join('');
             
         } else {
-            // Si los datos son incorrectos o el estatus no es 'aprobada'
-            alert(data.message);
+            // Error: Folio incorrecto, CURP mal escrita o estatus no 'aprobada'
+            alert("Error de validación: " + data.message);
         }
     } catch (e) {
-        console.error("Error:", e);
-        alert("Error crítico: No se pudo conectar con el servidor de validación.");
+        console.error("Error en validación:", e);
+        alert("No se pudo conectar con el servidor. Revisa tu conexión.");
     }
 }
 
 /**
- * Función que se dispara al confirmar la inscripción
+ * 2. FINALIZA LA INSCRIPCIÓN
+ * Se dispara al presionar el botón verde "CONFIRMAR E INSCRIBIR"
  */
-function finalizarInscripcion() {
-    // Generamos un número de control ficticio (Ej: 2612 + 4 dígitos)
-    const numControl = "2612" + Math.floor(1000 + Math.random() * 9000);
+async function finalizarInscripcion() {
+    // Verificación de seguridad
+    if (!folioActual) {
+        alert("Error de sesión: No se encontró un folio válido.");
+        return;
+    }
+
+    const confirmar = confirm("¿Deseas confirmar tu inscripción oficial?\n\nAl aceptar, se generará tu Número de Control y quedarás registrado como alumno.");
     
-    alert("¡INSCRIPCIÓN COMPLETADA EXITOSAMENTE!\n\n" +
-          "Aspirante: " + document.getElementById('nombre-alumno').innerText + "\n" +
-          "Número de Control: " + numControl + "\n\n" +
-          "Bienvenido a la comunidad del Tec.");
-          
-    // Redirigir al inicio después de aceptar
-    window.location.href = "../index.html"; 
+    if (!confirmar) return;
+
+    // Preparamos los datos para enviar al procesador final
+    const formData = new FormData();
+    formData.append('folio', folioActual);
+
+    try {
+        // Llamada al archivo PHP que inserta en la tabla 'alumnos'
+        const response = await fetch('confirmar_inscripcion.php', {
+            method: 'POST',
+            body: formData
+        });
+        
+        const resData = await response.json();
+
+        if (resData.success) {
+            // Éxito Total
+            alert("¡INSCRIPCIÓN COMPLETADA EXITOSAMENTE!\n\n" +
+                  "Aspirante: " + document.getElementById('nombre-alumno').innerText + "\n" +
+                  "Número de Control Oficial: " + resData.num_control + "\n\n" +
+                  "Bienvenido a la comunidad del Tec. Guarda bien tu número.");
+            
+            // Redirigir al inicio o login de alumnos
+            window.location.href = "../index.html"; 
+        } else {
+            // Error devuelto por el servidor (ej. error de SQL)
+            alert("Hubo un problema al procesar tu registro: " + resData.message);
+        }
+    } catch (error) {
+        console.error("Error al finalizar:", error);
+        alert("Error crítico al intentar registrar la inscripción.");
+    }
 }

@@ -1,5 +1,4 @@
 function procesarRegistro() {
-    // 1. Obtención de valores
     const nom = document.getElementById('nombre').value.trim();
     const ape = document.getElementById('apellido').value.trim();
     const curp = document.getElementById('curp').value.trim();

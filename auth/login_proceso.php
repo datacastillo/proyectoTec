@@ -1,30 +1,20 @@
 <?php
-// 1. Iniciamos la sesión
 session_start();
-
-// 2. Cargamos la conexión (Ruta: sube un nivel de 'auth' y entra a 'config')
 $path_db = __DIR__ . '/../config/db.php';
 
 if (file_exists($path_db)) {
     require_once $path_db;
 } else {
-    die("Error crítico: No se encontró el archivo de conexión en: " . $path_db);
+    die("Error crítico: No se encontró la conexión.");
 }
 
-// 3. Verificamos que los datos lleguen del formulario
 if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['email'])) {
     
-    // Limpiamos el email de espacios accidentales
     $email = trim($_POST['email']);
-    $password = $_POST['password']; 
+    $password_ingresada = trim($_POST['password']); 
 
-    // 4. Verificamos la variable de conexión ($conexion) definida en db.php
-    if (!isset($conexion)) {
-        die("Error: La variable \$conexion no está definida en db.php");
-    }
-
-    // 5. Consulta SQL con LEFT JOIN para traer datos de alumno si existen
-    $sql = "SELECT u.*, a.id as alumno_id, a.matricula 
+    // Traemos todos los datos necesarios: de usuarios y de alumnos (si existe)
+    $sql = "SELECT u.id, u.nombre_completo, u.rol, u.password as pass_hash, a.matricula, a.id as alumno_id 
             FROM usuarios u 
             LEFT JOIN alumnos a ON u.id = a.usuario_id 
             WHERE u.correo = ?";
@@ -36,50 +26,48 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['email'])) {
         $usuario = mysqli_fetch_assoc($result);
 
         if ($usuario) {
-            // --- SOLUCIÓN PARA CHAR(60) ---
-            // trim() elimina los espacios en blanco que MySQL añade al final en campos CHAR
-            $pass_db = trim($usuario['password']);
+            $acceso_concedido = false;
 
-            // 6. VALIDACIÓN: Compara texto plano (pass123) O Hash encriptado
-            if ($password === $pass_db || password_verify($password, $pass_db)) {
-                
-                // Guardamos los datos base en la sesión
+            // LÓGICA DE VALIDACIÓN POR ROL
+            if ($usuario['rol'] == 'alumno') {
+                // Para alumnos: La "contraseña" es su Matrícula
+                if ($password_ingresada === $usuario['matricula']) {
+                    $acceso_concedido = true;
+                }
+            } else {
+                // Para Admin/Docentes: Usamos la contraseña (hash) de la tabla usuarios
+                if (password_verify($password_ingresada, trim($usuario['pass_hash']))) {
+                    $acceso_concedido = true;
+                }
+            }
+
+            if ($acceso_concedido) {
+                // Seteamos las variables de sesión que tus otros archivos necesitan
                 $_SESSION['id_usuario'] = $usuario['id'];
                 $_SESSION['nombre']     = $usuario['nombre_completo'];
                 $_SESSION['rol']        = $usuario['rol'];
+                $_SESSION['matricula']  = $usuario['matricula'] ?? 'N/A';
+                $_SESSION['alumno_id']  = $usuario['alumno_id'] ?? null;
 
-                // 7. REDIRECCIÓN SEGÚN ROL Y ESTRUCTURA DE PROYECTO
+                // Redirecciones
                 if ($usuario['rol'] == 'alumno') {
-                    $_SESSION['alumno_id'] = $usuario['alumno_id'];
-                    $_SESSION['matricula'] = $usuario['matricula'];
-                    
-                    // Ruta corregida a la subcarpeta de Materias
-                    header("Location: ../Alumno/Materias/Index.php");
-
+                    header("Location: ../Alumno/Materias/index.php");
                 } elseif ($usuario['rol'] == 'admin') {
-                    // Ruta actualizada según el módulo de tu compañero (Administrador/admin.html)
                     header("Location: ../Administrador/admin.html");
-
-                } elseif ($usuario['rol'] == 'docente') {
-                    // Ruta estándar para docentes
-                    header("Location: ../Docente/index.php");
-
                 } else {
-                    // Por si existe algún otro rol no definido
-                    header("Location: login.html");
+                    header("Location: ../Docente/index.php");
                 }
                 exit();
-
             } else {
-                echo "<script>alert('Contraseña incorrecta.'); window.location.href='login.html';</script>";
+                $msg = ($usuario['rol'] == 'alumno') ? 'Matrícula incorrecta.' : 'Contraseña incorrecta.';
+                echo "<script>alert('$msg'); window.location.href='login.html';</script>";
             }
         } else {
-            echo "<script>alert('El correo institucional no está registrado o el usuario está inactivo.'); window.location.href='login.html';</script>";
+            echo "<script>alert('El correo no está registrado.'); window.location.href='login.html';</script>";
         }
         mysqli_stmt_close($stmt);
     }
 } else {
-    // Si intentan entrar directo al archivo por URL, mandarlos al login
     header("Location: login.html");
     exit();
 }

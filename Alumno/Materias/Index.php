@@ -7,16 +7,19 @@ if (!isset($_SESSION['rol']) || $_SESSION['rol'] != 'alumno') {
     exit();
 }
 
+// Estas variables ahora vienen cargadas correctamente desde tu login_proceso.php
 $id_usuario = $_SESSION['id_usuario'];
 $nombreAlumno = $_SESSION['nombre'];
 $matricula = $_SESSION['matricula'];
 
- 
+/**
+ * CONSULTA OPTIMIZADA:
+ * Buscamos las materias que pertenecen a la carrera del alumno.
+ * No usamos 'inscripciones' ni 'grupos' porque aún están vacías en tu BD.
+ */
 $query_materias = "SELECT m.nombre, m.clave 
                    FROM materias m
-                   INNER JOIN grupos g ON m.id = g.materia_id
-                   INNER JOIN inscripciones i ON g.id = i.grupo_id
-                   INNER JOIN alumnos a ON i.alumno_id = a.id
+                   INNER JOIN alumnos a ON m.carrera_id = a.carrera_id
                    WHERE a.usuario_id = '$id_usuario'";
 
 $res_materias = mysqli_query($conexion, $query_materias);
@@ -34,7 +37,7 @@ $res_materias = mysqli_query($conexion, $query_materias);
 <body>
 
     <header class="topbar">
-        <div class="menu-btn" onclick="toggleMenu()">☰</div>
+        <div class="menu-btn">☰</div>
         <img src="../img/logoTec.png" class="logo" alt="Logo Tec">
         <a href="../../auth/logout.php" class="home" title="Cerrar Sesión">🚪</a>
     </header>
@@ -42,7 +45,7 @@ $res_materias = mysqli_query($conexion, $query_materias);
     <div class="container">
         <aside class="sidebar">
             <div class="user">
-                <img src="../img/user.png" class="user-img" alt="Usuario" onerror="this.src='https://ui-avatars.com/api/?name=<?php echo $nombreAlumno; ?>'">
+                <img src="../img/user.png" class="user-img" alt="Usuario" onerror="this.src='https://ui-avatars.com/api/?name=<?php echo urlencode($nombreAlumno); ?>'">
                 <span class="user-id"><?php echo $matricula; ?></span>
             </div>
 
@@ -60,7 +63,7 @@ $res_materias = mysqli_query($conexion, $query_materias);
                             echo "<li onclick=\"mostrarMateria('$clave')\" style='cursor:pointer; color: #ccc; padding: 5px 0; list-style: none;'>" . strtoupper($nom) . "</li>";
                         }
                     } else {
-                        echo "<li style='color: #888; list-style: none; font-size: 0.8em;'>Sin materias inscritas</li>";
+                        echo "<li style='color: #888; list-style: none; font-size: 0.8em;'>Sin materias asignadas</li>";
                     }
                     ?>
                 </ul>
@@ -78,19 +81,13 @@ $res_materias = mysqli_query($conexion, $query_materias);
     </div>
 
     <script>
-        // Función para abrir/cerrar el menú de materias
         function toggleMaterias() {
             var lista = document.getElementById("materiasLista");
-            if (lista.style.display === "none" || lista.style.display === "") {
-                lista.style.display = "block";
-            } else {
-                lista.style.display = "none";
-            }
+            lista.style.display = (lista.style.display === "none" || lista.style.display === "") ? "block" : "none";
         }
 
-        // Función para cuando se haga clic en una materia
         function mostrarMateria(clave) {
-            document.getElementById('contenido').innerHTML = "<h1>Cargando materia: " + clave + "</h1><p>Aquí aparecerán las unidades y tareas de esta materia.</p>";
+            document.getElementById('contenido').innerHTML = "<h1>Materia: " + clave + "</h1><p>Contenido de la materia cargado correctamente.</p>";
         }
     </script>
 </body>
