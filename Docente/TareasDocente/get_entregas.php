@@ -1,39 +1,56 @@
 <?php
+session_start();
 require_once '../../config/db.php';
 
-$tarea_id = $_GET['tarea_id'];
+$tarea_id = $_GET['tarea_id'] ?? 0;
 
-// 1. Obtener la unidad y grupo de esta tarea para saber qué alumnos listar
-$q_info = "SELECT unidad_id FROM tareas WHERE id = '$tarea_id'";
-$r_info = mysqli_query($conexion, $q_info);
-$tarea_info = mysqli_fetch_assoc($r_info);
-$unidad_id = $tarea_info['unidad_id'];
+if (!$tarea_id) {
+    echo "<p style='color:white;'>Error: Tarea no identificada.</p>";
+    exit;
+}
 
-// 2. Traer a los alumnos inscritos en el grupo de esa unidad
-// Y hacer un LEFT JOIN con las entregas para ver quién ya subió
-$query = "SELECT u.nombre_completo, e.archivo_url, e.fecha_entrega, e.id as entrega_id
-          FROM usuarios u
-          JOIN alumnos a ON u.id = a.usuario_id
-          JOIN inscripciones i ON a.id = i.alumno_id
-          JOIN unidades un ON i.grupo_id = un.grupo_id
-          LEFT JOIN entregas e ON (e.alumno_id = a.id AND e.tarea_id = '$tarea_id')
-          WHERE un.id = '$unidad_id'";
+// Consulta usando tus nombres reales: 'entregas', 'archivo_alumno', 'puntos_obtenidos'
+$query = "SELECT e.id, a.matricula, u.nombre_completo, e.archivo_alumno, e.fecha_subida, e.puntos_obtenidos 
+          FROM entregas e
+          JOIN alumnos a ON e.alumno_id = a.id
+          JOIN usuarios u ON a.usuario_id = u.id
+          WHERE e.tarea_id = '$tarea_id'";
 
 $res = mysqli_query($conexion, $query);
 
-if(mysqli_num_rows($res) > 0) {
+if (!$res) {
+    die("<p style='color:red;'>Error en consulta: " . mysqli_error($conexion) . "</p>");
+}
+
+if (mysqli_num_rows($res) > 0) {
+    echo '<table style="width:100%; color:white; border-collapse:collapse; margin-top:10px;">
+            <thead>
+                <tr style="border-bottom:2px solid #3e92cc; color:#3e92cc;">
+                    <th style="padding:10px; text-align:left;">Alumno</th>
+                    <th style="padding:10px; text-align:center;">Archivo</th>
+                    <th style="padding:10px; text-align:center;">Calificación</th>
+                    <th style="padding:10px; text-align:center;">Acción</th>
+                </tr>
+            </thead>
+            <tbody>';
     while($row = mysqli_fetch_assoc($res)) {
-        $estatus = $row['entrega_id'] ? "<span style='color:#00ff00;'>ENTREGADO</span>" : "<span style='color:#ff4444;'>PENDIENTE</span>";
-        $link = $row['entrega_id'] ? "<a href='../../uploads/tareas/{$row['archivo_url']}' target='_blank' style='color:#0088ff;'>Ver Archivo</a>" : "-";
+        // Mostramos los puntos_obtenidos actuales
+        $nota_actual = $row['puntos_obtenidos'] ?? '';
         
-        echo "<tr>
-                <td>".htmlspecialchars($row['nombre_completo'])."</td>
-                <td>Tarea Unidad</td>
-                <td>$link</td>
-                <td>$estatus</td>
+        echo "<tr style='border-bottom:1px solid rgba(255,255,255,0.05);'>
+                <td style='padding:10px;'>".strtoupper($row['nombre_completo'])."<br><small style='color:#666;'>{$row['matricula']}</small></td>
+                <td style='padding:10px; text-align:center;'>
+                    <a href='../../uploads/tareas/{$row['archivo_alumno']}' target='_blank' style='text-decoration:none; color:#3e92cc;'>📂 Descargar</a>
+                </td>
+                <td style='padding:10px; text-align:center;'>
+                    <input type='number' id='puntos_{$row['id']}' value='{$nota_actual}' min='0' max='100' style='width:60px; background:#0d1b2a; border:1px solid #3e92cc; color:white; text-align:center; padding:5px; border-radius:4px;'>
+                </td>
+                <td style='padding:10px; text-align:center;'>
+                    <button onclick='guardarPuntosTarea({$row['id']})' style='background:#28a745; color:white; border:none; padding:8px 12px; border-radius:4px; cursor:pointer;'>Guardar</button>
+                </td>
               </tr>";
     }
+    echo '</tbody></table>';
 } else {
-    echo "<tr><td colspan='4' style='text-align:center;'>No hay alumnos inscritos en este grupo.</td></tr>";
+    echo "<p style='color:#adb5bd; text-align:center; padding:30px;'>Aún no hay archivos entregados para esta tarea.</p>";
 }
-?>
