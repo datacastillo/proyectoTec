@@ -2,7 +2,7 @@
 session_start();
 require_once '../../config/db.php';
 
-if (!isset($_SESSION['rol']) || $_SESSION['rol'] != 'docente') {
+if (!isset($_SESSION['id_usuario']) || $_SESSION['rol'] != 'docente') {
     header("Location: ../../auth/login.html");
     exit();
 }
@@ -13,244 +13,355 @@ $nombre_docente = $_SESSION['nombre'] ?? 'Docente';
 // Obtener ID del docente
 $res_doc = mysqli_query($conexion, "SELECT id FROM docentes WHERE usuario_id = '$id_usuario'");
 $doc = mysqli_fetch_assoc($res_doc);
-$id_docente = $doc['id'];
+$id_docente = $doc['id'] ?? 0;
 
-// Consulta de unidades para el selector de tareas
-$query_unidades = "SELECT u.id, m.nombre as materia, g.nombre_grupo, u.numero_unit 
-                   FROM unidades u 
-                   JOIN grupos g ON u.grupo_id = g.id 
-                   JOIN materias m ON g.materia_id = m.id 
-                   WHERE g.docente_id = '$id_docente'";
-$res_unidades = mysqli_query($conexion, $query_unidades);
+// Obtener grupos para las tarjetas
+$query = "SELECT g.id, g.nombre_grupo, m.nombre AS materia 
+          FROM grupos g 
+          JOIN materias m ON g.materia_id = m.id 
+          WHERE g.docente_id = '$id_docente'";
+$grupos = mysqli_query($conexion, $query);
 ?>
 <!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Gestión de Tareas | ISIC</title>
-    <link rel="stylesheet" href="../docente.css">
     <style>
         :root {
-            --primary-blue: #1a3a4a;
-            --dark-blue: #0d1b2a;
-            --sidebar-blue: #142d3e;
-            --accent-blue: #3e92cc;
-            --text-light: #e0e1dd;
+            --bg-principal: #0f3145;
+            --bg-secundario: #255b68;
+            --accent: #2b6671;
+            --texto: #ffffff;
+            --subtexto: #adb5bd;
+            --exito: #2ecc71;
         }
 
-        body { 
-            background-color: var(--dark-blue); 
-            color: var(--text-light); 
-            font-family: 'Helvetica Neue', Arial, sans-serif;
-        }
-
-        .hidden { display: none !important; }
-
-        .add-btn {
-            background-color: var(--accent-blue);
-            color: white;
-            border: none;
-            width: 42px;
-            height: 42px;
-            border-radius: 8px;
-            font-size: 22px;
-            cursor: pointer;
-            margin-left: 20px;
-            transition: 0.3s;
+        body {
+            margin: 0;
             display: flex;
-            align-items: center;
-            justify-content: center;
+            min-height: 100vh;
+            background-color: var(--bg-principal);
+            color: var(--texto);
+            font-family: 'Segoe UI', sans-serif;
         }
-        .add-btn:hover { background-color: #ffffff; color: var(--primary-blue); }
 
-        .cards-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-            gap: 25px;
+        /* SIDEBAR FIJA */
+        .sidebar {
+            width: 250px;
+            min-width: 250px;
+            background-color: var(--bg-secundario);
+            border-right: 1px solid var(--accent);
+            display: flex;
+            flex-direction: column;
+            position: sticky;
+            top: 0;
+            height: 100vh;
+        }
+
+        .sidebar-header {
+            padding: 30px 20px;
+            text-align: center;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .sidebar-menu { list-style: none; padding: 0; margin: 0; }
+
+        .sidebar-menu li a {
+            display: block;
+            padding: 15px 25px;
+            color: var(--subtexto);
+            text-decoration: none;
+            transition: 0.3s;
+            border-left: 4px solid transparent;
+        }
+
+        .sidebar-menu li a:hover, .sidebar-menu li a.active {
+            background: var(--bg-principal);
+            color: white;
+            border-left: 4px solid var(--exito);
+        }
+
+        /* CONTENIDO */
+        .main-content {
+            flex: 1;
+            padding: 40px;
+            overflow-y: auto;
+        }
+
+        .card-materia {
+            background: var(--bg-secundario);
+            border: 1px solid var(--accent);
+            border-radius: 12px;
             padding: 25px;
+            cursor: pointer;
+            transition: 0.3s;
+            width: 280px;
+            text-align: center;
         }
 
-        .tarea-card {
-            background: var(--sidebar-blue);
-            border: 1px solid rgba(255,255,255,0.1);
-            padding: 20px;
+        .card-materia:hover {
+            transform: translateY(-5px);
+            border-color: var(--exito);
+        }
+
+        .btn-accion {
+            background: var(--exito);
+            color: black;
+            border: none;
+            padding: 10px 20px;
             border-radius: 5px;
             cursor: pointer;
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
-        }
-        .tarea-card:hover {
-            border-left: 5px solid var(--accent-blue);
-            background: #1c3d52;
-            transform: scale(1.02);
+            font-weight: bold;
         }
 
-        .tarea-card h3 { color: #fff; margin: 0 0 10px 0; font-weight: 600; font-size: 18px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 5px;}
-        .tarea-card p { font-size: 14px; color: #adb5bd; margin: 4px 0; }
-
+        /* MODALES */
         .modal {
             display: none;
             position: fixed;
-            top: 0; left: 0;
-            width: 100%; height: 100%;
-            background: rgba(0,0,0,0.8);
-            z-index: 9999;
-            justify-content: center;
-            align-items: center;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.85);
+            justify-content: center; align-items: center;
+            z-index: 2000;
         }
-
-        .modal-box {
-            background: var(--primary-blue);
+        
+        .modal-content {
+            background: var(--bg-secundario);
             padding: 30px;
-            border-radius: 10px;
-            width: 90%;
-            max-width: 480px;
-            color: #fff;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.5);
+            border-radius: 12px;
+            width: 450px;
+            border: 1px solid var(--accent);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
         }
 
-        .modal-box input, .modal-box textarea, .modal-box select {
+        .modal-content input, .modal-content select, .modal-content textarea {
             width: 100%;
             padding: 12px;
             margin: 10px 0;
-            background: rgba(255,255,255,0.05);
-            border: 1px solid rgba(255,255,255,0.2);
+            background: var(--bg-principal);
+            border: 1px solid var(--accent);
             color: white;
-            border-radius: 4px;
+            border-radius: 5px;
             box-sizing: border-box;
         }
 
-        .btn-submit {
-            background: var(--accent-blue);
-            color: white;
-            border: none;
-            padding: 14px;
-            width: 100%;
-            font-weight: bold;
-            border-radius: 4px;
-            cursor: pointer;
-            margin-top: 15px;
+        /* Spinner para carga de PDF */
+        .spinner {
+            border: 4px solid rgba(255, 255, 255, 0.1);
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            border-left-color: var(--exito);
+            animation: spin 1s linear infinite;
+            display: inline-block;
         }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
     </style>
 </head>
 <body>
 
-<div class="wrapper">
     <aside class="sidebar">
         <div class="sidebar-header">
-            <img src="../../img/logoTec.png" alt="Logo" style="width: 90px; filter: brightness(0) invert(1);">
-            <div style="margin-top: 15px; font-size: 14px; border-top: 1px solid rgba(255,255,255,0.1); padding-top: 15px;">
-                <span>BIENVENIDO,<br><b><?php echo strtoupper($nombre_docente); ?></b></span>
-            </div>
+            <h2 style="color: var(--exito); margin:0;">ISIC</h2>
+            <small>Docente: <?php echo htmlspecialchars($nombre_docente); ?></small>
         </div>
-        <nav class="sidebar-nav">
-            <ul>
-                <li><a href="../docente.php">🏠 INICIO</a></li>
-                <li><a href="../MateriasDocente/docenteM.php">📘 MIS MATERIAS</a></li>
-                <li><a href="../CalificacionesDocente/calificaciones.php">📝 CALIFICACIONES</a></li>
-                <li class="active"><a href="docenteT.php">📂 GESTIÓN TAREAS</a></li>
-                <li style="margin-top: 100px;"><a href="../../auth/logout.php" style="color: #ff4444;">🚪 SALIR</a></li>
-            </ul>
-        </nav>
+        <ul class="sidebar-menu">
+            <li><a href="../docente.php">🏠 INICIO</a></li>
+            <li><a href="../MateriasDocente/docenteM.php">📚 MIS MATERIAS</a></li>
+            <li><a href="../Calificaciones/calificaciones.php">📝 CALIFICACIONES</a></li>
+            <li><a href="docenteT.php" class="active">📂 TAREAS</a></li>
+        </ul>
+        <a href="../../auth/logout.php" style="margin-top:auto; padding:20px; text-align:center; color:#ffb3b3; text-decoration:none; font-weight:bold;">CERRAR SESIÓN</a>
     </aside>
 
     <main class="main-content">
-        <header class="topbar">
-            <div style="display:flex; align-items:center; padding: 0 25px; height: 70px;">
-                <div class="isic-box">MODULO DE TAREAS</div>
-                <button class="add-btn" onclick="abrirModal()" title="Nueva Tarea">+</button>
-            </div>
-        </header>
-
-        <section class="content-section">
-            <div id="cardsContainer" class="cards-grid">
-                <?php
-                $query_tareas = "SELECT t.id, t.titulo, m.nombre as materia, g.nombre_grupo 
-                                 FROM tareas t 
-                                 JOIN unidades u ON t.unidad_id = u.id 
-                                 JOIN grupos g ON u.grupo_id = g.id 
-                                 JOIN materias m ON g.materia_id = m.id 
-                                 WHERE g.docente_id = '$id_docente' ORDER BY t.id DESC";
-                $res_tareas = mysqli_query($conexion, $query_tareas);
-
-                while($row = mysqli_fetch_assoc($res_tareas)): ?>
-                    <div class="tarea-card" onclick="verEntregas(<?php echo $row['id']; ?>)">
-                        <h3><?php echo strtoupper($row['titulo']); ?></h3>
-                        <p>📘 <?php echo $row['materia']; ?></p>
-                        <p>👥 <?php echo $row['nombre_grupo']; ?></p>
+        <div id="vista_grupos">
+            <h1>Gestión de Tareas</h1>
+            <p style="color: var(--subtexto); margin-bottom: 30px;">Selecciona un grupo para gestionar actividades.</p>
+            <div style="display: flex; gap: 25px; flex-wrap: wrap;">
+                <?php while($g = mysqli_fetch_assoc($grupos)): ?>
+                    <div class="card-materia" onclick="abrirGrupo(<?php echo $g['id']; ?>, '<?php echo $g['materia']; ?>')">
+                        <div style="font-size: 2rem; margin-bottom: 10px;">📁</div>
+                        <h3><?php echo $g['materia']; ?></h3>
+                        <small style="color: var(--exito);">Grupo: <?php echo $g['nombre_grupo']; ?></small>
                     </div>
                 <?php endwhile; ?>
             </div>
+        </div>
 
-            <div id="vistaTarea" class="hidden" style="padding: 30px;">
-                <button onclick="volver()" style="background:none; color:#3e92cc; border:1px solid #3e92cc; padding:8px 20px; border-radius:4px; cursor:pointer; margin-bottom:20px;">⬅ VOLVER AL LISTADO</button>
-                <div id="entregasBody" style="background: var(--sidebar-blue); border-radius: 8px; overflow: hidden; padding: 20px;"></div>
+        <div id="vista_detalle" style="display: none;">
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                <h2 id="txt_titulo_materia"></h2>
+                <div>
+                    <button class="btn-accion" onclick="mostrarModalTarea()" style="background: var(--accent); margin-right: 10px; color: white;">+ Nueva Tarea</button>
+                    <button onclick="regresar()" style="background:none; border:1px solid var(--subtexto); color:white; padding:10px; cursor:pointer; border-radius:5px;">⬅ Volver</button>
+                </div>
             </div>
-        </section>
+            <div id="contenedor_entregas"></div>
+        </div>
     </main>
-</div>
 
-<div class="modal" id="modalTarea">
-    <div class="modal-box">
-        <form id="formNuevaTarea">
-            <h2 style="text-align: center; font-weight: 300;">NUEVA ACTIVIDAD</h2>
-            <input type="text" name="titulo" placeholder="Título de la tarea" required>
-            <textarea name="descripcion" rows="4" placeholder="Instrucciones..." required></textarea>
-            
-            <label style="display:block; margin-top:10px; font-size:12px; color:#aaa;">FECHA LÍMITE:</label>
-            <input type="date" name="fecha" required>
-            
-            <select name="unidad_id" required>
-                <option value="">Seleccionar Grupo/Materia...</option>
-                <?php mysqli_data_seek($res_unidades, 0); 
-                while($u = mysqli_fetch_assoc($res_unidades)): ?>
-                    <option value="<?php echo $u['id']; ?>">
-                        <?php echo "U{$u['numero_unit']} - {$u['materia']} ({$u['nombre_grupo']})"; ?>
-                    </option>
-                <?php endwhile; ?>
-            </select>
-            
-            <button type="submit" class="btn-submit">PUBLICAR TAREA</button>
-            <button type="button" onclick="cerrarModal()" style="width:100%; background:none; border:none; color:#aaa; cursor:pointer; margin-top:10px;">Descartar</button>
-        </form>
+    <div id="modalTarea" class="modal">
+        <div class="modal-content">
+            <h2 style="margin-top:0; color: var(--exito);">Asignar Nueva Tarea</h2>
+            <form id="formNuevaTarea">
+                <input type="hidden" name="grupo_id" id="modal_grupo_id">
+                
+                <label>Título de la tarea:</label>
+                <input type="text" name="titulo" required placeholder="Ej: Ensayo de Redes">
+                
+                <label>Unidad:</label>
+                <select name="unidad_id" id="select_unidades" required></select>
+
+                <label>Descripción:</label>
+                <textarea name="descripcion" rows="3" placeholder="Instrucciones para el alumno..."></textarea>
+
+                <button type="submit" class="btn-accion" style="width:100%; margin-top:10px;">🚀 Publicar Tarea</button>
+                <button type="button" onclick="cerrarModal()" style="width:100%; background:none; border:none; color:var(--subtexto); margin-top:10px; cursor:pointer;">Cancelar</button>
+            </form>
+        </div>
     </div>
-</div>
 
-<script>
-    function abrirModal() { document.getElementById('modalTarea').style.display = 'flex'; }
-    function cerrarModal() { document.getElementById('modalTarea').style.display = 'none'; }
+    <div id="visor_modal" class="modal" style="background: rgba(0,0,0,0.92);">
+        <div style="background: #0f3145; border: 1px solid var(--accent); border-radius: 12px; width: 95%; max-width: 1400px; height: 92vh; display: flex; flex-direction: column; overflow: hidden;">
+            
+            <div style="padding: 15px 25px; background: var(--bg-secundario); border-bottom: 1px solid var(--accent); display: flex; justify-content: space-between; align-items: center;">
+                <div>
+                    <h3 id="visor_nombre_alumno" style="margin: 0; color: var(--exito);">CARGANDO...</h3>
+                    <small id="visor_titulo_tarea" style="color: var(--subtexto);">Tarea</small>
+                </div>
+                <button onclick="cerrarVisor()" style="background:none; border:none; color:white; font-size:35px; cursor:pointer;">&times;</button>
+            </div>
+
+            <div style="flex: 1; display: flex;">
+                <div style="flex: 2; background: #1a1a1a; position: relative; border-right: 1px solid var(--accent);">
+                    <iframe id="pdf_frame" src="" style="width: 100%; height: 100%; border: none;"></iframe>
+                    <div id="pdf_loading" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); text-align: center;">
+                        <div class="spinner"></div>
+                        <p style="color: var(--subtexto); margin-top: 10px;">Cargando documento...</p>
+                    </div>
+                </div>
+
+                <div style="flex: 0.6; padding: 30px; background: #0f3145; display: flex; flex-direction: column;">
+                    <h4 style="color:white; margin-bottom: 25px;">EVALUACIÓN</h4>
+                    
+                    <label style="color: var(--subtexto); font-size: 13px;">CALIFICACIÓN (0-100):</label>
+                    <input type="number" id="visor_nota_input" min="0" max="100" step="0.1" 
+                           style="width: 100%; padding: 15px; background: #163d50; border: 2px solid var(--exito); color: var(--exito); border-radius: 8px; font-size: 32px; text-align: center; font-weight: bold; margin: 15px 0;">
+
+                    <button onclick="guardarCalificacionVisor()" id="btn_guardar_visor" class="btn-accion" style="padding: 20px; font-size: 1.1rem; margin-top: 20px;">
+                        💾 GUARDAR NOTA
+                    </button>
+                    
+                    <p style="font-size: 12px; color: var(--subtexto); line-height: 1.6; margin-top: auto;">
+                        * La nota se guardará directamente en la base de datos y se reflejará en la tabla del grupo.
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+    let grupoSeleccionado = 0;
+    let actualEntregaId = null;
+
+    // --- LÓGICA DE GRUPOS Y TAREAS ---
+    function abrirGrupo(id, nombre) {
+        grupoSeleccionado = id;
+        document.getElementById('vista_grupos').style.display = 'none';
+        document.getElementById('vista_detalle').style.display = 'block';
+        document.getElementById('txt_titulo_materia').innerText = nombre;
+        document.getElementById('modal_grupo_id').value = id;
+        cargarEntregas(id);
+    }
+
+    function cargarEntregas(id) {
+        fetch('get_entregas.php?grupo_id=' + id)
+            .then(res => res.text())
+            .then(html => { document.getElementById('contenedor_entregas').innerHTML = html; });
+    }
+
+    // --- LÓGICA DEL VISOR ---
+    function abrirVisor(entregaId, nombre, tarea, ruta, notaActual) {
+        actualEntregaId = entregaId;
+        document.getElementById('visor_nombre_alumno').innerText = nombre.toUpperCase();
+        document.getElementById('visor_titulo_tarea').innerText = tarea;
+        document.getElementById('visor_nota_input').value = (notaActual > 0) ? notaActual : "";
+        
+        const frame = document.getElementById('pdf_frame');
+        const loading = document.getElementById('pdf_loading');
+        
+        frame.style.display = 'none';
+        loading.style.display = 'block';
+        frame.src = ruta;
+
+        frame.onload = function() {
+            frame.style.display = 'block';
+            loading.style.display = 'none';
+        };
+
+        document.getElementById('visor_modal').style.display = 'flex';
+    }
+
+    function cerrarVisor() {
+        document.getElementById('visor_modal').style.display = 'none';
+        document.getElementById('pdf_frame').src = "";
+    }
+
+    function guardarCalificacionVisor() {
+        const nota = document.getElementById('visor_nota_input').value;
+        const btn = document.getElementById('btn_guardar_visor');
+
+        if (nota === "" || nota < 0 || nota > 100) {
+            alert("Ingresa una nota válida.");
+            return;
+        }
+
+        btn.innerText = "⏳ Guardando...";
+        btn.disabled = true;
+
+        const data = new FormData();
+        data.append('entrega_id', actualEntregaId);
+        data.append('nota', nota);
+
+        fetch('guardar_nota_tarea.php', { method: 'POST', body: data })
+        .then(res => res.text())
+        .then(res => {
+            if(res.trim() === "success") {
+                cargarEntregas(grupoSeleccionado); 
+                cerrarVisor();
+            } else {
+                alert("Error al guardar nota");
+            }
+        })
+        .finally(() => {
+            btn.innerText = "💾 GUARDAR NOTA";
+            btn.disabled = false;
+        });
+    }
+
+    // --- GESTIÓN DE MODAL NUEVA TAREA ---
+    function mostrarModalTarea() {
+        document.getElementById('modalTarea').style.display = 'flex';
+        fetch(`../Calificaciones/get_calificaciones_unidades.php?grupo_id=${grupoSeleccionado}&solo_unidades=1`)
+            .then(res => res.json())
+            .then(unidades => {
+                let options = unidades.map(u => `<option value="${u.id}">${u.nombre_unidad}</option>`).join('');
+                document.getElementById('select_unidades').innerHTML = options;
+            });
+    }
 
     document.getElementById('formNuevaTarea').onsubmit = function(e) {
         e.preventDefault();
-        fetch('guardar_tarea.php', {
-            method: 'POST',
-            body: new FormData(this)
-        })
-        .then(res => res.json())
-        .then(data => {
-            if(data.success) {
-                alert("Tarea registrada correctamente.");
-                location.reload();
-            } else {
-                alert("Error: " + data.error);
-            }
-        })
-        .catch(err => alert("Error en el servidor."));
+        fetch('guardar_tarea.php', { method: 'POST', body: new FormData(this) })
+        .then(() => { cerrarModal(); cargarEntregas(grupoSeleccionado); });
     };
 
-    function verEntregas(id) {
-        document.getElementById('cardsContainer').classList.add('hidden');
-        document.getElementById('vistaTarea').classList.remove('hidden');
-        fetch('get_entregas.php?tarea_id=' + id)
-        .then(res => res.text())
-        .then(html => { document.getElementById('entregasBody').innerHTML = html; });
+    function cerrarModal() { document.getElementById('modalTarea').style.display = 'none'; }
+    function regresar() { 
+        document.getElementById('vista_grupos').style.display = 'flex'; 
+        document.getElementById('vista_detalle').style.display = 'none'; 
     }
-
-    function volver() {
-        document.getElementById('cardsContainer').classList.remove('hidden');
-        document.getElementById('vistaTarea').classList.add('hidden');
-    }
-</script>
+    </script>
 </body>
 </html>

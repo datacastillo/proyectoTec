@@ -1,41 +1,97 @@
-let tareas = JSON.parse(localStorage.getItem("docenteT")) || [];
-let editIndex = null;
+// VARIABLES GLOBALES
+let actualEntregaId = null;
 
-const alumnos = ["JUAN", "HECTOR", "LUIS"];
-
-let entregas = {
-    JUAN: { entrego: true, cal: 100 },
-    HECTOR: { entrego: false, cal: 0 },
-    LUIS: { entrego: true, cal: 80 }
-};
-
-function ir(pagina) {
-    window.location.href = pagina;
+// 1. CARGAR LAS TAREAS (TARJETAS)
+function cargarTareasMateria(materiaId) {
+    fetch(`get_tareas_cards.php?materia_id=${materiaId}`)
+        .then(res => res.text())
+        .then(html => {
+            document.getElementById("cards").innerHTML = html;
+        });
 }
 
-function guardarLocal() {
-    localStorage.setItem("docenteT", JSON.stringify(tareas));
-}
-
-function render() {
-    const cont = document.getElementById("cards");
-    cont.innerHTML = "";
-
-    tareas.forEach((t, i) => {
-        cont.innerHTML += `
-        <div class="card" onclick="verTarea()">
-            <span class="edit-btn" onclick="event.stopPropagation(); editarTarea(${i})">✏️</span>
-            <span class="delete-btn" onclick="event.stopPropagation(); eliminarTarea(${i})">✖</span>
-            <strong>${t.titulo}</strong>
-            <small>${t.materia} - ${t.grupo}</small>
-        </div>`;
-    });
-}
-
-function verTarea() {
+// 2. CARGAR LA TABLA DE ENTREGAS (EL "CUÁNDO" SE PULSA VER ENTREGAS)
+function verEntregas(tareaId, tituloTarea) {
+    // Cambiamos de vista (tu lógica de ocultar/mostrar)
     document.getElementById("cards").style.display = "none";
-    document.getElementById("vistaTarea").classList.remove("hidden");
-    renderTabla();
+    const vistaTarea = document.getElementById("vistaTarea");
+    vistaTarea.classList.remove("hidden");
+    
+    // Título de la tarea en la cabecera
+    document.getElementById("tituloTareaSeleccionada").innerText = tituloTarea;
+
+    // Traemos los datos reales del PHP que corregimos antes
+    fetch(`get_entregas.php?tarea_id=${tareaId}`)
+        .then(res => res.text())
+        .then(html => {
+            document.getElementById("tablaTarea").innerHTML = html;
+        });
+}
+
+// 3. FUNCIÓN PARA ABRIR EL VISOR (La que llama el botón "REVISAR")
+function abrirVisor(entregaId, nombre, tarea, ruta, notaActual) {
+    actualEntregaId = entregaId;
+    
+    // Llenar datos en el modal del visor
+    document.getElementById('visor_nombre_alumno').innerText = nombre.toUpperCase();
+    document.getElementById('visor_titulo_tarea').innerText = tarea;
+    document.getElementById('visor_nota_input').value = (notaActual > 0) ? notaActual : "";
+    
+    const frame = document.getElementById('pdf_frame');
+    const loading = document.getElementById('pdf_loading');
+    
+    frame.style.display = 'none';
+    loading.style.display = 'block';
+    
+    // Cargamos el PDF real
+    frame.src = ruta;
+    frame.onload = function() {
+        frame.style.display = 'block';
+        loading.style.display = 'none';
+    };
+
+    document.getElementById('visor_modal').style.display = 'flex';
+}
+
+// 4. GUARDAR CALIFICACIÓN DESDE EL VISOR
+function guardarCalificacionVisor() {
+    const nota = document.getElementById('visor_nota_input').value;
+    const btn = document.getElementById('btn_guardar_visor');
+
+    if (nota === "" || nota < 0 || nota > 100) {
+        alert("Ingresa una nota válida (0-100)");
+        return;
+    }
+
+    btn.innerText = "⏳ Guardando...";
+    btn.disabled = true;
+
+    const data = new FormData();
+    data.append('entrega_id', actualEntregaId);
+    data.append('nota', nota);
+
+    fetch('guardar_nota_tarea.php', {
+        method: 'POST',
+        body: data
+    })
+    .then(res => res.text())
+    .then(res => {
+        if(res.trim() === "success") {
+            // Cerramos y refrescamos la tabla para ver el cambio de color
+            cerrarVisor();
+            // Refrescamos la lista de entregas (asumiendo que tienes el id de tarea a mano)
+            // Si no, un location.reload() o volver a llamar a verEntregas()
+            alert("✅ Calificación guardada");
+            location.reload(); 
+        }
+    })
+    .catch(err => alert("Error al conectar con el servidor"));
+}
+
+// 5. FUNCIONES DE NAVEGACIÓN Y UI
+function cerrarVisor() {
+    document.getElementById('visor_modal').style.display = 'none';
+    document.getElementById('pdf_frame').src = "";
 }
 
 function volver() {
@@ -43,70 +99,10 @@ function volver() {
     document.getElementById("vistaTarea").classList.add("hidden");
 }
 
-function renderTabla() {
-    const tbody = document.getElementById("tablaTarea");
-    tbody.innerHTML = "";
-
-    alumnos.forEach(nombre => {
-        const d = entregas[nombre];
-
-        tbody.innerHTML += `
-        <tr>
-            <td>${nombre}</td>
-            <td>${d.entrego ? '✔' : '✖'}</td>
-            <td>${d.entrego ? '📖' : ''}</td>
-            <td>${d.cal} <span onclick="editarCal('${nombre}')">✏️</span></td>
-        </tr>`;
-    });
-}
-
-function editarCal(nombre) {
-    let nueva = prompt("Nueva calificación:");
-    if (nueva) {
-        entregas[nombre].cal = parseInt(nueva);
-        renderTabla();
-    }
-}
-
-function abrirModal() {
-    editIndex = null;
-    document.getElementById("modal").style.display = "flex";
-}
-
-function editarTarea(i) {
-    editIndex = i;
-    document.getElementById("modal").style.display = "flex";
-}
-
-function guardarTarea() {
-    const titulo = document.getElementById("titulo").value;
-    const materia = document.getElementById("materia").value;
-    const grupo = document.getElementById("grupo").value;
-
-    if (!titulo || !materia || !grupo) return;
-
-    let nueva = { titulo, materia, grupo };
-
-    if (editIndex !== null) tareas[editIndex] = nueva;
-    else tareas.push(nueva);
-
-    guardarLocal();
-    render();
-    cerrarModal();
-}
-
-function eliminarTarea(i) {
-    tareas.splice(i, 1);
-    guardarLocal();
-    render();
+function toggleMenu() {
+    document.querySelector(".sidebar").classList.toggle("active");
 }
 
 function cerrarModal() {
     document.getElementById("modal").style.display = "none";
-}
-
-render();
-
-function toggleMenu() {
-    document.querySelector(".sidebar").classList.toggle("active");
 }

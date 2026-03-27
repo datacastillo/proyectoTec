@@ -10,85 +10,179 @@ if (!isset($_SESSION['id_usuario']) || $_SESSION['rol'] != 'docente') {
 $id_usuario = $_SESSION['id_usuario'];
 $nombre_docente = $_SESSION['nombre'] ?? 'Docente';
 
+// Obtener ID del docente
 $res_doc = mysqli_query($conexion, "SELECT id FROM docentes WHERE usuario_id = '$id_usuario'");
 $doc = mysqli_fetch_assoc($res_doc);
 $id_docente = $doc['id'] ?? 0;
 
-$query_materias = "SELECT g.id as grupo_id, m.nombre as materia, g.nombre_grupo 
-                   FROM grupos g 
-                   JOIN materias m ON g.materia_id = m.id 
-                   WHERE g.docente_id = '$id_docente'";
-
-$resultado_materias = mysqli_query($conexion, $query_materias);
+// Consulta de Grupos
+$query = "SELECT g.id AS grupo_id, g.nombre_grupo, m.nombre AS materia_nombre 
+          FROM grupos g 
+          INNER JOIN materias m ON g.materia_id = m.id 
+          WHERE g.docente_id = '$id_docente'";
+$res_grupos = mysqli_query($conexion, $query);
 ?>
 <!DOCTYPE html>
 <html lang="es">
 <head>
     <meta charset="UTF-8">
     <title>Mis Materias | ISIC</title>
-    <link rel="stylesheet" href="../docente.css">
     <style>
-        .grid-materias { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 20px; padding: 20px; }
-        .materia-card { 
-            background: #142d3e; border-radius: 12px; padding: 25px; 
-            border: 1px solid rgba(62, 146, 204, 0.2); position: relative; 
+        :root {
+            --bg-principal: #0f3145;
+            --bg-secundario: #255b68;
+            --accent: #2b6671;
+            --texto: #ffffff;
+            --exito: #2ecc71;
         }
-        .materia-card::before { content: ''; position: absolute; top: 0; left: 0; width: 4px; height: 100%; background: #3e92cc; }
-        .materia-card h3 { color: #fff; margin: 0 0 10px 0; text-transform: uppercase; font-size: 1.1rem; }
-        .materia-card p { color: #adb5bd; margin: 5px 0; font-size: 14px; }
-        .btn-ver { 
-            display: inline-block; margin-top: 15px; padding: 10px 20px; 
-            background: #3e92cc; color: white; text-decoration: none; 
-            border-radius: 5px; font-size: 12px; font-weight: bold; transition: 0.3s;
+
+        body {
+            margin: 0;
+            display: flex;
+            min-height: 100vh;
+            background-color: var(--bg-principal);
+            color: var(--texto);
+            font-family: 'Segoe UI', sans-serif;
         }
-        .btn-ver:hover { background: #fff; color: #142d3e; }
+
+        /* BARRA LATERAL FIJA */
+        .sidebar {
+            width: 250px;
+            min-width: 250px;
+            background-color: var(--bg-secundario);
+            border-right: 1px solid var(--accent);
+            display: flex;
+            flex-direction: column;
+            position: sticky;
+            top: 0;
+            height: 100vh;
+        }
+
+        .sidebar-header {
+            padding: 30px 20px;
+            text-align: center;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+
+        .sidebar-menu {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .sidebar-menu li a {
+            display: block;
+            padding: 15px 25px;
+            color: #adb5bd;
+            text-decoration: none;
+            transition: 0.3s;
+            border-left: 4px solid transparent;
+        }
+
+        .sidebar-menu li a:hover, .sidebar-menu li a.active {
+            background: var(--bg-principal);
+            color: white;
+            border-left: 4px solid var(--exito);
+        }
+
+        /* CONTENIDO */
+        .main-content {
+            flex: 1;
+            padding: 40px;
+            overflow-y: auto;
+        }
+
+        .card-materia {
+            background: var(--bg-secundario);
+            padding: 25px;
+            border-radius: 12px;
+            border: 1px solid var(--accent);
+            cursor: pointer;
+            transition: 0.3s;
+            width: 280px;
+            text-align: center;
+        }
+
+        .card-materia:hover {
+            transform: translateY(-5px);
+            border-color: var(--exito);
+        }
+
+        .tabla-alumnos {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+            background: var(--bg-secundario);
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        .tabla-alumnos th { background: var(--accent); padding: 15px; text-align: left; }
+        .tabla-alumnos td { padding: 12px 15px; border-bottom: 1px solid rgba(255,255,255,0.1); }
+        
+        .btn-regresar {
+            background: var(--accent);
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            margin-bottom: 20px;
+        }
     </style>
 </head>
 <body>
-<div class="wrapper">
+
     <aside class="sidebar">
         <div class="sidebar-header">
-            <img src="../../img/logoTec.png" class="logo-tec" alt="Logo">
-            <div class="user-info">
-                <span>DOCENTE:<br><b><?php echo strtoupper($nombre_docente); ?></b></span>
-            </div>
+            <h2 style="color: var(--exito); margin:0;">ISIC</h2>
+            <small>Docente</small>
         </div>
-        <nav class="sidebar-nav">
-            <ul>
-                <li><a href="../docente.php">🏠 INICIO</a></li>
-                <li class="active"><a href="docenteM.php">📘 MIS MATERIAS</a></li>
-                <li><a href="../calificaciones/calificaciones.php">📝 CALIFICACIONES</a></li>
-                <li><a href="../TareasDocente/docenteT.php">📂 TAREAS</a></li>
-                <li style="margin-top: 50px;"><a href="../../auth/logout.php" style="color: #ff4444;">🚪 SALIR</a></li>
-            </ul>
-        </nav>
+        <ul class="sidebar-menu">
+            <li><a href="../docente.php">🏠 INICIO</a></li>
+            <li><a href="docenteM.php" class="active">📚 MIS MATERIAS</a></li>
+            <li><a href="../Calificaciones/calificaciones.php">📝 CALIFICACIONES</a></li>
+            <li><a href="../TareasDocente/docenteT.php">📂 TAREAS</a></li>
+        </ul>
+        <a href="../../auth/logout.php" style="margin-top:auto; padding:20px; text-align:center; color:#ffb3b3; text-decoration:none;">CERRAR SESIÓN</a>
     </aside>
 
     <main class="main-content">
-        <header class="topbar">
-            <div class="isic-box">GESTIÓN DE ASIGNATURAS</div>
-        </header>
-
-        <section style="padding: 30px;">
-            <h2 style="color: white; margin-bottom: 25px;">Mis Grupos Asignados</h2>
-            
-            <div class="grid-materias">
-                <?php if($resultado_materias && mysqli_num_rows($resultado_materias) > 0): ?>
-                    <?php while($row = mysqli_fetch_assoc($resultado_materias)): ?>
-                        <div class="materia-card">
-                            <h3><?php echo $row['materia']; ?></h3>
-                            <p><b>Grupo:</b> <?php echo $row['nombre_grupo']; ?></p>
-                            <a href="../calificaciones/calificaciones.php?grupo_id=<?php echo $row['grupo_id']; ?>" class="btn-ver">GESTIONAR CALIFICACIONES</a>
-                        </div>
-                    <?php endwhile; ?>
-                <?php else: ?>
-                    <div style="background: rgba(255,255,255,0.05); color: #adb5bd; grid-column: 1/-1; text-align: center; padding: 50px; border-radius: 10px;">
-                        <p>No se encontraron materias vinculadas a tu cuenta de docente.</p>
+        <div id="vista_principal">
+            <h1>Mis Materias</h1>
+            <div style="display: flex; gap: 20px; flex-wrap: wrap;">
+                <?php while($g = mysqli_fetch_assoc($res_grupos)): ?>
+                    <div class="card-materia" onclick="verAlumnos(<?php echo $g['grupo_id']; ?>, '<?php echo $g['materia_nombre']; ?>')">
+                        <small style="color: var(--exito);">Grupo: <?php echo $g['nombre_grupo']; ?></small>
+                        <h3><?php echo $g['materia_nombre']; ?></h3>
+                        <p style="font-size: 12px; color: #adb5bd;">Click para ver lista de alumnos</p>
                     </div>
-                <?php endif; ?>
+                <?php endwhile; ?>
             </div>
-        </section>
+        </div>
+
+        <div id="vista_alumnos" style="display: none;">
+            <button class="btn-regresar" onclick="regresar()">⬅ Volver a Materias</button>
+            <h2 id="titulo_materia"></h2>
+            <div id="tabla_alumnos_res"></div>
+        </div>
     </main>
-</div>
+
+    <script>
+    function verAlumnos(grupoId, materia) {
+        document.getElementById('vista_principal').style.display = 'none';
+        document.getElementById('vista_alumnos').style.display = 'block';
+        document.getElementById('titulo_materia').innerText = "Lista de Alumnos - " + materia;
+
+        fetch('get_alumnos.php?grupo_id=' + grupoId)
+            .then(res => res.text())
+            .then(html => { document.getElementById('tabla_alumnos_res').innerHTML = html; });
+    }
+
+    function regresar() {
+        document.getElementById('vista_principal').style.display = 'block';
+        document.getElementById('vista_alumnos').style.display = 'none';
+    }
+    </script>
 </body>
 </html>
