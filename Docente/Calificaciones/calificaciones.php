@@ -266,20 +266,29 @@ $grupos = mysqli_query($conexion, $query);
 
     // --- FUNCIONES DEL MODAL ---
     function abrirModalGraduar(alumnoId, nombre, notasJsonStr) {
-        const notas = JSON.parse(notasJsonStr);
-        document.getElementById('modal_alumno_id').value = alumnoId;
-        document.getElementById('modal_nombre_alumno').innerText = 'Estudiante: ' + nombre.toUpperCase();
-        
-        let htmlInputs = '';
-        notas.forEach(n => {
-            htmlInputs += `<label style="display:block; margin-top:10px; color:var(--subtexto); font-size:12px;">UNIDAD: ${n.nombre.toUpperCase()}</label>`;
-            htmlInputs += `<input type="number" step="0.1" min="0" max="100" class="input-nota" id="nota_uni_${n.unidad_id}" value="${n.nota}" 
-                           oninput="if(this.value>100)this.value=100; if(this.value<0)this.value=0;"
-                           onkeydown="return event.key !== 'e' && event.key !== 'E' && event.key !== '-' && event.key !== '+'">`;
-        });
-        
-        document.getElementById('modal_inputs_contenedor').innerHTML = htmlInputs;
-        document.getElementById('modal_calificar').style.display = 'flex';
+        try {
+            // ¡AQUÍ ESTÁ LA CORRECCIÓN! Usamos decodeURIComponent para desempaquetar la cadena
+            const notas = JSON.parse(decodeURIComponent(notasJsonStr)); 
+            
+            document.getElementById('modal_alumno_id').value = alumnoId;
+            document.getElementById('modal_nombre_alumno').innerText = 'Estudiante: ' + nombre.toUpperCase();
+            
+            let htmlInputs = '';
+            notas.forEach(n => {
+                let valorNota = (n.nota === null || n.nota === "") ? 0 : n.nota;
+                
+                htmlInputs += `<label style="display:block; margin-top:10px; color:var(--subtexto); font-size:12px;">UNIDAD: ${n.nombre.toUpperCase()}</label>`;
+                htmlInputs += `<input type="number" step="0.1" min="0" max="100" class="input-nota" id="nota_uni_${n.unidad_id}" value="${valorNota}" 
+                               oninput="if(this.value>100)this.value=100; if(this.value<0)this.value=0;"
+                               onkeydown="return event.key !== 'e' && event.key !== 'E' && event.key !== '-' && event.key !== '+'">`;
+            });
+            
+            document.getElementById('modal_inputs_contenedor').innerHTML = htmlInputs;
+            document.getElementById('modal_calificar').style.display = 'flex';
+        } catch (error) {
+            console.error("Error al procesar JSON: ", error);
+            alert("Hubo un error al procesar las calificaciones.");
+        }
     }
 
     function cerrarModal() {
@@ -294,7 +303,7 @@ $grupos = mysqli_query($conexion, $query);
         const alumnoId = document.getElementById('modal_alumno_id').value;
         const inputs = document.querySelectorAll('#modal_inputs_contenedor input');
         
-        let promesas = []; // Arreglo para mandar todas las notas de golpe
+        let promesas = []; 
         
         inputs.forEach(input => {
             const unidadId = input.id.replace('nota_uni_', '');
@@ -305,13 +314,13 @@ $grupos = mysqli_query($conexion, $query);
             data.append('unidad_id', unidadId);
             data.append('nota', nota);
             
+            // Usamos guardar_nota.php que es el archivo que acabamos de corregir
             promesas.push(fetch('guardar_nota.php', { method: 'POST', body: data }));
         });
         
-        // Cuando todas las notas se guarden en la base de datos...
         Promise.all(promesas).then(() => {
             cerrarModal();
-            cargarTablaCalificaciones(document.getElementById('selector_grupo').value); // Recarga la tabla para ver el verde/rojo
+            cargarTablaCalificaciones(document.getElementById('selector_grupo').value); 
             btn.innerText = '💾 Guardar Calificaciones';
             btn.disabled = false;
         });

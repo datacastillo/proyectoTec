@@ -4,109 +4,88 @@ require_once '../../config/db.php';
 $grupo_id = $_GET['grupo_id'] ?? 0;
 
 if (!$grupo_id) {
-    echo "<p style='text-align:center; color:#adb5bd; padding:40px;'>Selecciona un grupo válido.</p>";
+    echo "<p style='color:white; text-align:center;'>Selecciona un grupo válido.</p>";
     exit;
 }
 
-// 1. Obtener las unidades de este grupo
-$unidades_query = "SELECT id, nombre_unidad FROM unidades WHERE grupo_id = '$grupo_id' ORDER BY id ASC";
-$res_unidades = mysqli_query($conexion, $unidades_query);
+// 1. Obtener las unidades del grupo
+$sql_unidades = "SELECT id, nombre_unidad FROM unidades WHERE grupo_id = '$grupo_id' ORDER BY id ASC";
+$res_unidades = mysqli_query($conexion, $sql_unidades);
 $unidades = [];
-while($u = mysqli_fetch_assoc($res_unidades)) {
+while ($u = mysqli_fetch_assoc($res_unidades)) {
     $unidades[] = $u;
 }
 
-// 2. Obtener los alumnos inscritos
-$alumnos_query = "SELECT a.id as alumno_id, a.matricula, u.nombre_completo 
-                  FROM inscripciones i
-                  INNER JOIN alumnos a ON i.alumno_id = a.id
-                  INNER JOIN usuarios u ON a.usuario_id = u.id
-                  WHERE i.grupo_id = '$grupo_id'
-                  GROUP BY a.id
-                  ORDER BY u.nombre_completo ASC";
-$res_alumnos = mysqli_query($conexion, $alumnos_query);
+// 2. Obtener los alumnos inscritos (¡AQUÍ CORREGIMOS EL NOMBRE DE LA TABLA A "inscripciones"!)
+$sql_alumnos = "SELECT a.id AS alumno_id, u.nombre_completo, a.matricula 
+                FROM alumnos a 
+                JOIN usuarios u ON a.usuario_id = u.id 
+                WHERE a.id IN (SELECT alumno_id FROM inscripciones WHERE grupo_id = '$grupo_id')
+                ORDER BY u.nombre_completo ASC";
+$res_alumnos = mysqli_query($conexion, $sql_alumnos);
 
-if (count($unidades) == 0) {
-    echo "<div style='background:#1e4d58; padding:20px; border-radius:10px; text-align:center; border:1px solid #2b6671;'>
-            <p style='color:#ffb3b3; margin:0;'>⚠️ No hay unidades creadas para este grupo.</p>
-            <p style='font-size:13px; color:#adb5bd;'>Debes crear unidades antes de poder asignar calificaciones finales.</p>
-          </div>";
+if (!$res_alumnos) {
+    echo "<p style='color:red; text-align:center;'>Error en la consulta de alumnos: " . mysqli_error($conexion) . "</p>";
     exit;
 }
 
-echo '<table style="width:100%; border-collapse:collapse; background:#255b68; color:white; border-radius:8px; overflow:hidden;">
-        <thead>
-            <tr style="background:#1e4d58; border-bottom:2px solid #2b6671;">
-                <th style="padding:15px; text-align:left;">ALUMNO</th>';
-
-// Cabeceras de Unidades
-foreach ($unidades as $uni) {
-    echo "<th style='padding:15px; text-align:center; font-size:13px;'>".strtoupper($uni['nombre_unidad'])."</th>";
+if (mysqli_num_rows($res_alumnos) == 0) {
+    echo "<p style='color:white; text-align:center; padding: 20px;'>No hay alumnos inscritos en este grupo.</p>";
+    exit;
 }
 
-// Cabecera de Promedio y la Nueva Cabecera de ACCIONES
-echo '          <th style="padding:15px; text-align:center; background:rgba(0,0,0,0.2);">PROMEDIO</th>
-                <th style="padding:15px; text-align:center;">ACCIONES</th>
+echo '<table style="width:100%; border-collapse:collapse; color:white; background:#1a3c4d; border-radius:10px; overflow:hidden;">
+        <thead>
+            <tr style="background:#255b68;">
+                <th style="padding:15px; text-align:left;">ALUMNO</th>';
+foreach ($unidades as $uni) {
+    echo "<th style='padding:15px; text-align:center; font-size:12px;'>" . strtoupper($uni['nombre_unidad']) . "</th>";
+}
+echo '          <th style="padding:15px; text-align:center;">ACCIONES</th>
             </tr>
         </thead>
         <tbody>';
 
-while($alu = mysqli_fetch_assoc($res_alumnos)) {
-    $a_id = $alu['alumno_id'];
-    echo "<tr style='border-bottom:1px solid rgba(255,255,255,0.1);' onmouseover='this.style.background=\"#2b6671\"' onmouseout='this.style.background=\"none\"'>
-            <td style='padding:12px 15px;'>
-                <b style='font-size:14px;'>".strtoupper($alu['nombre_completo'])."</b><br>
-                <small style='color:#88d4e8;'>{$alu['matricula']}</small>
-            </td>";
-    
-    $suma = 0;
-    $notas_alumno = []; // Arreglo para guardar las notas y mandarlas al modal
-    
-    // Iteramos unidades
+while ($alu = mysqli_fetch_assoc($res_alumnos)) {
+    echo "<tr style='border-bottom:1px solid rgba(255,255,255,0.1);'>";
+    echo "<td style='padding:12px 15px;'>
+            <div style='font-weight:bold;'>" . strtoupper($alu['nombre_completo']) . "</div>
+            <div style='font-size:11px; color:#adb5bd;'>" . $alu['matricula'] . "</div>
+          </td>";
+
+    $notas_para_modal = [];
+
     foreach ($unidades as $uni) {
+        $a_id = $alu['alumno_id'];
         $u_id = $uni['id'];
         
-        $nota_query = "SELECT nota_final FROM calificaciones_unidades WHERE alumno_id = '$a_id' AND unidad_id = '$u_id'";
-        $res_nota = mysqli_query($conexion, $nota_query);
-        $nota_data = mysqli_fetch_assoc($res_nota);
-        $nota = $nota_data['nota_final'] ?? 0;
-        $suma += $nota;
+        // Consulta a la tabla correcta de calificaciones
+        $sql_nota = "SELECT nota_final FROM calificaciones_unidades WHERE alumno_id = '$a_id' AND unidad_id = '$u_id'";
+        $res_nota = mysqli_query($conexion, $sql_nota);
+        $dato_nota = mysqli_fetch_assoc($res_nota);
+        $valor_nota = $dato_nota['nota_final'] ?? 0;
 
-        // Guardamos el ID, nombre de la unidad y calificación actual en el arreglo
-        $notas_alumno[] = [
+        $notas_para_modal[] = [
             'unidad_id' => $u_id,
             'nombre' => $uni['nombre_unidad'],
-            'nota' => $nota
+            'nota' => $valor_nota
         ];
 
-        // Visualización: Nota estática, color rojo si reprobó (<70)
-        $nota_color = ($nota < 70) ? '#ff4d4d' : 'white';
-        echo "<td style='padding:12px; text-align:center; font-weight:bold; color:{$nota_color};'>{$nota}</td>";
+        $color = ($valor_nota >= 70) ? '#2ecc71' : '#ff4d4d';
+        echo "<td style='text-align:center; color:$color; font-weight:bold;'>$valor_nota</td>";
     }
-    
-    // Promedio
-    $promedio = ($suma > 0) ? ($suma / count($unidades)) : 0;
-    $color_promedio = ($promedio < 70) ? '#ff4d4d' : '#2ecc71';
 
-    echo "<td style='padding:12px; text-align:center; font-weight:bold; color:{$color_promedio}; background:rgba(0,0,0,0.1);'>
-            ".number_format($promedio, 1)."
-          </td>";
-    
-    // Convertimos el arreglo a texto JSON y lo hacemos seguro para HTML
-    $notas_json = json_encode($notas_alumno);
-    $notas_json_seguro = htmlspecialchars($notas_json, ENT_QUOTES, 'UTF-8');
-    $nombre_seguro = htmlspecialchars($alu['nombre_completo'], ENT_QUOTES, 'UTF-8');
+    // Empaquetado seguro para el JSON
+    $json_seguro = rawurlencode(json_encode($notas_para_modal));
+    $nombre_escapado = addslashes($alu['nombre_completo']);
 
-    // Botón con los TRES parámetros que necesita el JavaScript
-    echo "<td style='padding:12px; text-align:center;'>
-            <button onclick=\"abrirModalGraduar({$a_id}, '{$nombre_seguro}', '{$notas_json_seguro}')\"
-                    style='background: #2b6671; color:white; border:1px solid #adb5bd; padding: 8px 15px; border-radius: 5px; cursor:pointer; font-weight:bold; font-size:12px; transition:0.3s;'
-                    onmouseover='this.style.background=\"#2ecc71\"; this.style.borderColor=\"#2ecc71\"'
-                    onmouseout='this.style.background=\"#2b6671\"; this.style.borderColor=\"#adb5bd\"'>
-                ✏️ Calificar
+    echo "<td style='text-align:center;'>
+            <button onclick=\"abrirModalGraduar('{$alu['alumno_id']}', '$nombre_escapado', '$json_seguro')\" 
+                    style='background:none; border:1px solid #2ecc71; color:#2ecc71; padding:5px 10px; border-radius:5px; cursor:pointer;'>
+                📝 Calificar
             </button>
-          </td>
-          </tr>";
+          </td>";
+    echo "</tr>";
 }
 echo '</tbody></table>';
 ?>
