@@ -17,13 +17,17 @@ $info_alumno = mysqli_fetch_assoc($res_info);
 $alumno_id = $info_alumno['id'] ?? 0;
 $matricula = $info_alumno['matricula'] ?? 'S/N';
 
+// AQUÍ ESTÁ LA MAGIA: Agregamos hasta 6 unidades y contamos el total real de unidades
 $query_calificaciones = "
     SELECT 
         m.nombre as materia,
         MAX(CASE WHEN u.numero_unit = 1 THEN cu.nota_final ELSE NULL END) as unidad_1,
         MAX(CASE WHEN u.numero_unit = 2 THEN cu.nota_final ELSE NULL END) as unidad_2,
         MAX(CASE WHEN u.numero_unit = 3 THEN cu.nota_final ELSE NULL END) as unidad_3,
-        MAX(CASE WHEN u.numero_unit = 4 THEN cu.nota_final ELSE NULL END) as unidad_4
+        MAX(CASE WHEN u.numero_unit = 4 THEN cu.nota_final ELSE NULL END) as unidad_4,
+        MAX(CASE WHEN u.numero_unit = 5 THEN cu.nota_final ELSE NULL END) as unidad_5,
+        MAX(CASE WHEN u.numero_unit = 6 THEN cu.nota_final ELSE NULL END) as unidad_6,
+        COUNT(DISTINCT u.id) as total_unidades
     FROM inscripciones i
     JOIN grupos g ON i.grupo_id = g.id
     JOIN materias m ON g.materia_id = m.id
@@ -40,37 +44,57 @@ $res_calificaciones = mysqli_query($conexion, $query_calificaciones);
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Mis Calificaciones | ISIC</title>
-    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700;900&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;600;700;900&display=swap" rel="stylesheet">
     <style>
-        /* Paleta de colores Azul (Estilo Docente) */
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Montserrat', sans-serif; }
         body { background-color: #0d1b2a; color: #e0e1dd; }
         .wrapper { display: flex; min-height: 100vh; }
         
         /* Barra Lateral */
-        .sidebar { width: 280px; background: #142d3e; padding-top: 20px; border-right: 1px solid rgba(255,255,255,0.05); }
+        .sidebar { width: 280px; background: #142d3e; padding-top: 20px; border-right: 1px solid rgba(255,255,255,0.05); flex-shrink: 0;}
         .sidebar-header { text-align: center; padding-bottom: 20px; border-bottom: 1px solid rgba(255,255,255,0.05); }
         .user-info { margin-top: 15px; }
         .sidebar-nav ul { list-style: none; padding: 0; margin-top: 20px; }
         .sidebar-nav li a { display: block; padding: 15px 25px; color: #e0e1dd; text-decoration: none; transition: 0.3s; font-size: 14px; font-weight: bold; }
-        .sidebar-nav li a:hover { background: #0d1b2a; color: #3e92cc; border-left: 4px solid #3e92cc; }
-        .sidebar-nav li.active a { background: #0d1b2a; color: #3e92cc; border-left: 4px solid #3e92cc; }
+        .sidebar-nav li a:hover, .sidebar-nav li.active a { background: #0d1b2a; color: #3e92cc; border-left: 4px solid #3e92cc; }
         
         /* Contenido Principal */
-        .main-content { flex: 1; display: flex; flex-direction: column; }
+        .main-content { flex: 1; display: flex; flex-direction: column; overflow: hidden;}
         .topbar { background: #142d3e; padding: 20px 30px; border-bottom: 1px solid rgba(255,255,255,0.05); display: flex; align-items: center; }
         .isic-box { background: #3e92cc; color: #fff; padding: 8px 15px; border-radius: 5px; font-weight: bold; font-size: 14px; letter-spacing: 1px; }
         
-        .table-card { background: #142d3e; border-radius: 10px; padding: 25px; box-shadow: 0 10px 30px rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.05); margin-top: 20px;}
-        table { width: 100%; border-collapse: collapse; }
-        th { text-align: left; padding: 15px; border-bottom: 2px solid #3e92cc; color: #fff; text-transform: uppercase; font-size: 13px; }
-        td { padding: 15px; border-bottom: 1px solid rgba(255,255,255,0.05); color: #e0e1dd; }
-        tr:hover td { background: rgba(255,255,255,0.02); }
+        /* Tarjeta de la tabla */
+        .table-card { 
+            background: #142d3e; 
+            border-radius: 12px; 
+            padding: 25px; 
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2); 
+            border: 1px solid rgba(62, 146, 204, 0.2); 
+            margin-top: 20px;
+            overflow-x: auto; /* Permite scroll horizontal si no caben las 6 unidades */
+        }
         
-        .badge { padding: 6px 12px; border-radius: 4px; font-size: 11px; font-weight: bold; letter-spacing: 1px; display: inline-block; min-width: 90px; text-align: center;}
-        .aprobado { background: rgba(46, 204, 113, 0.2); color: #2ecc71; border: 1px solid #2ecc71; }
-        .reprobado { background: rgba(231, 76, 60, 0.2); color: #e74c3c; border: 1px solid #e74c3c; }
-        .pendiente { background: rgba(241, 196, 15, 0.2); color: #f1c40f; border: 1px solid #f1c40f; }
+        table { width: 100%; border-collapse: collapse; min-width: 900px; }
+        th { text-align: left; padding: 18px 10px; border-bottom: 2px solid #3e92cc; color: #fff; text-transform: uppercase; font-size: 12px; letter-spacing: 1px; }
+        td { padding: 18px 10px; border-bottom: 1px solid rgba(255,255,255,0.05); color: #adb5bd; transition: all 0.3s ease; font-size: 14px;}
+        
+        tr { transition: all 0.3s ease; }
+        tr:hover td { background: rgba(62, 146, 204, 0.05); color: #fff; }
+        
+        /* Etiquetas (Badges) */
+        .badge { 
+            padding: 8px 16px; 
+            border-radius: 50px; 
+            font-size: 11px; 
+            font-weight: 900; 
+            letter-spacing: 1px; 
+            display: inline-block; 
+            min-width: 100px; 
+            text-align: center;
+        }
+        .aprobado { background: rgba(46, 204, 113, 0.1); color: #2ecc71; border: 1px solid rgba(46, 204, 113, 0.3); box-shadow: 0 4px 10px rgba(46, 204, 113, 0.15); }
+        .reprobado { background: rgba(231, 76, 60, 0.1); color: #e74c3c; border: 1px solid rgba(231, 76, 60, 0.3); box-shadow: 0 4px 10px rgba(231, 76, 60, 0.15); }
+        .pendiente { background: rgba(241, 196, 15, 0.1); color: #f1c40f; border: 1px solid rgba(241, 196, 15, 0.3); box-shadow: 0 4px 10px rgba(241, 196, 15, 0.15); }
     </style>
 </head>
 <body>
@@ -102,19 +126,21 @@ $res_calificaciones = mysqli_query($conexion, $query_calificaciones);
             <div class="isic-box">PORTAL ALUMNO | ISIC</div>
         </header>
 
-        <section style="padding: 30px;">
-            <h2 style="color: #fff; font-size: 2rem; margin-bottom: 5px;">Boleta de Calificaciones</h2>
-            <p style="color: #adb5bd; font-size: 1rem; margin-bottom: 25px;">Consulta tu progreso general en las materias inscritas.</p>
+        <section style="padding: 40px 30px;">
+            <h2 style="color: #fff; font-size: 2.2rem; margin-bottom: 5px;">Boleta de Calificaciones</h2>
+            <p style="color: #adb5bd; font-size: 1rem; margin-bottom: 30px;">Consulta tu progreso general en las materias inscritas.</p>
 
             <div class="table-card">
                 <table>
                     <thead>
                         <tr>
                             <th>Materia</th>
-                            <th style="text-align: center;">Unidad 1</th>
-                            <th style="text-align: center;">Unidad 2</th>
-                            <th style="text-align: center;">Unidad 3</th>
-                            <th style="text-align: center;">Unidad 4</th>
+                            <th style="text-align: center;">U1</th>
+                            <th style="text-align: center;">U2</th>
+                            <th style="text-align: center;">U3</th>
+                            <th style="text-align: center;">U4</th>
+                            <th style="text-align: center;">U5</th>
+                            <th style="text-align: center;">U6</th>
                             <th style="text-align: center;">Promedio</th>
                             <th style="text-align: center;">Estado</th>
                         </tr>
@@ -127,32 +153,50 @@ $res_calificaciones = mysqli_query($conexion, $query_calificaciones);
                                 $u2 = $fila['unidad_2'];
                                 $u3 = $fila['unidad_3'];
                                 $u4 = $fila['unidad_4'];
+                                $u5 = $fila['unidad_5'];
+                                $u6 = $fila['unidad_6'];
+                                $total_unidades = (int)$fila['total_unidades'];
 
-                                $tiene_todo = ($u1 !== null && $u2 !== null && $u3 !== null && $u4 !== null);
+                                $suma = 0;
+                                $calificadas = 0;
+
+                                // Contamos cuántas unidades realmente tienen calificación
+                                if ($u1 !== null) { $suma += $u1; $calificadas++; }
+                                if ($u2 !== null) { $suma += $u2; $calificadas++; }
+                                if ($u3 !== null) { $suma += $u3; $calificadas++; }
+                                if ($u4 !== null) { $suma += $u4; $calificadas++; }
+                                if ($u5 !== null) { $suma += $u5; $calificadas++; }
+                                if ($u6 !== null) { $suma += $u6; $calificadas++; }
+
+                                // Revisamos si ya tiene todas las calificaciones según el total de unidades que tiene la materia
+                                $tiene_todo = ($calificadas == $total_unidades && $total_unidades > 0);
                                 $promedio = 0;
-                                
-                                if ($tiene_todo) {
-                                    $promedio = ($u1 + $u2 + $u3 + $u4) / 4;
-                                }
 
-                                if (!$tiene_todo) {
+                                if ($tiene_todo) {
+                                    $promedio = $suma / $total_unidades;
+                                    
+                                    if ($promedio >= 70) {
+                                        $estado_clase = "aprobado";
+                                        $estado_texto = "APROBADO";
+                                    } else {
+                                        $estado_clase = "reprobado";
+                                        $estado_texto = "REPROBADO";
+                                    }
+                                } else {
                                     $estado_clase = "pendiente";
                                     $estado_texto = "EN CURSO";
-                                } else if ($promedio >= 70) {
-                                    $estado_clase = "aprobado";
-                                    $estado_texto = "APROBADO";
-                                } else {
-                                    $estado_clase = "reprobado";
-                                    $estado_texto = "REPROBADO";
                                 }
                         ?>
                         <tr>
-                            <td style="font-weight: bold;"><?php echo strtoupper($fila['materia']); ?></td>
+                            <td style="font-weight: 700; color: #fff;"><?php echo strtoupper($fila['materia']); ?></td>
                             <td style="text-align: center;"><?php echo $u1 !== null ? number_format($u1, 2) : '-'; ?></td>
                             <td style="text-align: center;"><?php echo $u2 !== null ? number_format($u2, 2) : '-'; ?></td>
                             <td style="text-align: center;"><?php echo $u3 !== null ? number_format($u3, 2) : '-'; ?></td>
                             <td style="text-align: center;"><?php echo $u4 !== null ? number_format($u4, 2) : '-'; ?></td>
-                            <td style="text-align: center; font-weight: bold; color: <?php echo ($tiene_todo && $promedio >= 70) ? '#2ecc71' : ($tiene_todo ? '#e74c3c' : '#fff'); ?>">
+                            <td style="text-align: center;"><?php echo $u5 !== null ? number_format($u5, 2) : '-'; ?></td>
+                            <td style="text-align: center;"><?php echo $u6 !== null ? number_format($u6, 2) : '-'; ?></td>
+                            
+                            <td style="text-align: center; font-weight: 800; color: <?php echo ($tiene_todo && $promedio >= 70) ? '#2ecc71' : ($tiene_todo ? '#e74c3c' : '#fff'); ?>;">
                                 <?php echo $tiene_todo ? number_format($promedio, 2) : '-'; ?>
                             </td>
                             <td style="text-align: center;"><span class="badge <?php echo $estado_clase; ?>"><?php echo $estado_texto; ?></span></td>
@@ -162,7 +206,7 @@ $res_calificaciones = mysqli_query($conexion, $query_calificaciones);
                         else:
                         ?>
                         <tr>
-                            <td colspan="7" style="padding: 40px; text-align: center; color: #adb5bd;">No estás inscrito en ninguna materia actualmente.</td>
+                            <td colspan="9" style="padding: 40px; text-align: center; color: #adb5bd; font-style: italic;">No estás inscrito en ninguna materia actualmente.</td>
                         </tr>
                         <?php endif; ?>
                     </tbody>

@@ -19,9 +19,9 @@ $info_alumno = mysqli_fetch_assoc($res_info);
 $alumno_id = $info_alumno['id'] ?? 0;
 $matricula = $info_alumno['matricula'] ?? 'S/N';
 
-// Consulta de materias dinámicas
-$query_materias = "SELECT DISTINCT m.nombre, m.clave 
-                   FROM materias m
+// Consulta de materias dinámicas (¡Ahora traemos el grupo_id!)
+// Consulta de materias dinámicas (Agregamos DISTINCT para evitar duplicados)
+$query_materias = "SELECT DISTINCT g.id AS grupo_id, m.nombre, m.clave                   FROM materias m
                    INNER JOIN grupos g ON m.id = g.materia_id
                    INNER JOIN inscripciones i ON g.id = i.grupo_id
                    WHERE i.alumno_id = '$alumno_id'";
@@ -102,11 +102,11 @@ $res_materias = mysqli_query($conexion, $query_materias);
                 if($res_materias && mysqli_num_rows($res_materias) > 0) {
                     while($materia = mysqli_fetch_assoc($res_materias)) {
                         echo "
-                        <div class='card-materia' onclick=\"location.href='../Tareas/tareas.php?materia_clave=".$materia['clave']."'\">
-                            <div class='card-title'>".strtoupper($materia['nombre'])."</div>
-                            <div class='card-clave'>CLAVE: ".$materia['clave']."</div>
-                            <button class='btn-entrar'>IR A LA MATERIA ➔</button>
-                        </div>";
+                    <div class='card-materia' onclick=\"location.href='detalle_materia.php?grupo_id=".$materia['grupo_id']."'\">
+                        <div class='card-title'>".strtoupper($materia['nombre'])."</div>
+                        <div class='card-clave'>CLAVE: ".$materia['clave']."</div>
+                        <button class='btn-entrar'>IR A LA MATERIA ➔</button>
+                    </div>";
                     }
                 } else {
                     echo "<p style='color: #adb5bd; font-size: 1rem;'>No tienes materias inscritas en este semestre.</p>";
