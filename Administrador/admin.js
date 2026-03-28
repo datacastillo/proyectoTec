@@ -99,11 +99,16 @@ function abrirModal(tipo) {
         document.getElementById("extraLabel").innerText = tipo === 'ALUMNO' ? 'Matrícula' : 'Especialidad';
         
         // Limpiar campos para un nuevo registro
+        document.getElementById("userId").value = ""; // IMPLEMENTADO: Se limpia el ID oculto
         document.getElementById("userName").value = "";
         document.getElementById("userEmail").value = "";
         document.getElementById("userPass").value = "";
         document.getElementById("userExtra").value = "";
         
+        // Contraseña obligatoria para nuevos
+        document.getElementById("userPass").required = true;
+        document.getElementById("userPass").placeholder = "********";
+
         // Asegurar que los campos no estén bloqueados
         document.getElementById("userExtra").disabled = false;
     } else {
@@ -117,19 +122,25 @@ function cerrarModal() {
 
 // 5. GUARDAR USUARIO EN LA BD (ENVÍO A PHP)
 async function guardarUsuario() {
+    const id = document.getElementById("userId").value; // ¡Aquí tomamos el ID oculto!
     const nombre = document.getElementById("userName").value;
     const correo = document.getElementById("userEmail").value;
     const password = document.getElementById("userPass").value;
     const extra = document.getElementById("userExtra").value;
 
-    // Validación simple
-    if(!nombre || !correo || !password || !extra) {
-        alert("Por favor rellena todos los campos.");
+    // Validación según si es nuevo o edición
+    if(!nombre || !correo || !extra) {
+        alert("Por favor rellena todos los campos obligatorios.");
+        return;
+    }
+    if(!id && !password) { // Si NO hay ID (es nuevo) y NO hay contraseña
+        alert("La contraseña es obligatoria para crear un nuevo usuario.");
         return;
     }
 
     // Preparar datos para el envío
     const formData = new FormData();
+    formData.append('id', id); // Enviamos el ID al PHP
     formData.append('nombre', nombre);
     formData.append('correo', correo);
     formData.append('password', password);
@@ -145,7 +156,7 @@ async function guardarUsuario() {
         const res = await response.json();
 
         if(res.success) {
-            alert("¡Registro guardado correctamente!");
+            alert(id ? "¡Registro actualizado correctamente!" : "¡Registro guardado correctamente!");
             cerrarModal();
             // Recargar la tabla donde estábamos
             cargarDatosBD(tipoActual.toLowerCase());
@@ -164,9 +175,33 @@ function toggleMenu() {
 }
 
 // 7. FUNCIONES DE ACCIÓN
+// IMPLEMENTADO: Lógica real para editar respetando tus arrays globales
 function editar(tipo, id) {
-    console.log(`Editar ${tipo} con ID: ${id}`);
-    // Próximo paso: Cargar datos en el modal para edición
+    tipoActual = tipo.toUpperCase(); 
+    
+    // Buscamos a la persona en el arreglo correspondiente
+    let persona = tipo === 'alumno' ? alumnos.find(a => a.id == id) : docentes.find(d => d.id == id);
+
+    if (persona) {
+        const modal = document.getElementById("userModal");
+        modal.style.display = "flex";
+
+        document.getElementById("modalTitle").innerText = tipo === 'alumno' ? 'Editar Alumno' : 'Editar Docente';
+        document.getElementById("extraLabel").innerText = tipo === 'alumno' ? 'Matrícula' : 'Especialidad';
+
+        // Llenamos el formulario
+        document.getElementById("userId").value = persona.id; 
+        document.getElementById("userName").value = persona.nombre;
+        document.getElementById("userEmail").value = persona.correo || ""; 
+        document.getElementById("userExtra").value = persona.extra || "";
+
+        // Ajustes de contraseña para edición
+        document.getElementById("userPass").value = "";
+        document.getElementById("userPass").required = false;
+        document.getElementById("userPass").placeholder = "Dejar en blanco para no cambiarla";
+    } else {
+        alert("No se encontraron los datos para editar.");
+    }
 }
 
 async function eliminar(tipo, id) {

@@ -1,75 +1,111 @@
 <?php
 session_start();
 header('Content-Type: application/json');
-
-// Ajusta la ruta a db.php según tu estructura
-// Si estás en /Administrador/api/ y db.php está en /config/
 require_once '../../config/db.php';
 
-// 1. Validar Sesión y Rol
 if (!isset($_SESSION['rol']) || $_SESSION['rol'] != 'admin') {
     echo json_encode(['success' => false, 'message' => 'No tienes permisos de administrador']);
     exit();
 }
 
-// 2. Procesar la solicitud POST
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     
-    // Limpiar datos para evitar Inyección SQL
+    // Recibir datos y limpiar para evitar inyección SQL
+    $id_enviado = isset($_POST['id']) ? intval($_POST['id']) : 0; // Si no hay ID, es 0 (Nuevo)
     $nombre   = mysqli_real_escape_string($conexion, $_POST['nombre']);
     $correo   = mysqli_real_escape_string($conexion, $_POST['correo']);
     $password = $_POST['password']; 
-    $rol      = mysqli_real_escape_string($conexion, $_POST['rol']); // 'alumno' o 'docente'
-    $extra    = mysqli_real_escape_string($conexion, $_POST['extra']); // Matrícula o Especialidad
+    $rol      = mysqli_real_escape_string($conexion, $_POST['rol']);
+    $extra    = mysqli_real_escape_string($conexion, $_POST['extra']);
 
-    // Validar que no vengan vacíos
-    if (empty($nombre) || empty($correo) || empty($password) || empty($extra)) {
-        echo json_encode(['success' => false, 'message' => 'Todos los campos son obligatorios']);
+    // Validar campos obligatorios (nombre, correo, extra)
+    if (empty($nombre) || empty($correo) || empty($extra)) {
+        echo json_encode(['success' => false, 'message' => 'Faltan campos obligatorios']);
         exit();
     }
 
-    // Encriptar contraseña para que sea compatible con password_verify en el login
-    $pass_hash = password_hash($password, PASSWORD_DEFAULT);
-    
-    // --- PASO 1: Insertar en la tabla principal 'usuarios' ---
-    $query_user = "INSERT INTO usuarios (nombre_completo, correo, password, rol, activo) 
-                   VALUES ('$nombre', '$correo', '$pass_hash', '$rol', 1)";
+    if ($id_enviado > 0) {
+        // ==========================================
+        // MODO EDICIÓN (UPDATE)
+        // ==========================================
+        $usuario_id_a_editar = 0;
 
-    if (mysqli_query($conexion, $query_user)) {
-        // Obtenemos el ID del usuario recién creado
-        $id_usuario = mysqli_insert_id($conexion);
-
-        // --- PASO 2: Insertar en la tabla específica según el Rol ---
+        // 1. Buscamos el usuario_id real
         if ($rol === 'alumno') {
-            // Se asocia a carrera_id 1 por defecto (Sistemas)
-            $query_esp = "INSERT INTO alumnos (usuario_id, carrera_id, matricula, fecha_ingreso) 
-                          VALUES ($id_usuario, 1, '$extra', CURDATE())";
+            $res = mysqli_query($conexion, "SELECT usuario_id FROM alumnos WHERE id = $id_enviado");
         } else {
-            // Para docentes
-            $query_esp = "INSERT INTO docentes (usuario_id, especialidad) 
-                          VALUES ($id_usuario, '$extra')";
+            $res = mysqli_query($conexion, "SELECT usuario_id FROM docentes WHERE id = $id_enviado");
         }
 
+        if ($row = mysqli_fetch_assoc($res)) {
+            $usuario_id_a_editar = $row['usuario_id'];
+        } else {
+            echo json_encode(['success' => false, 'message' => 'No se encontró el registro para editar.']);
+            exit();
+        }
+
+        // 2. Actualizamos la tabla principal (usuarios)
+        $query_user = "UPDATE usuarios SET nombre_completo = '$nombre', correo = '$correo' ";
+        
+        // Si escribieron una contraseña nueva, la encriptamos y la actualizamos. Si está vacía, no se toca.
+        if (!empty($password)) {
+            $pass_hash = password_hash($password, PASSWORD_DEFAULT);
+            $query_user .= ", password = '$pass_hash' ";
+        }
+        $query_user .= " WHERE id = $usuario_id_a_editar";
+        
+        mysqli_query($conexion, $query_user);
+
+        // 3. Actualizamos la tabla específica (alumnos o docentes)
+        if ($rol === 'alumno') {
+            $query_esp = "UPDATE alumnos SET matricula = '$extra' WHERE id = $id_enviado";
+        } else {
+            $query_esp = "UPDATE docentes SET especialidad = '$extra' WHERE id = $id_enviado";
+        }
+        
         if (mysqli_query($conexion, $query_esp)) {
-            // ÉXITO TOTAL
             echo json_encode(['success' => true]);
         } else {
-            // Error en la segunda tabla (limpiar rastro en usuarios si es necesario, 
-            // aunque aquí solo informamos el error)
-            echo json_encode([
-                'success' => false, 
-                'message' => 'Usuario creado, pero hubo error en tabla específica: ' . mysqli_error($conexion)
-            ]);
+            echo json_encode(['success' => false, 'message' => 'Error al actualizar datos específicos: ' . mysqli_error($conexion)]);
         }
+
     } else {
-        // Error al insertar en la tabla usuarios (ej: correo duplicado)
-        echo json_encode([
-            'success' => false, 
-            'message' => 'Error al crear credenciales: ' . mysqli_error($conexion)
-        ]);
+        // ==========================================
+        // MODO CREACIÓN (INSERT) - (Tu código original)
+        // ==========================================
+        
+        // Para crear un usuario nuevo, la contraseña SÍ es obligatoria
+        if (empty($password)) {
+            echo json_encode(['success' => false, 'message' => 'La contraseña es obligatoria para nuevos usuarios.']);
+            exit();
+        }
+
+        $pass_hash = password_hash($password, PASSWORD_DEFAULT);
+        
+        $query_user = "INSERT INTO usuarios (nombre_completo, correo, password, rol, activo) 
+                       VALUES ('$nombre', '$correo', '$pass_hash', '$rol', 1)";
+
+        if (mysqli_query($conexion, $query_user)) {
+            $id_usuario = mysqli_insert_id($conexion);
+
+            if ($rol === 'alumno') {
+                $query_esp = "INSERT INTO alumnos (usuario_id, carrera_id, matricula, fecha_ingreso) 
+                              VALUES ($id_usuario, 1, '$extra', CURDATE())";
+            } else {
+                $query_esp = "INSERT INTO docentes (usuario_id, especialidad) 
+                              VALUES ($id_usuario, '$extra')";
+            }
+
+            if (mysqli_query($conexion, $query_esp)) {
+                echo json_encode(['success' => true]);
+            } else {
+                echo json_encode(['success' => false, 'message' => 'Error en tabla específica: ' . mysqli_error($conexion)]);
+            }
+        } else {
+            echo json_encode(['success' => false, 'message' => 'Error al crear credenciales: ' . mysqli_error($conexion)]);
+        }
     }
 } else {
-    // Si intentan entrar por URL sin POST
     echo json_encode(['success' => false, 'message' => 'Método no permitido']);
 }
 ?>
