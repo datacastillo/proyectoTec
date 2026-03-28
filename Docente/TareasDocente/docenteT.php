@@ -180,10 +180,10 @@ $grupos = mysqli_query($conexion, $query);
             <p style="color: var(--subtexto); margin-bottom: 30px;">Selecciona un grupo para gestionar actividades.</p>
             <div style="display: flex; gap: 25px; flex-wrap: wrap;">
                 <?php while($g = mysqli_fetch_assoc($grupos)): ?>
-                    <div class="card-materia" onclick="abrirGrupo(<?php echo $g['id']; ?>, '<?php echo $g['materia']; ?>')">
+                    <div class="card-materia" onclick="abrirGrupo(<?php echo $g['id']; ?>, '<?php echo htmlspecialchars($g['materia']); ?>')">
                         <div style="font-size: 2rem; margin-bottom: 10px;">📁</div>
-                        <h3><?php echo $g['materia']; ?></h3>
-                        <small style="color: var(--exito);">Grupo: <?php echo $g['nombre_grupo']; ?></small>
+                        <h3><?php echo htmlspecialchars($g['materia']); ?></h3>
+                        <small style="color: var(--exito);">Grupo: <?php echo htmlspecialchars($g['nombre_grupo']); ?></small>
                     </div>
                 <?php endwhile; ?>
             </div>
@@ -343,21 +343,73 @@ $grupos = mysqli_query($conexion, $query);
     // --- GESTIÓN DE MODAL NUEVA TAREA ---
     function mostrarModalTarea() {
         document.getElementById('modalTarea').style.display = 'flex';
-        fetch(`../Calificaciones/get_calificaciones_unidades.php?grupo_id=${grupoSeleccionado}&solo_unidades=1`)
+        
+        // Llamada al archivo local JSON que creamos
+        fetch(`get_unidades_json.php?grupo_id=${grupoSeleccionado}`)
             .then(res => res.json())
             .then(unidades => {
-                let options = unidades.map(u => `<option value="${u.id}">${u.nombre_unidad}</option>`).join('');
+                if (unidades.error) {
+                     console.error("Error del servidor:", unidades.error);
+                     document.getElementById('select_unidades').innerHTML = '<option value="">Error al cargar unidades</option>';
+                     return;
+                }
+
+                if (!unidades || unidades.length === 0) {
+                     document.getElementById('select_unidades').innerHTML = '<option value="">No hay unidades en este grupo</option>';
+                     return;
+                }
+                
+                let options = '<option value="">-- Seleccionar Unidad --</option>'; 
+                options += unidades.map(u => {
+                    let nombreUnidad = u.nombre_unidad || "Unidad sin nombre";
+                    return `<option value="${u.id}">${nombreUnidad.toUpperCase()}</option>`;
+                }).join('');
+                
                 document.getElementById('select_unidades').innerHTML = options;
+            })
+            .catch(error => {
+                console.error("Error en el fetch:", error);
+                document.getElementById('select_unidades').innerHTML = '<option value="">Error de conexión</option>';
             });
     }
 
+    // --- ENVÍO DEL FORMULARIO DE NUEVA TAREA (NUEVO) ---
     document.getElementById('formNuevaTarea').onsubmit = function(e) {
         e.preventDefault();
+        
+        const btn = this.querySelector('button[type="submit"]');
+        const textoOriginal = btn.innerText;
+        btn.innerText = "⏳ Guardando...";
+        btn.disabled = true;
+
         fetch('guardar_tarea.php', { method: 'POST', body: new FormData(this) })
-        .then(() => { cerrarModal(); cargarEntregas(grupoSeleccionado); });
+        .then(res => res.text()) // Leemos la respuesta del PHP
+        .then(res => {
+            // Evaluamos lo que responde el servidor
+            if(res.trim() === "success") {
+                alert("✅ Tarea publicada correctamente.");
+                cerrarModal(); 
+                cargarEntregas(grupoSeleccionado); // Refrescamos la vista de entregas
+                document.getElementById('formNuevaTarea').reset(); // Limpiamos el formulario
+            } else {
+                // Muestra la alerta con el error exacto que envía la base de datos
+                alert("❌ Error al guardar la tarea:\n" + res);
+            }
+        })
+        .catch(error => {
+            console.error("Error en el fetch:", error);
+            alert("❌ Error de conexión con el servidor.");
+        })
+        .finally(() => {
+            btn.innerText = textoOriginal;
+            btn.disabled = false;
+        });
     };
 
-    function cerrarModal() { document.getElementById('modalTarea').style.display = 'none'; }
+    function cerrarModal() { 
+        document.getElementById('modalTarea').style.display = 'none'; 
+    }
+    
     function regresar() { 
         document.getElementById('vista_grupos').style.display = 'flex'; 
         document.getElementById('vista_detalle').style.display = 'none'; 
