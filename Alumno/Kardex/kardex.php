@@ -17,15 +17,15 @@ $reg_alu = mysqli_fetch_assoc($res_alu);
 $alumno_id = $reg_alu['id'] ?? 0;
 $matricula = $reg_alu['matricula'] ?? 'S/N';
 
-
- 
+// Hacemos el conteo real de unidades por materia y traemos todas las calificaciones
 $query_kardex = "
     SELECT 
         m.id AS materia_id, 
         m.nombre AS materia_nombre, 
         m.clave,
         u.numero_unit,
-        cu.nota_final
+        cu.nota_final,
+        (SELECT COUNT(id) FROM unidades WHERE grupo_id = g.id) as total_unidades
     FROM materias m
     INNER JOIN grupos g ON m.id = g.materia_id
     INNER JOIN inscripciones i ON g.id = i.grupo_id
@@ -43,10 +43,13 @@ while ($row = mysqli_fetch_assoc($res_kardex)) {
         $materias_notas[$m_id] = [
             'nombre' => $row['materia_nombre'],
             'clave' => $row['clave'],
-            'notas' => [1 => '-', 2 => '-', 3 => '-', 4 => '-']
+            // Expandimos a 6 espacios vacíos por defecto
+            'notas' => [1 => '-', 2 => '-', 3 => '-', 4 => '-', 5 => '-', 6 => '-'],
+            'total_unidades' => (int)$row['total_unidades']
         ];
     }
-    if ($row['nota_final'] !== null) {
+    // Si la unidad es 1 a 6 y tiene calificación, la guardamos
+    if ($row['nota_final'] !== null && $row['numero_unit'] >= 1 && $row['numero_unit'] <= 6) {
         $materias_notas[$m_id]['notas'][$row['numero_unit']] = $row['nota_final'];
     }
 }
@@ -83,9 +86,9 @@ while ($row = mysqli_fetch_assoc($res_kardex)) {
         .logo-kardex { max-width: 120px; margin-bottom: 20px; }
         .kardex-table { width: 100%; border-collapse: collapse; margin-top: 20px; background: #0d1b2a; }
         .kardex-table th { background: #1b3a57; color: #3e92cc; padding: 15px; border: 1px solid rgba(255,255,255,0.05); text-transform: uppercase; font-size: 13px; }
-        .kardex-table td { padding: 12px; border: 1px solid rgba(255,255,255,0.05); text-align: center; color: #e0e1dd; }
+        .kardex-table td { padding: 12px; border: 1px solid rgba(255,255,255,0.05); text-align: center; color: #e0e1dd; font-size: 13px; }
         .text-left { text-align: left !important; }
-        .promedio-final { font-weight: bold; color: #2ecc71; background: rgba(46, 204, 113, 0.1); }
+        .promedio-final { font-weight: bold; font-size: 14px; }
         
         /* Botón PDF */
         .btn-pdf { background: #3e92cc; color: white; border: none; padding: 15px 30px; border-radius: 5px; cursor: pointer; font-weight: bold; margin-top: 30px; transition: 0.3s; font-size: 14px; letter-spacing: 1px; }
@@ -124,7 +127,7 @@ while ($row = mysqli_fetch_assoc($res_kardex)) {
 
         <section style="padding: 30px; display: flex; flex-direction: column; align-items: center;">
             
-            <div id="areaDescarga" style="width: 100%; max-width: 900px; text-align: center;">
+            <div id="areaDescarga" style="width: 100%; max-width: 950px; text-align: center;">
                 <img src="../../img/logoTec.png" class="logo-kardex" alt="Logo Tec">
                 <h2 style="color: #fff; margin-bottom: 5px; font-size: 1.8rem;">KÁRDEX ACADÉMICO OFICIAL</h2>
                 <p style="color: #adb5bd; margin-bottom: 25px;">Alumno: <strong style="color: #fff;"><?php echo strtoupper($nombreAlumno); ?></strong> | Matrícula: <strong style="color: #fff;"><?php echo $matricula; ?></strong></p>
@@ -137,6 +140,8 @@ while ($row = mysqli_fetch_assoc($res_kardex)) {
                             <th>U2</th>
                             <th>U3</th>
                             <th>U4</th>
+                            <th>U5</th>
+                            <th>U6</th>
                             <th>PROM</th>
                         </tr>
                     </thead>
@@ -146,21 +151,44 @@ while ($row = mysqli_fetch_assoc($res_kardex)) {
                                 <tr>
                                     <td class="text-left"><strong style="color: #3e92cc;"><?php echo $m['clave']; ?></strong> - <?php echo strtoupper($m['nombre']); ?></td>
                                     <?php 
-                                    $suma = 0; $cont = 0;
-                                    for ($i=1; $i <= 4; $i++): 
+                                    $suma = 0; $calificadas = 0;
+                                    $total_reales = $m['total_unidades'];
+
+                                    // Iteramos hasta 6 para dibujar todas las columnas
+                                    for ($i=1; $i <= 6; $i++): 
                                         $n = $m['notas'][$i];
-                                        if (is_numeric($n)) { $suma += $n; $cont++; }
+                                        if (is_numeric($n)) { $suma += $n; $calificadas++; }
                                     ?>
                                         <td><?php echo is_numeric($n) ? number_format($n, 0) : '-'; ?></td>
                                     <?php endfor; ?>
                                     
-                                    <td class="promedio-final">
-                                        <?php echo ($cont > 0) ? round($suma / $cont, 0) : '-'; ?>
+                                    <?php 
+                                        // Mismo sistema inteligente que en la boleta
+                                        $tiene_todo = ($calificadas == $total_reales && $total_reales > 0);
+                                        $promedio = '-';
+                                        $color_promedio = '#adb5bd'; // Gris por defecto
+                                        $bg_promedio = 'transparent';
+
+                                        if ($tiene_todo) {
+                                            $promedio_num = round($suma / $total_reales, 0);
+                                            $promedio = $promedio_num;
+                                            
+                                            if($promedio_num >= 70){
+                                                $color_promedio = '#2ecc71'; // Verde Aprobado
+                                                $bg_promedio = 'rgba(46, 204, 113, 0.1)';
+                                            } else {
+                                                $color_promedio = '#e74c3c'; // Rojo Reprobado
+                                                $bg_promedio = 'rgba(231, 76, 60, 0.1)';
+                                            }
+                                        }
+                                    ?>
+                                    <td class="promedio-final" style="color: <?php echo $color_promedio; ?>; background-color: <?php echo $bg_promedio; ?>;">
+                                        <?php echo $promedio; ?>
                                     </td>
                                 </tr>
                             <?php endforeach; ?>
                         <?php else: ?>
-                            <tr><td colspan="6" style="padding:40px; color: #adb5bd;">No se encontraron registros académicos para este alumno.</td></tr>
+                            <tr><td colspan="8" style="padding:40px; color: #adb5bd;">No se encontraron registros académicos para este alumno.</td></tr>
                         <?php endif; ?>
                     </tbody>
                 </table>

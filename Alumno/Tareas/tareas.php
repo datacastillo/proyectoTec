@@ -27,13 +27,14 @@ $query_tareas = "
         e.id as entrega_id,
         e.estatus as entrega_estatus
     FROM tareas t
-    INNER JOIN unidades u ON t.unidad_id = u.id /* AQUÍ ESTABA EL ERROR: Cambié unit_id por unidad_id */
+    INNER JOIN unidades u ON t.unidad_id = u.id 
     INNER JOIN grupos g ON u.grupo_id = g.id
     INNER JOIN materias m ON g.materia_id = m.id
     INNER JOIN inscripciones i ON g.id = i.grupo_id
     INNER JOIN alumnos a ON i.alumno_id = a.id
     LEFT JOIN entregas e ON t.id = e.tarea_id AND e.alumno_id = a.id
     WHERE a.usuario_id = '$id_usuario'
+    GROUP BY t.id -- <--- ESTA LÍNEA ES LA CLAVE PARA ELIMINAR DUPLICADOS
     ORDER BY t.fecha_entrega_limite ASC";
 
 $res_tareas = mysqli_query($conexion, $query_tareas);
@@ -106,7 +107,7 @@ if (!$res_tareas) {
 <div class="wrapper">
     <aside class="sidebar">
         <div class="sidebar-header">
-            <img src="../../img/logoTec.png" alt="Logo" style="max-width: 120px; margin-bottom: 10px;">
+            <img src="../img/logoTec.png" alt="Logo" style="max-width: 120px; margin-bottom: 10px;">
             <div class="user-info">
                 <span style="color:#3e92cc; font-size: 12px; font-weight: bold;">ALUMNO:</span><br>
                 <b style="color: white; font-size: 14px;"><?php echo strtoupper($nombreAlumno); ?></b><br>
