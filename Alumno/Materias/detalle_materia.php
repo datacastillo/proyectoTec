@@ -200,7 +200,7 @@ if ($res_unidades && mysqli_num_rows($res_unidades) > 0) {
 <div class="wrapper">
     <aside class="sidebar">
         <div class="sidebar-header">
-            <img src="../../img/logoTec.png" alt="Logo" style="max-width: 120px; margin-bottom: 10px;">
+            <img src="../img/logoTec.png" alt="Logo" style="max-width: 120px; margin-bottom: 10px;">
             <div class="user-info">
                 <span style="color:#3e92cc; font-size: 12px; font-weight: bold;">ALUMNO:</span><br>
                 <b style="color: white; font-size: 14px;"><?php echo strtoupper($nombreAlumno); ?></b><br>

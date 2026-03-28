@@ -43,6 +43,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
                 header("Location: ../Docente/docente.php");
             } elseif ($usuario['rol'] === 'alumno') {
                 header("Location: ../Alumno/Materias/Index.php");
+            } elseif ($usuario['rol'] === 'admin') {
+                // REDIRECCIÓN DEL ADMINISTRADOR AGREGADA AQUÍ
+                header("Location: ../Administrador/admin.php");
             } else {
                 header("Location: ../index.html");
             }
@@ -54,3 +57,4 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
         echo "<script>alert('Correo no registrado.'); window.location.href='../login.html';</script>";
     }
 }
+?>
