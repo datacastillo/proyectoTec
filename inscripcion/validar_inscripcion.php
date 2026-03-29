@@ -1,11 +1,11 @@
 <?php
-// 1. Conexión a la base de datos (Subimos un nivel para llegar a config)
+// 1. Conexión a la base de datos
 require_once '../config/db.php'; 
 
-// 2. Cabecera para responder en formato JSON
+// 2. Cabecera JSON
 header('Content-Type: application/json');
 
-// 3. Recibir y limpiar datos del formulario
+// 3. Recibir y limpiar datos
 $folio = isset($_POST['folio']) ? trim($_POST['folio']) : '';
 $curp  = isset($_POST['curp']) ? strtoupper(trim($_POST['curp'])) : '';
 
@@ -14,48 +14,51 @@ if (empty($folio) || empty($curp)) {
     exit;
 }
 
-// 4. Consulta Principal: Buscamos al aspirante y el nombre de su carrera
-// IMPORTANTE: Solo permite entrar si el estatus en la BD es 'aprobada'
-$sql = "SELECT s.nombre, s.apellido, s.carrera_id, c.nombre AS carrera_nombre 
-        FROM solicitudes_fichas s 
-        JOIN carreras c ON s.carrera_id = c.id 
-        WHERE s.folio = ? AND s.curp = ? AND s.estatus = 'aprobada'";
+try {
+    // 4. Buscar SOLO por Folio primero para ver si existe
+    $stmt = $pdo->prepare("SELECT s.*, c.nombre AS carrera_nombre 
+                           FROM solicitudes_fichas s 
+                           LEFT JOIN carreras c ON s.carrera_id = c.id 
+                           WHERE s.folio = ?");
+    $stmt->execute([$folio]);
+    $ficha = $stmt->fetch(PDO::FETCH_ASSOC);
 
-$stmt = mysqli_prepare($conexion, $sql);
-mysqli_stmt_bind_param($stmt, "ss", $folio, $curp);
-mysqli_stmt_execute($stmt);
-$result = mysqli_stmt_get_result($stmt);
-
-if ($row = mysqli_fetch_assoc($result)) {
-    $id_carrera = $row['carrera_id'];
-
-    // 5. Consulta de Materias: Traemos las materias cargadas para esa carrera
-    $sql_m = "SELECT clave, nombre, creditos FROM materias WHERE carrera_id = ?";
-    $stmt_m = mysqli_prepare($conexion, $sql_m);
-    mysqli_stmt_bind_param($stmt_m, "i", $id_carrera);
-    mysqli_stmt_execute($stmt_m);
-    $res_m = mysqli_stmt_get_result($stmt_m);
-    
-    $materias = [];
-    while($m = mysqli_fetch_assoc($res_m)) {
-        $materias[] = $m;
+    // Validación 1: ¿Existe el folio?
+    if (!$ficha) {
+        echo json_encode(['success' => false, 'message' => "El Folio '$folio' no existe en la base de datos. Verifica que lo hayas escrito bien."]);
+        exit;
     }
 
-    // 6. Respuesta de éxito con todos los datos necesarios
+    // Validación 2: ¿El CURP coincide?
+    if (strtoupper(trim($ficha['curp'])) !== $curp) {
+        echo json_encode(['success' => false, 'message' => "El CURP ingresado no coincide con el registrado para el folio '$folio'."]);
+        exit;
+    }
+
+    // Validación 3: ¿El estatus es correcto?
+    if (!in_array($ficha['estatus'], ['aprobada', 'inscrito'])) {
+        echo json_encode(['success' => false, 'message' => "El estatus actual del alumno es: '" . strtoupper($ficha['estatus']) . "'. Necesita ser APROBADA o INSCRITO."]);
+        exit;
+    }
+
+    // 5. Si pasa todas las pruebas, traemos las materias
+    $id_carrera = $ficha['carrera_id'];
+    
+    // ---> CORRECCIÓN AQUÍ: Quitamos 'creditos' de la consulta <---
+    $stmt_m = $pdo->prepare("SELECT clave, nombre FROM materias WHERE carrera_id = ?");
+    $stmt_m->execute([$id_carrera]);
+    $materias = $stmt_m->fetchAll(PDO::FETCH_ASSOC);
+
+    // 6. Respuesta de éxito
     echo json_encode([
         'success' => true,
-        'nombre' => $row['nombre'] . " " . $row['apellido'],
-        'carrera' => $row['carrera_nombre'],
+        'nombre' => $ficha['nombre'] . " " . $ficha['apellido'],
+        'carrera' => $ficha['carrera_nombre'],
         'materias' => $materias
     ]);
 
-} else {
-    // 7. Respuesta de error si no coincide o no está aprobado aún
-    echo json_encode([
-        'success' => false, 
-        'message' => 'Folio/CURP incorrectos o tu ficha aún no ha sido aprobada por la administración.'
-    ]);
+} catch (Exception $e) {
+    // Si la base de datos truena por algo, nos dirá el error exacto
+    echo json_encode(['success' => false, 'message' => 'Error de Base de Datos: ' . $e->getMessage()]);
 }
-
-mysqli_close($conexion);
 ?>

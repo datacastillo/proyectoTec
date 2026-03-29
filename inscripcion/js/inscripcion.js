@@ -1,3 +1,7 @@
+/**
+ * inscripcion.js - Gestión del proceso de inscripción de aspirantes
+ */
+
 // Variable global para mantener el folio durante toda la sesión de inscripción
 let folioActual = "";
 
@@ -43,14 +47,13 @@ async function validarAcceso() {
             document.getElementById('nombre-alumno').innerText = data.nombre;
             document.getElementById('carrera-alumno').innerText = data.carrera;
 
-            // Renderizar las materias obtenidas de la BD
+            // Renderizar las materias obtenidas de la BD (Sin créditos)
             const tbody = document.getElementById('lista-materias');
             tbody.innerHTML = data.materias.map(m => `
                 <tr>
                     <td><span class="status-badge">✅ CARGADA</span></td>
                     <td><strong>${m.clave}</strong></td>
                     <td>${m.nombre}</td>
-                    <td>${m.creditos} Cr.</td>
                 </tr>
             `).join('');
             
@@ -84,7 +87,7 @@ async function finalizarInscripcion() {
     formData.append('folio', folioActual);
 
     try {
-        // Llamada al archivo PHP que inserta en la tabla 'alumnos'
+        // Llamada al archivo PHP que inserta en la tabla 'alumnos' y 'usuarios'
         const response = await fetch('confirmar_inscripcion.php', {
             method: 'POST',
             body: formData
@@ -93,13 +96,21 @@ async function finalizarInscripcion() {
         const resData = await response.json();
 
         if (resData.success) {
-            // Éxito Total
-            alert("¡INSCRIPCIÓN COMPLETADA EXITOSAMENTE!\n\n" +
-                  "Aspirante: " + document.getElementById('nombre-alumno').innerText + "\n" +
-                  "Número de Control Oficial: " + resData.num_control + "\n\n" +
-                  "Bienvenido a la comunidad del Tec. Guarda bien tu número.");
+            // ÉXITO TOTAL: Extraemos datos de la respuesta para el alumno
+            const nombreAlumno = document.getElementById('nombre-alumno').innerText;
+
+            // Alerta informativa completa con las credenciales de acceso
+            // He usado concatenación (+) para asegurar que el navegador lea las variables del resData
+            alert("¡INSCRIPCIÓN COMPLETADA EXITOSAMENTE! 🎉\n\n" +
+                  "Aspirante: " + nombreAlumno + "\n" +
+                  "--------------------------------------------------\n" +
+                  "Número de Control (Matrícula): " + resData.num_control + "\n" +
+                  "Correo Institucional: " + resData.correo + "\n" +
+                  "--------------------------------------------------\n" +
+                  "Contraseña de acceso: Tu CURP\n\n" +
+                  "Bienvenido a la comunidad del Tec. Guarda bien tus datos.");
             
-            // Redirigir al inicio o login de alumnos
+            // Redirigir al inicio del sitio
             window.location.href = "../index.html"; 
         } else {
             // Error devuelto por el servidor (ej. error de SQL)

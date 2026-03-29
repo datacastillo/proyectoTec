@@ -360,14 +360,9 @@ $nombreAdmin = $_SESSION['nombre'] ?? 'ADMINISTRADOR';
                     <label style="display: block; margin-bottom: 5px;">Ciclo Escolar</label>
                     <select name="ciclo_escolar" required style="width: 100%; padding: 10px; border-radius: 4px; border: none; box-sizing: border-box;">
                         <option value="">Seleccione...</option>
-                        <option value="2024-1">2024-1</option>
-                        <option value="2024-2">2024-2</option>
-                        <option value="2025-1">2025-1</option>
-                        <option value="2025-2">2025-2</option>
                         <option value="2026-1">2026-1</option>
                         <option value="2026-2">2026-2</option>
-                        <option value="2027-1">2027-1</option>
-                        <option value="2027-2">2027-2</option>
+                        
                     </select>
                 </div>
             </div>
