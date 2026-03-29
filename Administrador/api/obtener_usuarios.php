@@ -1,47 +1,36 @@
 <?php
-session_start();
+header('Content-Type: application/json');
+include '../../config/db.php'; 
 
-// Ruta corregida: Sube dos niveles para salir de 'api' y 'Administrador' y llegar a 'config'
-require_once '../../config/db.php';
-
-// Seguridad: Solo admin
-if (!isset($_SESSION['rol']) || $_SESSION['rol'] != 'admin') {
-    header('Content-Type: application/json');
-    echo json_encode(['error' => 'No autorizado']);
-    exit();
-}
-
-$tipo = $_GET['tipo'] ?? 'alumno';
-$data = [];
+$tipo = $_GET['tipo'] ?? '';
 
 try {
     if ($tipo === 'alumno') {
-        // En tu tabla usuarios se llama 'nombre_completo'
-        $query = "SELECT a.id, u.nombre_completo as nombre, a.matricula as extra 
-                  FROM alumnos a 
-                  INNER JOIN usuarios u ON a.usuario_id = u.id 
-                  WHERE u.rol = 'alumno'";
+        // Consulta para ALUMNOS
+        $query = "SELECT u.id, u.nombre_completo, u.correo, a.matricula AS extra 
+                  FROM usuarios u 
+                  INNER JOIN alumnos a ON u.id = a.usuario_id 
+                  WHERE u.rol = 'alumno' AND u.activo = 1";
+                  
+    } else if ($tipo === 'docente') {
+        // Consulta para DOCENTES: Agregamos d.id AS docente_id para evitar el error de llave foránea
+        $query = "SELECT u.id, u.nombre_completo, u.correo, d.especialidad AS extra, d.id AS docente_id 
+                  FROM usuarios u 
+                  INNER JOIN docentes d ON u.id = d.usuario_id 
+                  WHERE u.rol = 'docente' AND u.activo = 1";
+                  
     } else {
-        // Para docentes (ajusta 'especialidad' si el campo se llama distinto en tu tabla docentes)
-        $query = "SELECT d.id, u.nombre_completo as nombre, d.especialidad as extra 
-                  FROM docentes d 
-                  INNER JOIN usuarios u ON d.usuario_id = u.id 
-                  WHERE u.rol = 'docente'";
+        echo json_encode(["error" => "Tipo de usuario no válido"]);
+        exit;
     }
 
-    $resultado = mysqli_query($conexion, $query);
+    $stmt = $pdo->prepare($query);
+    $stmt->execute();
+    $resultados = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    
+    echo json_encode($resultados);
 
-    if ($resultado) {
-        while ($fila = mysqli_fetch_assoc($resultado)) {
-            $data[] = $fila;
-        }
-    }
-
-    header('Content-Type: application/json');
-    echo json_encode($data);
-
-} catch (Exception $e) {
-    header('Content-Type: application/json');
-    echo json_encode(['error' => $e->getMessage()]);
+} catch (PDOException $e) {
+    echo json_encode(["error" => "Error DB: " . $e->getMessage()]);
 }
 ?>
