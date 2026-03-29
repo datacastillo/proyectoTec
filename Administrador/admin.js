@@ -68,7 +68,7 @@ function mostrarSeccion(seccion) {
 
 // 3. RENDERIZAR TABLAS HTML
 function render() {
-    // Tabla Alumnos
+    // Tabla Alumnos (Se añadieron comillas a ${a.id} por seguridad)
     let tablaA = document.getElementById("tablaAlumnos");
     if (tablaA) {
         tablaA.innerHTML = "";
@@ -79,14 +79,14 @@ function render() {
                 <td>${a.nombre_completo || a.nombre}</td>
                 <td>${a.extra || a.correo || 'Sin Matrícula'}</td>
                 <td>
-                    <button class="btn-primary" style="background:#3e92cc; margin-right:5px;" onclick="editar('alumno', ${a.id})"><i class="fas fa-edit"></i></button>
-                    <button class="btn-primary" style="background:#e74c3c;" onclick="eliminar('alumno', ${a.id})"><i class="fas fa-trash"></i></button>
+                    <button class="btn-primary" style="background:#3e92cc; margin-right:5px;" onclick="editar('alumno', '${a.id}')"><i class="fas fa-edit"></i></button>
+                    <button class="btn-primary" style="background:#e74c3c;" onclick="eliminar('alumno', '${a.id}')"><i class="fas fa-trash"></i></button>
                 </td>
             </tr>`;
         });
     }
 
-    // Tabla Docentes
+    // Tabla Docentes (Se añadieron comillas a ${d.id} por seguridad)
     let tablaD = document.getElementById("tablaDocentes");
     if (tablaD) {
         tablaD.innerHTML = "";
@@ -97,8 +97,8 @@ function render() {
                 <td>${d.nombre_completo || d.nombre}</td>
                 <td>${d.extra || 'Sin Especialidad'}</td>
                 <td>
-                    <button class="btn-primary" style="background:#3e92cc; margin-right:5px;" onclick="editar('docente', ${d.id})"><i class="fas fa-edit"></i></button>
-                    <button class="btn-primary" style="background:#e74c3c;" onclick="eliminar('docente', ${d.id})"><i class="fas fa-trash"></i></button>
+                    <button class="btn-primary" style="background:#3e92cc; margin-right:5px;" onclick="editar('docente', '${d.id}')"><i class="fas fa-edit"></i></button>
+                    <button class="btn-primary" style="background:#e74c3c;" onclick="eliminar('docente', '${d.id}')"><i class="fas fa-trash"></i></button>
                 </td>
             </tr>`;
         });
@@ -127,7 +127,7 @@ function render() {
         });
     }
 
-    // Tabla Materias
+    // Tabla Materias (Se añadieron comillas a ${m.id} por seguridad)
     let tablaM = document.getElementById("tablaMaterias");
     if (tablaM) {
         tablaM.innerHTML = "";
@@ -139,8 +139,8 @@ function render() {
                 <td>Carrera ${m.carrera_id}</td>
                 <td>Sem. ${m.semestre}</td>
                 <td>
-                    <button class="btn-primary" style="background:#3e92cc; margin-right:5px;" onclick="editar('materia', ${m.id})"><i class="fas fa-edit"></i></button>
-                    <button class="btn-primary" style="background:#e74c3c;" onclick="eliminar('materia', ${m.id})"><i class="fas fa-trash"></i></button>
+                    <button class="btn-primary" style="background:#3e92cc; margin-right:5px;" onclick="editar('materia', '${m.id}')"><i class="fas fa-edit"></i></button>
+                    <button class="btn-primary" style="background:#e74c3c;" onclick="eliminar('materia', '${m.id}')"><i class="fas fa-trash"></i></button>
                 </td>
             </tr>`;
         });
@@ -249,17 +249,29 @@ function editar(tipo, id) {
     }
 }
 
+// --- FUNCIÓN ELIMINAR ACTUALIZADA CON CONTROL DE ERRORES ---
 async function eliminar(tipo, id) {
-    if(confirm(`¿Estás seguro de eliminar este ${tipo}?`)) {
+    if(confirm(`¿Estás seguro de eliminar este ${tipo}? Esta acción no se puede deshacer.`)) {
         try {
             const response = await fetch(`api/eliminar_usuario.php?id=${id}&tipo=${tipo}`);
+            
+            // Verificamos si la respuesta del servidor es correcta
+            if (!response.ok) {
+                throw new Error("El servidor no respondió correctamente.");
+            }
+
             const res = await response.json();
+            
             if (res.success) {
-                alert("Eliminado con éxito.");
+                alert("✅ Eliminado con éxito.");
                 cargarDatosBD(tipo.toLowerCase());
+            } else {
+                // AHORA SÍ: Mostramos el error que devuelva PHP
+                alert("❌ No se pudo eliminar: " + (res.message || "Error desconocido en la base de datos."));
             }
         } catch (error) {
-            console.error("Error:", error);
+            console.error("Error crítico:", error);
+            alert("⚠️ Hubo un error de conexión o el archivo PHP tiene un fallo. Revisa la consola.");
         }
     }
 }
@@ -304,7 +316,6 @@ function llenarSelectsCarga() {
     if(selectDocente) {
         selectDocente.innerHTML = '<option value="">Seleccione un docente...</option>';
         docentes.forEach(d => {
-            // ---> ÚNICA ADECUACIÓN AQUÍ: Cambiamos d.id por d.docente_id <---
             selectDocente.innerHTML += `<option value="${d.docente_id}">${d.nombre_completo || d.nombre}</option>`;
         });
     }
@@ -354,7 +365,7 @@ async function cargarCargaAcademica() {
                     <td>Sem. ${c.semestre}</td>
                     <td>${c.ciclo_escolar}</td>
                     <td>
-                        <button class="btn-primary" style="background:#e74c3c;" onclick="eliminarCarga(${c.id})"><i class="fas fa-trash"></i></button>
+                        <button class="btn-primary" style="background:#e74c3c;" onclick="eliminarCarga('${c.id}')"><i class="fas fa-trash"></i></button>
                     </td>
                 </tr>`;
             });

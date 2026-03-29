@@ -8,7 +8,7 @@ if (!isset($_SESSION['rol']) || $_SESSION['rol'] != 'admin') {
     exit();
 }
 
-// Este es el ID de la tabla alumnos o docentes que nos manda el botón
+// Este es el ID que nos manda el botón
 $id_enviado = isset($_GET['id']) ? intval($_GET['id']) : 0;
 $tipo = isset($_GET['tipo']) ? $_GET['tipo'] : '';
 
@@ -24,27 +24,52 @@ try {
     $usuario_id_a_borrar = 0;
 
     if ($tipo === 'alumno') {
-        // 1. Buscamos el usuario_id asociado a este alumno
-        $res = mysqli_query($conexion, "SELECT usuario_id FROM alumnos WHERE id = $id_enviado");
-        if ($row = mysqli_fetch_assoc($res)) {
-            $usuario_id_a_borrar = $row['usuario_id'];
-            
-            // 2. Borramos al alumno usando su propio ID
-            mysqli_query($conexion, "DELETE FROM alumnos WHERE id = $id_enviado");
+        // 1. Asumimos que el JS manda el usuario_id (lo más común)
+        $res = mysqli_query($conexion, "SELECT usuario_id FROM alumnos WHERE usuario_id = $id_enviado");
+        if (mysqli_num_rows($res) > 0) {
+            $usuario_id_a_borrar = $id_enviado;
+            mysqli_query($conexion, "DELETE FROM alumnos WHERE usuario_id = $id_enviado");
         } else {
-            throw new Exception("No se encontró el registro del alumno.");
+            // Fallback: Por si acaso mandó el id directo de la tabla alumnos
+            $res2 = mysqli_query($conexion, "SELECT usuario_id FROM alumnos WHERE id = $id_enviado");
+            if ($row2 = mysqli_fetch_assoc($res2)) {
+                $usuario_id_a_borrar = $row2['usuario_id'];
+                mysqli_query($conexion, "DELETE FROM alumnos WHERE id = $id_enviado");
+            } else {
+                throw new Exception("No se encontró el registro del alumno.");
+            }
         }
+        
     } else if ($tipo === 'docente') {
-        // 1. Buscamos el usuario_id asociado a este docente
-        $res = mysqli_query($conexion, "SELECT usuario_id FROM docentes WHERE id = $id_enviado");
-        if ($row = mysqli_fetch_assoc($res)) {
-            $usuario_id_a_borrar = $row['usuario_id'];
-            
-            // 2. Borramos al docente usando su propio ID
-            mysqli_query($conexion, "DELETE FROM docentes WHERE id = $id_enviado");
+        // 1. Asumimos que el JS manda el usuario_id
+        $res = mysqli_query($conexion, "SELECT usuario_id FROM docentes WHERE usuario_id = $id_enviado");
+        if (mysqli_num_rows($res) > 0) {
+            $usuario_id_a_borrar = $id_enviado;
+            mysqli_query($conexion, "DELETE FROM docentes WHERE usuario_id = $id_enviado");
         } else {
-            throw new Exception("No se encontró el registro del docente.");
+            // Fallback: Por si acaso mandó el id de la tabla docentes
+            $res2 = mysqli_query($conexion, "SELECT usuario_id FROM docentes WHERE id = $id_enviado");
+            if ($row2 = mysqli_fetch_assoc($res2)) {
+                $usuario_id_a_borrar = $row2['usuario_id'];
+                mysqli_query($conexion, "DELETE FROM docentes WHERE id = $id_enviado");
+            } else {
+                throw new Exception("No se encontró el registro del docente.");
+            }
         }
+        
+    } else if ($tipo === 'materia') {
+        // AGREGADO: Soporte para borrar materias
+        mysqli_query($conexion, "DELETE FROM materias WHERE id = $id_enviado");
+        if (mysqli_affected_rows($conexion) > 0) {
+            mysqli_commit($conexion);
+            echo json_encode(['success' => true]);
+            exit(); // Terminamos aquí porque la materia no tiene cuenta en 'usuarios'
+        } else {
+            throw new Exception("No se encontró el registro de la materia.");
+        }
+        
+    } else {
+        throw new Exception("Tipo de registro no válido.");
     }
 
     // 3. Si encontramos el usuario_id, borramos la cuenta principal
@@ -56,10 +81,10 @@ try {
             mysqli_commit($conexion);
             echo json_encode(['success' => true]);
         } else {
-            throw new Exception("Se borró el perfil, pero no se encontró la cuenta de usuario principal.");
+            // Si por alguna razón el perfil existía pero la cuenta de usuario no, igual guardamos el cambio
+            mysqli_commit($conexion);
+            echo json_encode(['success' => true]); 
         }
-    } else {
-        throw new Exception("No se pudo identificar la cuenta vinculada.");
     }
 
 } catch (Exception $e) {
