@@ -480,5 +480,86 @@ document.addEventListener("DOMContentLoaded", () => {
                 console.error('Error:', error);
             }
         });
+        
+    }
+    
+});
+
+// ======================================AC================================
+// --- NUEVO: BUSCADOR EN TIEMPO REAL PARA ALUMNOS ---
+// ======================================================================
+document.addEventListener('DOMContentLoaded', function() {
+    const buscador = document.getElementById('buscadorAlumnos');
+    
+    if(buscador) {
+        buscador.addEventListener('keyup', function() {
+            let textoBusqueda = this.value.toLowerCase();
+            
+            // Seleccionamos específicamente las filas de la tabla de alumnos
+            let filas = document.querySelectorAll('#tablaAlumnos tr'); 
+
+            // CORRECCIÓN: Se cambió filaA por fila para que coincida con el contenido
+            filas.forEach(function(fila) { 
+                let contenidoFila = fila.textContent.toLowerCase();
+                
+                if(contenidoFila.includes(textoBusqueda)) {
+                    fila.style.display = '';
+                } else {
+                    fila.style.display = 'none';
+                }
+            });
+        });
+    }
+});
+
+// ======================================================================
+// --- NUEVO: BUSCADOR EN TIEMPO REAL PARA DOCENTES ---
+// ======================================================================
+document.addEventListener('DOMContentLoaded', function() {
+    const buscadorDocentes = document.getElementById('buscadorDocentes');
+    
+    if(buscadorDocentes) {
+        buscadorDocentes.addEventListener('keyup', function() {
+            let textoBusqueda = this.value.toLowerCase();
+            
+            // Seleccionamos específicamente las filas de la tabla de docentes
+            let filas = document.querySelectorAll('#tablaDocentes tr'); 
+
+            filas.forEach(function(fila) {
+                let contenidoFila = fila.textContent.toLowerCase();
+                
+                if(contenidoFila.includes(textoBusqueda)) {
+                    fila.style.display = '';
+                } else {
+                    fila.style.display = 'none';
+                }
+            });
+        });
+    }
+});
+
+// ======================================================================
+// --- NUEVO: BUSCADOR EN TIEMPO REAL PARA MATERIAS ---
+// ======================================================================
+document.addEventListener('DOMContentLoaded', function() {
+    const buscadorMaterias = document.getElementById('buscadorMaterias');
+    
+    if(buscadorMaterias) {
+        buscadorMaterias.addEventListener('keyup', function() {
+            let textoBusqueda = this.value.toLowerCase();
+            
+            // Seleccionamos específicamente las filas de la tabla de materias
+            let filas = document.querySelectorAll('#tablaMaterias tr'); 
+
+            filas.forEach(function(fila) {
+                let contenidoFila = fila.textContent.toLowerCase();
+                
+                if(contenidoFila.includes(textoBusqueda)) {
+                    fila.style.display = '';
+                } else {
+                    fila.style.display = 'none';
+                }
+            });
+        });
     }
 });

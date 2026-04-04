@@ -88,29 +88,32 @@ $nombreAdmin = $_SESSION['nombre'] ?? 'ADMINISTRADOR';
             </div>
         </header>
 
-        <section class="content-body seccion" id="alumnos">
+       <section class="content-body seccion" id="alumnos">
 
-            <div class="page-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-                <h2>Alumnos Inscritos</h2>
-                <button class="btn-primary" onclick="document.getElementById('modalRegistrarAlumno').style.display='flex'">+ Nuevo Alumno</button>
-            </div>
+    <div class="page-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+        <h2>Alumnos Inscritos</h2>
+        <button class="btn-primary" onclick="document.getElementById('modalRegistrarAlumno').style.display='flex'">+ Nuevo Alumno</button>
+    </div>
 
-            <div class="table-container">
-                <table class="user-table" style="width: 100%; border-collapse: collapse;">
-                    <thead>
-                        <tr>
-                            <th>ID</th>
-                            <th>NOMBRE</th>
-                            <th>MATRÍCULA</th>
-                            <th>ACCIONES</th>
-                        </tr>
-                    </thead>
-                    <tbody id="tablaAlumnos">
-                        </tbody>
-                </table>
-            </div>
+    <div style="margin-bottom: 15px;">
+        <input type="text" id="buscadorAlumnos" placeholder="Buscar por nombre o matrícula..." style="padding: 8px; width: 100%; max-width: 400px; border-radius: 5px; border: 1px solid #ccc; color: black; outline: none;">
+    </div>
+    <div class="table-container">
+        <table class="user-table" style="width: 100%; border-collapse: collapse;">
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>NOMBRE</th>
+                    <th>MATRÍCULA</th>
+                    <th>ACCIONES</th>
+                </tr>
+            </thead>
+            <tbody id="tablaAlumnos">
+            </tbody>
+        </table>
+    </div>
 
-        </section>
+</section>
 
         <section class="content-body seccion" id="docentes" style="display:none;">
 
@@ -121,6 +124,9 @@ $nombreAdmin = $_SESSION['nombre'] ?? 'ADMINISTRADOR';
                 </div>
             </div>
 
+            <div style="margin-bottom: 15px;">
+                <input type="text" id="buscadorDocentes" placeholder="Buscar por nombre o especialidad..." style="padding: 8px; width: 100%; max-width: 400px; border-radius: 5px; border: 1px solid #ccc; color: black; outline: none;">
+            </div>
             <div class="table-container">
                 <table class="user-table" style="width: 100%; border-collapse: collapse;">
                     <thead>
@@ -168,6 +174,9 @@ $nombreAdmin = $_SESSION['nombre'] ?? 'ADMINISTRADOR';
                 <button class="btn-primary" onclick="abrirModal('MATERIA')">+ Nueva Materia</button>
             </div>
 
+            <div style="margin-bottom: 15px;">
+                <input type="text" id="buscadorMaterias" placeholder="Buscar por nombre o clave..." style="padding: 8px; width: 100%; max-width: 400px; border-radius: 5px; border: 1px solid #ccc; color: black; outline: none;">
+            </div>
             <div class="table-container">
                 <table class="user-table" style="width: 100%; border-collapse: collapse;">
                     <thead>
