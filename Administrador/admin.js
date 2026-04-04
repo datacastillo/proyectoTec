@@ -8,6 +8,10 @@ let fichas = [];
 let materias = []; 
 let tipoActual = "";
 
+// --- INTEGRACIÓN DE AVATAR (CORREGIDO A ASSETS) ---
+let avatarSeleccionado = "default.png";
+const rutaAvatares = "assets/avatares/"; 
+
 // 1. CARGAR DATOS DESDE LA BD (API)
 async function cargarDatosBD(tipo) {
     try {
@@ -66,17 +70,19 @@ function mostrarSeccion(seccion) {
     }
 }
 
-// 3. RENDERIZAR TABLAS HTML
+// 3. RENDERIZAR TABLAS HTML (OPTIMIZADO PARA MAYOR RENDIMIENTO)
 function render() {
-    // Tabla Alumnos (Se añadieron comillas a ${a.id} por seguridad)
     let tablaA = document.getElementById("tablaAlumnos");
     if (tablaA) {
-        tablaA.innerHTML = "";
+        let htmlAlumnos = ""; // Se almacena en string para no recargar el DOM en cada iteración
         alumnos.forEach((a) => {
-            tablaA.innerHTML += `
+            htmlAlumnos += `
             <tr>
                 <td>${a.id}</td>
-                <td>${a.nombre_completo || a.nombre}</td>
+                <td>
+                    <img src="${rutaAvatares}${a.avatar || 'default.png'}" style="width:30px; height:30px; border-radius:50%; margin-right:10px; vertical-align:middle; object-fit:cover;">
+                    ${a.nombre_completo || a.nombre}
+                </td>
                 <td>${a.extra || a.correo || 'Sin Matrícula'}</td>
                 <td>
                     <button class="btn-primary" style="background:#3e92cc; margin-right:5px;" onclick="editar('alumno', '${a.id}')"><i class="fas fa-edit"></i></button>
@@ -84,17 +90,20 @@ function render() {
                 </td>
             </tr>`;
         });
+        tablaA.innerHTML = htmlAlumnos; // Se inyecta una sola vez
     }
 
-    // Tabla Docentes (Se añadieron comillas a ${d.id} por seguridad)
     let tablaD = document.getElementById("tablaDocentes");
     if (tablaD) {
-        tablaD.innerHTML = "";
+        let htmlDocentes = "";
         docentes.forEach((d) => {
-            tablaD.innerHTML += `
+            htmlDocentes += `
             <tr>
                 <td>${d.id}</td>
-                <td>${d.nombre_completo || d.nombre}</td>
+                <td>
+                    <img src="${rutaAvatares}${d.avatar || 'default.png'}" style="width:30px; height:30px; border-radius:50%; margin-right:10px; vertical-align:middle; object-fit:cover;">
+                    ${d.nombre_completo || d.nombre}
+                </td>
                 <td>${d.extra || 'Sin Especialidad'}</td>
                 <td>
                     <button class="btn-primary" style="background:#3e92cc; margin-right:5px;" onclick="editar('docente', '${d.id}')"><i class="fas fa-edit"></i></button>
@@ -102,19 +111,19 @@ function render() {
                 </td>
             </tr>`;
         });
+        tablaD.innerHTML = htmlDocentes;
     }
 
-    // Tabla Fichas
     let tablaF = document.getElementById("tablaFichas");
     if (tablaF) {
-        tablaF.innerHTML = "";
+        let htmlFichas = "";
         fichas.forEach((f) => {
             let colorBg = f.estatus === 'pendiente' ? '#f39c12' : 
                          (f.estatus === 'aprobada' ? '#2ecc71' : 
                          (f.estatus === 'rechazada' ? '#e74c3c' : 
                          (f.estatus === 'inscrito' ? '#3498db' : '#34495e')));
 
-            tablaF.innerHTML += `
+            htmlFichas += `
             <tr>
                 <td>${f.nombre_completo}<br><small style="color:gray;">Folio: ${f.folio}</small></td>
                 <td>Carrera ${f.carrera_id}</td>
@@ -125,14 +134,14 @@ function render() {
                 </td>
             </tr>`;
         });
+        tablaF.innerHTML = htmlFichas;
     }
 
-    // Tabla Materias (Se añadieron comillas a ${m.id} por seguridad)
     let tablaM = document.getElementById("tablaMaterias");
     if (tablaM) {
-        tablaM.innerHTML = "";
+        let htmlMaterias = "";
         materias.forEach((m) => {
-            tablaM.innerHTML += `
+            htmlMaterias += `
             <tr>
                 <td>${m.clave}</td>
                 <td>${m.nombre}</td>
@@ -144,6 +153,7 @@ function render() {
                 </td>
             </tr>`;
         });
+        tablaM.innerHTML = htmlMaterias;
     }
 }
 
@@ -153,6 +163,7 @@ function abrirModal(tipo) {
     const modal = document.getElementById("userModal");
     const emailGroup = document.getElementById("emailGroup");
     const passGroup = document.getElementById("passGroup");
+    const avatarGroup = document.getElementById("avatarGroup"); 
     
     if (modal) {
         modal.style.display = "flex"; 
@@ -162,11 +173,13 @@ function abrirModal(tipo) {
             document.getElementById("extraLabel").innerText = 'Clave';
             if(emailGroup) emailGroup.style.display = "none";
             if(passGroup) passGroup.style.display = "none";
+            if(avatarGroup) avatarGroup.style.display = "none";
         } else {
             document.getElementById("modalTitle").innerText = tipo === 'ALUMNO' ? 'Nuevo Alumno' : 'Nuevo Docente';
             document.getElementById("extraLabel").innerText = tipo === 'ALUMNO' ? 'Matrícula' : 'Especialidad';
             if(emailGroup) emailGroup.style.display = "block";
             if(passGroup) passGroup.style.display = "block";
+            if(avatarGroup) avatarGroup.style.display = "block";
         }
         
         document.getElementById("userId").value = ""; 
@@ -175,10 +188,27 @@ function abrirModal(tipo) {
         document.getElementById("userPass").value = "";
         document.getElementById("userExtra").value = "";
         
+        seleccionarAvatar('default.png');
+        
         if (tipo !== 'MATERIA') {
             document.getElementById("userPass").required = true;
         }
     }
+}
+
+// --- FUNCIÓN PARA SELECCIONAR AVATAR ---
+function seleccionarAvatar(archivo) {
+    avatarSeleccionado = archivo;
+    
+    const inputAvatar = document.getElementById('userAvatar');
+    if(inputAvatar) inputAvatar.value = archivo;
+
+    document.querySelectorAll('.avatar-option, .avatar-opcion').forEach(img => {
+        img.classList.remove('selected');
+        if(img.src.includes(archivo)) {
+            img.classList.add('selected');
+        }
+    });
 }
 
 function cerrarModal() {
@@ -205,6 +235,7 @@ async function guardarUsuario() {
     formData.append('password', password);
     formData.append('rol', tipoActual.toLowerCase());
     formData.append('extra', extra);
+    formData.append('avatar', avatarSeleccionado);
 
     try {
         const response = await fetch('api/guardar_usuario.php', {
@@ -246,16 +277,16 @@ function editar(tipo, id) {
         document.getElementById("userName").value = persona.nombre_completo || persona.nombre;
         document.getElementById("userEmail").value = persona.correo || ""; 
         document.getElementById("userExtra").value = persona.extra || persona.clave || "";
+        
+        if(persona.avatar) seleccionarAvatar(persona.avatar);
     }
 }
 
-// --- FUNCIÓN ELIMINAR ACTUALIZADA CON CONTROL DE ERRORES ---
 async function eliminar(tipo, id) {
     if(confirm(`¿Estás seguro de eliminar este ${tipo}? Esta acción no se puede deshacer.`)) {
         try {
             const response = await fetch(`api/eliminar_usuario.php?id=${id}&tipo=${tipo}`);
             
-            // Verificamos si la respuesta del servidor es correcta
             if (!response.ok) {
                 throw new Error("El servidor no respondió correctamente.");
             }
@@ -266,7 +297,6 @@ async function eliminar(tipo, id) {
                 alert("✅ Eliminado con éxito.");
                 cargarDatosBD(tipo.toLowerCase());
             } else {
-                // AHORA SÍ: Mostramos el error que devuelva PHP
                 alert("❌ No se pudo eliminar: " + (res.message || "Error desconocido en la base de datos."));
             }
         } catch (error) {
@@ -308,7 +338,7 @@ window.onload = () => {
 };
 
 // ======================================================================
-// --- AGREGADO: NUEVAS FUNCIONES PARA DOCENTES Y CARGA ACADÉMICA ---
+// --- FUNCIONES PARA DOCENTES Y CARGA ACADÉMICA ---
 // ======================================================================
 
 function llenarSelectsCarga() {
@@ -349,15 +379,15 @@ async function cargarCargaAcademica() {
         
         let tablaC = document.getElementById("tablaCargaAcademica");
         if (tablaC) {
-            tablaC.innerHTML = "";
             if(data.error || data.length === 0) {
                 tablaC.innerHTML = "<tr><td colspan='6' style='text-align:center;'>No hay materias asignadas aún</td></tr>";
                 llenarSelectsCarga();
                 return;
             }
             
+            let htmlCarga = ""; // Optimización de string
             data.forEach(c => {
-                tablaC.innerHTML += `
+                htmlCarga += `
                 <tr>
                     <td>${c.docente_nombre}</td>
                     <td>${c.materia_nombre}</td>
@@ -369,6 +399,7 @@ async function cargarCargaAcademica() {
                     </td>
                 </tr>`;
             });
+            tablaC.innerHTML = htmlCarga;
         }
         llenarSelectsCarga(); 
     } catch (error) {
@@ -393,19 +424,17 @@ async function eliminarCarga(grupo_id) {
     }
 }
 
-// ADECUACIONES: LISTENERS PARA MODALES DE REGISTRO
+// LISTENERS PARA MODALES DE REGISTRO
 document.addEventListener("DOMContentLoaded", () => {
     
-    // Listener para Registrar Alumno (Nuevo)
     const formRegistrarAlumno = document.getElementById('formRegistrarAlumno');
     if (formRegistrarAlumno) {
         formRegistrarAlumno.addEventListener('submit', async function(e) {
             e.preventDefault();
             let formData = new FormData(this);
-            formData.append('rol', 'alumno'); // Forzamos el rol alumno
+            formData.append('rol', 'alumno'); 
 
             try {
-                // Puedes usar el mismo endpoint de registrar_docente si lo haces genérico o uno nuevo
                 const response = await fetch('api/registrar_alumno.php', {
                     method: 'POST',
                     body: formData
@@ -426,7 +455,6 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 
-    // Listener para Registrar Docente (Existente)
     const formRegistrarDocente = document.getElementById('formRegistrarDocente');
     if (formRegistrarDocente) {
         formRegistrarDocente.addEventListener('submit', async function(e) {
@@ -454,7 +482,6 @@ document.addEventListener("DOMContentLoaded", () => {
         });
     }
 
-    // Listener para Asignar Carga (Existente)
     const formAsignarCarga = document.getElementById('formAsignarCarga');
     if (formAsignarCarga) {
         formAsignarCarga.addEventListener('submit', async function(e) {
@@ -480,86 +507,71 @@ document.addEventListener("DOMContentLoaded", () => {
                 console.error('Error:', error);
             }
         });
-        
     }
-    
 });
 
-// ======================================AC================================
-// --- NUEVO: BUSCADOR EN TIEMPO REAL PARA ALUMNOS ---
 // ======================================================================
-document.addEventListener('DOMContentLoaded', function() {
-    const buscador = document.getElementById('buscadorAlumnos');
-    
-    if(buscador) {
-        buscador.addEventListener('keyup', function() {
-            let textoBusqueda = this.value.toLowerCase();
-            
-            // Seleccionamos específicamente las filas de la tabla de alumnos
-            let filas = document.querySelectorAll('#tablaAlumnos tr'); 
+// --- BUSCADORES EN TIEMPO REAL (OPTIMIZADO) ---
+// ======================================================================
 
-            // CORRECCIÓN: Se cambió filaA por fila para que coincida con el contenido
+// Función genérica para evitar repetir la misma lógica de búsqueda
+function configurarBuscador(idInput, idTabla) {
+    const input = document.getElementById(idInput);
+    if (input) {
+        input.addEventListener('keyup', function() {
+            let textoBusqueda = this.value.toLowerCase();
+            let filas = document.querySelectorAll(`#${idTabla} tr`); 
             filas.forEach(function(fila) { 
                 let contenidoFila = fila.textContent.toLowerCase();
-                
-                if(contenidoFila.includes(textoBusqueda)) {
-                    fila.style.display = '';
-                } else {
-                    fila.style.display = 'none';
-                }
+                fila.style.display = contenidoFila.includes(textoBusqueda) ? '' : 'none';
             });
         });
     }
-});
+}
 
-// ======================================================================
-// --- NUEVO: BUSCADOR EN TIEMPO REAL PARA DOCENTES ---
-// ======================================================================
+// Inicializamos los 3 buscadores de forma limpia
 document.addEventListener('DOMContentLoaded', function() {
-    const buscadorDocentes = document.getElementById('buscadorDocentes');
-    
-    if(buscadorDocentes) {
-        buscadorDocentes.addEventListener('keyup', function() {
-            let textoBusqueda = this.value.toLowerCase();
-            
-            // Seleccionamos específicamente las filas de la tabla de docentes
-            let filas = document.querySelectorAll('#tablaDocentes tr'); 
-
-            filas.forEach(function(fila) {
-                let contenidoFila = fila.textContent.toLowerCase();
-                
-                if(contenidoFila.includes(textoBusqueda)) {
-                    fila.style.display = '';
-                } else {
-                    fila.style.display = 'none';
-                }
-            });
-        });
-    }
+    configurarBuscador('buscadorAlumnos', 'tablaAlumnos');
+    configurarBuscador('buscadorDocentes', 'tablaDocentes');
+    configurarBuscador('buscadorMaterias', 'tablaMaterias');
 });
 
 // ======================================================================
-// --- NUEVO: BUSCADOR EN TIEMPO REAL PARA MATERIAS ---
+// --- ACTUALIZAR PERFIL DEL ADMINISTRADOR ---
 // ======================================================================
-document.addEventListener('DOMContentLoaded', function() {
-    const buscadorMaterias = document.getElementById('buscadorMaterias');
-    
-    if(buscadorMaterias) {
-        buscadorMaterias.addEventListener('keyup', function() {
-            let textoBusqueda = this.value.toLowerCase();
-            
-            // Seleccionamos específicamente las filas de la tabla de materias
-            let filas = document.querySelectorAll('#tablaMaterias tr'); 
+async function actualizarPerfil(event) {
+    event.preventDefault(); // Evita definitivamente que la página se recargue
 
-            filas.forEach(function(fila) {
-                let contenidoFila = fila.textContent.toLowerCase();
-                
-                if(contenidoFila.includes(textoBusqueda)) {
-                    fila.style.display = '';
-                } else {
-                    fila.style.display = 'none';
-                }
-            });
+    const form = document.getElementById('formMiPerfil');
+    const formData = new FormData(form);
+    
+    try {
+        const response = await fetch('api/actualizar_perfil.php', {
+            method: 'POST',
+            body: formData
         });
+
+        const res = await response.json();
+
+        if (res.success) {
+            alert('✅ Perfil actualizado correctamente');
+            
+            // ACTUALIZACIÓN VISUAL INMEDIATA (Sin recargar)
+            const nuevoAvatar = document.getElementById('inputAvatarSeleccionado').value;
+            const rutaCompleta = 'assets/avatares/' + nuevoAvatar;
+
+            if(document.getElementById('imgSideBar')) {
+                document.getElementById('imgSideBar').src = rutaCompleta;
+            }
+            if(document.getElementById('imgPerfilGrande')) {
+                document.getElementById('imgPerfilGrande').src = rutaCompleta;
+            }
+
+        } else {
+            alert('❌ Error al actualizar: ' + res.message);
+        }
+    } catch (error) {
+        console.error('Error en la petición:', error);
+        alert('⚠️ Hubo un error de conexión con el servidor.');
     }
-});
+}

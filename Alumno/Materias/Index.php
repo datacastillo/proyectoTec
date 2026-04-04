@@ -19,6 +19,12 @@ $info_alumno = mysqli_fetch_assoc($res_info);
 $alumno_id = $info_alumno['id'] ?? 0;
 $matricula = $info_alumno['matricula'] ?? 'S/N';
 
+// NUEVO: Consulta para obtener el avatar del usuario desde la base de datos
+$query_user = "SELECT avatar FROM usuarios WHERE id = '$id_usuario' LIMIT 1";
+$res_user = mysqli_query($conexion, $query_user);
+$info_user = mysqli_fetch_assoc($res_user);
+$avatar = (!empty($info_user['avatar'])) ? $info_user['avatar'] : 'default.png';
+
 // Consulta de materias dinámicas (Agregamos DISTINCT para evitar duplicados)
 $query_materias = "SELECT DISTINCT g.id AS grupo_id, m.nombre, m.clave                   
                    FROM materias m
@@ -101,6 +107,11 @@ $res_materias = mysqli_query($conexion, $query_materias);
     <aside class="sidebar">
         <div class="sidebar-header">
             <img src="../img/logoTec.png" alt="Logo" style="max-width: 120px; margin-bottom: 10px;">
+            
+            <div style="margin-top: 15px; margin-bottom: 10px;">
+                <img src="../../Administrador/assets/avatares/<?php echo $avatar; ?>" alt="Avatar" style="width: 80px; height: 80px; border-radius: 50%; object-fit: cover; border: 3px solid #3e92cc; background-color: #0d1b2a;">
+            </div>
+
             <div class="user-info">
                 <span style="color:#3e92cc; font-size: 12px; font-weight: bold;">ALUMNO:</span><br>
                 <b style="color: white; font-size: 14px;"><?php echo strtoupper($nombreAlumno); ?></b><br>
