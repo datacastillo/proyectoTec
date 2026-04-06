@@ -34,6 +34,7 @@ $res_grupos = mysqli_query($conexion, $query);
             --accent: #2b6671;
             --texto: #ffffff;
             --exito: #2ecc71;
+            --info: #3e92cc; /* Color para el botón de imprimir */
         }
 
         body {
@@ -128,6 +129,7 @@ $res_grupos = mysqli_query($conexion, $query);
         }
         
         .btn-accion:hover { background: var(--exito); color: black; }
+        .btn-imprimir:hover { background: #2980b9 !important; color: white !important; }
 
         /* MODAL */
         .modal {
@@ -195,9 +197,16 @@ $res_grupos = mysqli_query($conexion, $query);
         <div id="vista_alumnos" style="display: none;">
             <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
                 <h2 id="titulo_materia" style="margin:0;"></h2>
-                <div>
-                    <button class="btn-accion" onclick="abrirModalUnidad()" style="background: var(--exito); color: black; margin-right: 10px;">+ Nueva Unidad</button>
-                    <button class="btn-accion" onclick="regresar()" style="background: transparent; border: 1px solid #adb5bd; color: white;">⬅ Volver</button>
+                <div style="display: flex; gap: 10px;">
+                    <button class="btn-accion btn-imprimir" onclick="imprimirListaAsistencia()" style="background: var(--info); color: white;">
+                        🖨️ Imprimir Lista
+                    </button>
+                    <button class="btn-accion" onclick="abrirModalUnidad()" style="background: var(--exito); color: black;">
+                        + Nueva Unidad
+                    </button>
+                    <button class="btn-accion" onclick="regresar()" style="background: transparent; border: 1px solid #adb5bd; color: white;">
+                        ⬅ Volver
+                    </button>
                 </div>
             </div>
             <div id="tabla_alumnos_res"></div>
@@ -223,7 +232,7 @@ $res_grupos = mysqli_query($conexion, $query);
     let grupoActualId = 0; // Guardamos el ID del grupo que estamos viendo
 
     function verAlumnos(grupoId, materia) {
-        grupoActualId = grupoId;
+        grupoActualId = grupoId; // Actualizamos la variable global
         document.getElementById('vista_principal').style.display = 'none';
         document.getElementById('vista_alumnos').style.display = 'block';
         document.getElementById('titulo_materia').innerText = materia;
@@ -233,9 +242,20 @@ $res_grupos = mysqli_query($conexion, $query);
             .then(html => { document.getElementById('tabla_alumnos_res').innerHTML = html; });
     }
 
+    // --- NUEVA FUNCIÓN PARA IMPRIMIR ---
+    function imprimirListaAsistencia() {
+        if(grupoActualId !== 0) {
+            // Abre el archivo imprimir_lista.php en una pestaña nueva pasándole el ID del grupo
+            window.open('imprimir_lista.php?id_grupo=' + grupoActualId, '_blank');
+        } else {
+            alert("Por favor, selecciona un grupo primero.");
+        }
+    }
+
     function regresar() {
         document.getElementById('vista_principal').style.display = 'block';
         document.getElementById('vista_alumnos').style.display = 'none';
+        grupoActualId = 0; // Reseteamos por seguridad
     }
 
     // --- LÓGICA DEL MODAL DE UNIDADES ---
