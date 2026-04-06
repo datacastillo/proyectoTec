@@ -61,13 +61,14 @@ while ($row = mysqli_fetch_assoc($res_kardex)) {
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Kardex Académico | ISIC</title>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         /* Paleta de colores Azul (Estilo Docente) */
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Montserrat', sans-serif; }
         body { background-color: #0d1b2a; color: #e0e1dd; }
         .wrapper { display: flex; min-height: 100vh; }
         
-        /* Barra Lateral */
+        /* Barra Lateral (Mantenemos por si el include hereda clases) */
         .sidebar { width: 280px; background: #142d3e; padding-top: 20px; border-right: 1px solid rgba(255,255,255,0.05); }
         .sidebar-header { text-align: center; padding-bottom: 20px; border-bottom: 1px solid rgba(255,255,255,0.05); }
         .user-info { margin-top: 15px; }
@@ -99,26 +100,8 @@ while ($row = mysqli_fetch_assoc($res_kardex)) {
 <body>
 
 <div class="wrapper">
-    <aside class="sidebar">
-        <div class="sidebar-header">
-            <img src="../img/logoTec.png" alt="Logo" style="max-width: 120px; margin-bottom: 10px;">
-            <div class="user-info">
-                <span style="color:#3e92cc; font-size: 12px; font-weight: bold;">ALUMNO:</span><br>
-                <b style="color: white; font-size: 14px;"><?php echo strtoupper($nombreAlumno); ?></b><br>
-                <span style="color: #adb5bd; font-size: 12px;">Matrícula: <?php echo $matricula; ?></span>
-            </div>
-        </div>
-
-        <nav class="sidebar-nav">
-            <ul>
-                <li><a href="../Materias/Index.php">📚 MIS MATERIAS</a></li>
-                <li><a href="../Calificaciones/calificaciones.php">📊 CALIFICACIONES</a></li>
-                <li><a href="../Tareas/tareas.php">📝 TAREAS PENDIENTES</a></li>
-                <li class="active"><a href="kardex.php">📜 MI KARDEX</a></li>
-                <li style="margin-top: 30px;"><a href="../../auth/logout.php" style="color: #e74c3c;">🚪 CERRAR SESIÓN</a></li>
-            </ul>
-        </nav>
-    </aside>
+    
+    <?php include '../sidebar.php'; ?>
 
     <main class="main-content">
         <header class="topbar">

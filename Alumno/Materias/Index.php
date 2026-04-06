@@ -2,9 +2,8 @@
 session_start();
 require_once '../../config/db.php'; 
 
-// 1. Validar sesión
 if (!isset($_SESSION['rol']) || $_SESSION['rol'] != 'alumno') {
-    header("Location: ../../auth/login.html");
+    header("Location: /proyectoTec/auth/login.html");
     exit();
 }
 
@@ -40,13 +39,14 @@ $res_materias = mysqli_query($conexion, $query_materias);
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Portal Alumno | ISIC</title>
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     <style>
         /* Paleta de colores Azul (Estilo Docente) */
         * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Montserrat', sans-serif; }
         body { background-color: #0d1b2a; color: #e0e1dd; }
         .wrapper { display: flex; min-height: 100vh; }
         
-        /* Barra Lateral */
+        /* Barra Lateral (Mantenemos por si el include hereda clases) */
         .sidebar { width: 280px; background: #142d3e; padding-top: 20px; border-right: 1px solid rgba(255,255,255,0.05); flex-shrink: 0;}
         .sidebar-header { text-align: center; padding-bottom: 20px; border-bottom: 1px solid rgba(255,255,255,0.05); }
         .user-info { margin-top: 15px; }
@@ -104,31 +104,8 @@ $res_materias = mysqli_query($conexion, $query_materias);
 <body>
 
 <div class="wrapper">
-    <aside class="sidebar">
-        <div class="sidebar-header">
-            <img src="../img/logoTec.png" alt="Logo" style="max-width: 120px; margin-bottom: 10px;">
-            
-            <div style="margin-top: 15px; margin-bottom: 10px;">
-                <img src="../../Administrador/assets/avatares/<?php echo $avatar; ?>" alt="Avatar" style="width: 80px; height: 80px; border-radius: 50%; object-fit: cover; border: 3px solid #3e92cc; background-color: #0d1b2a;">
-            </div>
-
-            <div class="user-info">
-                <span style="color:#3e92cc; font-size: 12px; font-weight: bold;">ALUMNO:</span><br>
-                <b style="color: white; font-size: 14px;"><?php echo strtoupper($nombreAlumno); ?></b><br>
-                <span style="color: #adb5bd; font-size: 12px;">Matrícula: <?php echo $matricula; ?></span>
-            </div>
-        </div>
-
-        <nav class="sidebar-nav">
-            <ul>
-                <li class="active"><a href="Index.php">📚 MIS MATERIAS</a></li>
-                <li><a href="../Calificaciones/calificaciones.php">📊 CALIFICACIONES</a></li>
-                <li><a href="../Tareas/tareas.php">📝 TAREAS PENDIENTES</a></li>
-                <li><a href="../Kardex/kardex.php">📜 MI KARDEX</a></li>
-                <li style="margin-top: 30px;"><a href="../../auth/logout.php" style="color: #e74c3c;">🚪 CERRAR SESIÓN</a></li>
-            </ul>
-        </nav>
-    </aside>
+    
+    <?php include '../sidebar.php'; ?>
 
     <main class="main-content">
         <header class="topbar">
@@ -164,5 +141,86 @@ $res_materias = mysqli_query($conexion, $query_materias);
     </main>
 </div>
 
+<div id="modalAvatar" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.8); z-index:9999; justify-content:center; align-items:center;">
+    <div style="background:#142d3e; padding:30px; border-radius:12px; width:450px; text-align:center; border: 1px solid rgba(255,255,255,0.1); box-shadow: 0 10px 30px rgba(0,0,0,0.5);">
+        <h3 style="color:#fff; margin-bottom:20px;">Elige tu nuevo Avatar</h3>
+        
+        <div style="display:flex; flex-wrap:wrap; gap:15px; justify-content:center; margin-bottom: 20px;">
+            <img src="../../Administrador/assets/avatares/default.png" class="avatar-opt" onclick="seleccionarNuevoAvatar('default.png', this)" style="width:70px; height:70px; border-radius:50%; cursor:pointer; border:3px solid transparent; background: #0d1b2a;">
+            <img src="../../Administrador/assets/avatares/avatar_1.png" class="avatar-opt" onclick="seleccionarNuevoAvatar('avatar_1.png', this)" style="width:70px; height:70px; border-radius:50%; cursor:pointer; border:3px solid transparent; background: #0d1b2a;">
+            <img src="../../Administrador/assets/avatares/avatar_2.png" class="avatar-opt" onclick="seleccionarNuevoAvatar('avatar_2.png', this)" style="width:70px; height:70px; border-radius:50%; cursor:pointer; border:3px solid transparent; background: #0d1b2a;">
+            <img src="../../Administrador/assets/avatares/avatar_3.png" class="avatar-opt" onclick="seleccionarNuevoAvatar('avatar_3.png', this)" style="width:70px; height:70px; border-radius:50%; cursor:pointer; border:3px solid transparent; background: #0d1b2a;">
+            <img src="../../Administrador/assets/avatares/avatar_4.png" class="avatar-opt" onclick="seleccionarNuevoAvatar('avatar_4.png', this)" style="width:70px; height:70px; border-radius:50%; cursor:pointer; border:3px solid transparent; background: #0d1b2a;">
+            <img src="../../Administrador/assets/avatares/avatar_5.png" class="avatar-opt" onclick="seleccionarNuevoAvatar('avatar_5.png', this)" style="width:70px; height:70px; border-radius:50%; cursor:pointer; border:3px solid transparent; background: #0d1b2a;">
+            <img src="../../Administrador/assets/avatares/avatar_6.png" class="avatar-opt" onclick="seleccionarNuevoAvatar('avatar_6.png', this)" style="width:70px; height:70px; border-radius:50%; cursor:pointer; border:3px solid transparent; background: #0d1b2a;">
+            <img src="../../Administrador/assets/avatares/avatar_7.png" class="avatar-opt" onclick="seleccionarNuevoAvatar('avatar_7.png', this)" style="width:70px; height:70px; border-radius:50%; cursor:pointer; border:3px solid transparent; background: #0d1b2a;">
+            <img src="../../Administrador/assets/avatares/avatar_8.png" class="avatar-opt" onclick="seleccionarNuevoAvatar('avatar_8.png', this)" style="width:70px; height:70px; border-radius:50%; cursor:pointer; border:3px solid transparent; background: #0d1b2a;">
+            <img src="../../Administrador/assets/avatares/avatar_9.png" class="avatar-opt" onclick="seleccionarNuevoAvatar('avatar_9.png', this)" style="width:70px; height:70px; border-radius:50%; cursor:pointer; border:3px solid transparent; background: #0d1b2a;">
+            <img src="../../Administrador/assets/avatares/avatar_10.png" class="avatar-opt" onclick="seleccionarNuevoAvatar('avatar_10.png', this)" style="width:70px; height:70px; border-radius:50%; cursor:pointer; border:3px solid transparent; background: #0d1b2a;">
+            <img src="../../Administrador/assets/avatares/avatar_11.png" class="avatar-opt" onclick="seleccionarNuevoAvatar('avatar_11.png', this)" style="width:70px; height:70px; border-radius:50%; cursor:pointer; border:3px solid transparent; background: #0d1b2a;">
+            <img src="../../Administrador/assets/avatares/avatar_12.png" class="avatar-opt" onclick="seleccionarNuevoAvatar('avatar_12.png', this)" style="width:70px; height:70px; border-radius:50%; cursor:pointer; border:3px solid transparent; background: #0d1b2a;">
+            <img src="../../Administrador/assets/avatares/avatar_13.png" class="avatar-opt" onclick="seleccionarNuevoAvatar('avatar_13.png', this)" style="width:70px; height:70px; border-radius:50%; cursor:pointer; border:3px solid transparent; background: #0d1b2a;">
+            <img src="../../Administrador/assets/avatares/avatar_14.png" class="avatar-opt" onclick="seleccionarNuevoAvatar('avatar_14.png', this)" style="width:70px; height:70px; border-radius:50%; cursor:pointer; border:3px solid transparent; background: #0d1b2a;">
+            <img src="../../Administrador/assets/avatares/avatar_15.png" class="avatar-opt" onclick="seleccionarNuevoAvatar('avatar_15.png', this)" style="width:70px; height:70px; border-radius:50%; cursor:pointer; border:3px solid transparent; background: #0d1b2a;">
+        </div>
+
+        <input type="hidden" id="inputMiAvatar" value="">
+        
+        <div style="margin-top:20px; display: flex; justify-content: center; gap: 10px;">
+            <button onclick="guardarMiAvatar()" style="background:#2ecc71; color:#fff; border:none; padding:10px 20px; border-radius:5px; cursor:pointer; font-weight:bold; width: 100%;">Guardar Avatar</button>
+            <button onclick="cerrarModalAvatar()" style="background:#e74c3c; color:#fff; border:none; padding:10px 20px; border-radius:5px; cursor:pointer; font-weight:bold; width: 100%;">Cancelar</button>
+        </div>
+    </div>
+</div>
+
+<script>
+    function abrirModalAvatar() {
+        document.getElementById('modalAvatar').style.display = 'flex';
+        document.getElementById('inputMiAvatar').value = ''; 
+        // Resetear bordes
+        document.querySelectorAll('.avatar-opt').forEach(img => img.style.borderColor = 'transparent');
+    }
+
+    function cerrarModalAvatar() {
+        document.getElementById('modalAvatar').style.display = 'none';
+    }
+
+    function seleccionarNuevoAvatar(archivo, elemento) {
+        document.getElementById('inputMiAvatar').value = archivo;
+        
+        // Quitar borde a todos y ponérselo al seleccionado
+        document.querySelectorAll('.avatar-opt').forEach(img => img.style.borderColor = 'transparent');
+        elemento.style.borderColor = '#3e92cc';
+    }
+
+    async function guardarMiAvatar() {
+        const avatarSeleccionado = document.getElementById('inputMiAvatar').value;
+        
+        if (!avatarSeleccionado) {
+            alert("⚠️ Por favor, selecciona un avatar primero.");
+            return;
+        }
+
+        const formData = new FormData();
+        formData.append('avatar', avatarSeleccionado);
+
+        try {
+            const response = await fetch('actualizar_avatar.php', {
+                method: 'POST',
+                body: formData
+            });
+            const data = await response.json();
+
+            if (data.success) {
+                location.reload();
+            } else {
+                alert("❌ Error: " + data.message);
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            alert("⚠️ Ocurrió un error de conexión.");
+        }
+    }
+</script>
 </body>
 </html>

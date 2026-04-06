@@ -291,12 +291,19 @@ $telefono_actual = $user_data['telefono'] ?? '';
 
                     <h3 style="color: white; border-bottom: 1px solid #333; padding-bottom: 10px; margin-bottom: 20px;">Cambiar Avatar</h3>
                     <div style="display: grid; grid-template-columns: repeat(auto-fill, minmax(80px, 1fr)); gap: 15px; background: #0f0f1a; padding: 20px; border-radius: 10px;">
-                        <?php for($i=1; $i<=10; $i++): $nombreImg = "avatar_$i.png"; ?>
+                        
+                        <img src="assets/avatares/default.png" 
+                             class="avatar-opcion" 
+                             onclick="seleccionarAvatarPerfil('default.png', this)"
+                             style="width: 100%; cursor: pointer; border-radius: 50%; border: 3px solid transparent; transition: 0.3s; <?php if('default.png' == $foto_actual) echo 'border-color: #d4af37; transform: scale(1.1);'; ?>">
+
+                        <?php for($i=1; $i<=15; $i++): $nombreImg = "avatar_$i.png"; ?>
                             <img src="assets/avatares/<?php echo $nombreImg; ?>" 
                                  class="avatar-opcion" 
                                  onclick="seleccionarAvatarPerfil('<?php echo $nombreImg; ?>', this)"
                                  style="width: 100%; cursor: pointer; border-radius: 50%; border: 3px solid transparent; transition: 0.3s; <?php if($nombreImg == $foto_actual) echo 'border-color: #d4af37; transform: scale(1.1);'; ?>">
                         <?php endfor; ?>
+
                     </div>
                 </form>
             </div>
@@ -319,13 +326,20 @@ $telefono_actual = $user_data['telefono'] ?? '';
             <div id="avatarGroup" style="margin-bottom: 15px;">
                 <label style="display: block; margin-bottom: 8px; color: white;">Selecciona un Avatar:</label>
                 <div style="display: flex; gap: 10px; flex-wrap: wrap; background: rgba(255,255,255,0.05); padding: 10px; border-radius: 8px;">
-                    <input type="hidden" id="userAvatar" value="avatar_1.png">
-                    <?php for($i=1; $i<=6; $i++): $img = "avatar_$i.png"; ?>
+                    
+                    <input type="hidden" id="userAvatar" value="default.png">
+                    <img src="assets/avatares/default.png" 
+                         class="avatar-option selected" 
+                         onclick="seleccionarAvatarModal('default.png', this)"
+                         title="default.png">
+
+                    <?php for($i=1; $i<=15; $i++): $img = "avatar_$i.png"; ?>
                         <img src="assets/avatares/<?php echo $img; ?>" 
                              class="avatar-option" 
                              onclick="seleccionarAvatarModal('<?php echo $img; ?>', this)"
                              title="<?php echo $img; ?>">
                     <?php endfor; ?>
+
                 </div>
             </div>
 
