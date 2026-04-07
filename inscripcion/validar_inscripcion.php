@@ -44,12 +44,11 @@ try {
     // 5. Si pasa todas las pruebas, traemos las materias
     $id_carrera = $ficha['carrera_id'];
     
-    // ---> CORRECCIÓN AQUÍ: Quitamos 'creditos' de la consulta <---
     $stmt_m = $pdo->prepare("SELECT clave, nombre FROM materias WHERE carrera_id = ?");
     $stmt_m->execute([$id_carrera]);
     $materias = $stmt_m->fetchAll(PDO::FETCH_ASSOC);
 
-    // 6. Respuesta de éxito
+    // 6. Respuesta de éxito (REGRESAMOS A TU COLUMNA 'apellido')
     echo json_encode([
         'success' => true,
         'nombre' => $ficha['nombre'] . " " . $ficha['apellido'],
@@ -58,7 +57,6 @@ try {
     ]);
 
 } catch (Exception $e) {
-    // Si la base de datos truena por algo, nos dirá el error exacto
     echo json_encode(['success' => false, 'message' => 'Error de Base de Datos: ' . $e->getMessage()]);
 }
 ?>

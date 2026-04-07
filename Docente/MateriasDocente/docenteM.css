@@ -76,3 +76,30 @@ td:hover .icon-edit { opacity: 1; }
 .modal-actions { display: flex; justify-content: space-between; gap: 10px; }
 .btn-aceptar { background: #2ecc71; border: none; padding: 12px; border-radius: 20px; font-weight: bold; flex: 1; cursor: pointer; }
 .btn-cancelar { background: #e74c3c; color: white; border: none; padding: 12px; border-radius: 20px; flex: 1; cursor: pointer; }
+
+.badge {
+    padding: 4px 10px;
+    border-radius: 4px;
+    font-size: 10px;
+    font-weight: bold;
+    text-transform: uppercase;
+}
+.badge-verde { background: #27ae60; color: white; }
+.badge-amarillo { background: #f1c40f; color: black; }
+.badge-rojo { background: #e74c3c; color: white; }
+.badge-gris { background: #7f8c8d; color: white; }
+
+.btn-alerta {
+    background: #e67e22;
+    color: white;
+    border: none;
+    padding: 5px 12px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 11px;
+    transition: 0.3s;
+}
+.btn-alerta:hover {
+    background: #d35400;
+    box-shadow: 0 0 10px rgba(230, 126, 34, 0.5);
+}

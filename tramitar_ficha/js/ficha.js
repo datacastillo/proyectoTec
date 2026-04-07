@@ -38,7 +38,20 @@ function procesarRegistro() {
         method: 'POST',
         body: datos
     })
-    .then(response => response.json())
+    .then(async response => {
+        // TRAMPA: Leemos la respuesta de PHP como texto primero
+        const textoCrudo = await response.text();
+        
+        try {
+            // Intentamos convertir ese texto a JSON
+            const data = JSON.parse(textoCrudo);
+            return data; 
+        } catch (err) {
+            // Si explota, te mostramos exactamente qué dijo PHP
+            console.error("🚨 ERROR REAL DE PHP:\n", textoCrudo);
+            throw new Error("PHP devolvió un error en lugar de JSON. Revisa la consola.");
+        }
+    })
     .then(result => {
         if(result.status === 'success') {
             // Llenado de datos en la ficha con el FOLIO REAL generado por PHP
@@ -59,7 +72,7 @@ function procesarRegistro() {
         }
     })
     .catch(error => {
-        console.error("Error:", error);
-        alert("❌ Hubo un fallo en la conexión con el servidor.");
+        console.error("Error capturado:", error);
+        alert("❌ Hubo un fallo en la conexión. Abre la consola (F12) para ver el error exacto.");
     });
 }

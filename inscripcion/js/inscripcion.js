@@ -33,7 +33,17 @@ async function validarAcceso() {
             body: formData
         });
         
-        const data = await response.json();
+        // TRAMPA PARA ERRORES DE PHP: Leemos como texto primero
+        const textoCrudo = await response.text();
+        let data;
+
+        try {
+            data = JSON.parse(textoCrudo);
+        } catch (err) {
+            console.error("🚨 ERROR REAL DE PHP (validar_inscripcion.php):\n", textoCrudo);
+            alert("Error en el servidor. Abre la consola (F12) para ver los detalles.");
+            return; // Detenemos la ejecución si no es JSON válido
+        }
 
         if (data.success) {
             // Guardamos el folio de forma global para la función de finalizar
@@ -49,20 +59,25 @@ async function validarAcceso() {
 
             // Renderizar las materias obtenidas de la BD (Sin créditos)
             const tbody = document.getElementById('lista-materias');
-            tbody.innerHTML = data.materias.map(m => `
-                <tr>
-                    <td><span class="status-badge">✅ CARGADA</span></td>
-                    <td><strong>${m.clave}</strong></td>
-                    <td>${m.nombre}</td>
-                </tr>
-            `).join('');
+            
+            if (data.materias && data.materias.length > 0) {
+                tbody.innerHTML = data.materias.map(m => `
+                    <tr>
+                        <td><span class="status-badge">✅ CARGADA</span></td>
+                        <td><strong>${m.clave}</strong></td>
+                        <td>${m.nombre}</td>
+                    </tr>
+                `).join('');
+            } else {
+                tbody.innerHTML = `<tr><td colspan="3" style="text-align:center;">No hay materias registradas para esta carrera.</td></tr>`;
+            }
             
         } else {
             // Error: Folio incorrecto, CURP mal escrita o estatus no 'aprobada'
             alert("Error de validación: " + data.message);
         }
     } catch (e) {
-        console.error("Error en validación:", e);
+        console.error("Error en petición (Red):", e);
         alert("No se pudo conectar con el servidor. Revisa tu conexión.");
     }
 }
@@ -93,14 +108,23 @@ async function finalizarInscripcion() {
             body: formData
         });
         
-        const resData = await response.json();
+        // TRAMPA PARA ERRORES DE PHP: Leemos como texto primero
+        const textoCrudo = await response.text();
+        let resData;
+
+        try {
+            resData = JSON.parse(textoCrudo);
+        } catch (err) {
+            console.error("🚨 ERROR REAL DE PHP (confirmar_inscripcion.php):\n", textoCrudo);
+            alert("Error al confirmar en el servidor. Abre la consola (F12) para ver los detalles.");
+            return; // Detenemos la ejecución si no es JSON válido
+        }
 
         if (resData.success) {
             // ÉXITO TOTAL: Extraemos datos de la respuesta para el alumno
             const nombreAlumno = document.getElementById('nombre-alumno').innerText;
 
             // Alerta informativa completa con las credenciales de acceso
-            // He usado concatenación (+) para asegurar que el navegador lea las variables del resData
             alert("¡INSCRIPCIÓN COMPLETADA EXITOSAMENTE! 🎉\n\n" +
                   "Aspirante: " + nombreAlumno + "\n" +
                   "--------------------------------------------------\n" +
@@ -117,7 +141,7 @@ async function finalizarInscripcion() {
             alert("Hubo un problema al procesar tu registro: " + resData.message);
         }
     } catch (error) {
-        console.error("Error al finalizar:", error);
-        alert("Error crítico al intentar registrar la inscripción.");
+        console.error("Error al finalizar (Red):", error);
+        alert("Error crítico al intentar registrar la inscripción. Revisa tu conexión.");
     }
 }
