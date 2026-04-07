@@ -18,6 +18,7 @@ $alumno_id = $reg_alu['id'] ?? 0;
 $matricula = $reg_alu['matricula'] ?? 'S/N';
 
 // Hacemos el conteo real de unidades por materia y traemos todas las calificaciones
+// Hacemos el conteo real de unidades por materia y traemos todas las calificaciones
 $query_kardex = "
     SELECT 
         m.id AS materia_id, 
@@ -29,11 +30,10 @@ $query_kardex = "
     FROM materias m
     INNER JOIN grupos g ON m.id = g.materia_id
     INNER JOIN inscripciones i ON g.id = i.grupo_id
-    INNER JOIN unidades u ON g.id = u.grupo_id
+    LEFT JOIN unidades u ON g.id = u.grupo_id 
     LEFT JOIN calificaciones_unidades cu ON u.id = cu.unidad_id AND cu.alumno_id = '$alumno_id'
     WHERE i.alumno_id = '$alumno_id'
     ORDER BY m.nombre, u.numero_unit ASC";
-
 $res_kardex = mysqli_query($conexion, $query_kardex);
 
 $materias_notas = [];
