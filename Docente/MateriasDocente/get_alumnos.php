@@ -4,19 +4,23 @@ require_once '../../config/db.php';
 if (isset($_GET['grupo_id'])) {
     $id_grupo = mysqli_real_escape_string($conexion, $_GET['grupo_id']);
 
-    // Usando 'nota_final' que es el nombre real en tu tabla
+    // CONSULTA CORREGIDA: Ahora filtramos las notas por las unidades del grupo actual
     $query = "SELECT a.id AS id_alumno, a.matricula, u.nombre_completo, u.id AS id_usuario_alumno,
               IFNULL(AVG(cu.nota_final), 0) as promedio
               FROM inscripciones i
               INNER JOIN alumnos a ON i.alumno_id = a.id
               INNER JOIN usuarios u ON a.usuario_id = u.id
-              LEFT JOIN calificaciones_unidades cu ON a.id = cu.alumno_id
+              -- Unimos con unidades para saber a qué materia pertenece cada nota
+              LEFT JOIN unidades uni ON uni.grupo_id = '$id_grupo'
+              -- Unimos con calificaciones filtrando por alumno Y por la unidad correcta
+              LEFT JOIN calificaciones_unidades cu ON (a.id = cu.alumno_id AND cu.unidad_id = uni.id)
               WHERE i.grupo_id = '$id_grupo'
               GROUP BY a.id, a.matricula, u.nombre_completo, u.id
               ORDER BY u.nombre_completo ASC";
 
     $res = mysqli_query($conexion, $query);
 
+    // ... (El resto de tu código de la tabla permanece igual)
     if (!$res) {
         die("Error en SQL: " . mysqli_error($conexion));
     }
