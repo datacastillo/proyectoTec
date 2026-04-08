@@ -3,7 +3,8 @@ session_start();
 header('Content-Type: application/json');
 require_once '../../config/db.php';
 
-if (!isset($_SESSION['rol']) || $_SESSION['rol'] != 'admin') {
+// Validación ajustada para aceptar 'admin' o 'administrador'
+if (!isset($_SESSION['rol']) || ($_SESSION['rol'] !== 'admin' && $_SESSION['rol'] !== 'administrador')) {
     echo json_encode(['success' => false, 'message' => 'No autorizado']);
     exit();
 }
