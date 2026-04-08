@@ -116,7 +116,7 @@ while ($row = mysqli_fetch_assoc($res_kardex)) {
         <section style="padding: 30px; display: flex; flex-direction: column; align-items: center;">
             
             <div id="areaDescarga" style="width: 100%; max-width: 950px; text-align: center;">
-                <img src="../../img/logoTec.png" class="logo-kardex" alt="Logo Tec">
+                <img src="../img/logoTec.png" class="logo-kardex" alt="Logo Tec">
                 <h2 style="color: #fff; margin-bottom: 5px; font-size: 1.8rem;">KÁRDEX ACADÉMICO OFICIAL</h2>
                 <p style="color: #adb5bd; margin-bottom: 25px;">Alumno: <strong style="color: #fff;"><?php echo strtoupper($nombreAlumno); ?></strong> | Matrícula: <strong style="color: #fff;"><?php echo $matricula; ?></strong></p>
                 
