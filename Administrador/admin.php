@@ -24,7 +24,12 @@ mysqli_stmt_close($stmt);
 
 $foto_actual = !empty($user_data['foto_perfil']) ? $user_data['foto_perfil'] : 'avatar_1.png';
 $telefono_actual = $user_data['telefono'] ?? '';
-?>
+
+// --- LÓGICA PARA CARGAR CARRERAS Y GRUPOS EN LOS MODALES ---
+// Ajustado: Se cambió 'nombre_carrera' por 'nombre' según tu DB
+$res_carreras = mysqli_query($conexion, "SELECT id, nombre FROM carreras");
+// CORRECCIÓN: Se cambió 'nombre_groupo' por 'nombre_grupo' para evitar el Fatal Error
+$res_grupos = mysqli_query($conexion, "SELECT id, nombre_grupo, semestre FROM grupos GROUP BY nombre_grupo, semestre");?>
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -53,6 +58,16 @@ $telefono_actual = $user_data['telefono'] ?? '';
         .avatar-opcion.selected { /* Para la sección de perfil */
             border-color: #d4af37 !important;
             transform: scale(1.1);
+        }
+        /* Estilo para selects en modales oscuros */
+        select.modal-input {
+            width: 100%; 
+            padding: 10px; 
+            border-radius: 4px; 
+            border: none; 
+            background: white; 
+            color: black;
+            margin-bottom: 10px;
         }
     </style>
 </head>
@@ -425,6 +440,30 @@ $telefono_actual = $user_data['telefono'] ?? '';
                 <label style="display: block; margin-bottom: 5px;">Matrícula</label>
                 <input type="text" name="matricula" required placeholder="Ej. 24040001" style="width: 100%; padding: 10px; border-radius: 4px; border: none;">
             </div>
+            
+            <div style="margin-bottom: 15px;">
+                <label style="display: block; margin-bottom: 5px;">Carrera</label>
+                <select name="carrera_id" required class="modal-input">
+                    <option value="">Seleccione Carrera...</option>
+                    <?php while($c = mysqli_fetch_assoc($res_carreras)): ?>
+                        <option value="<?php echo $c['id']; ?>"><?php echo $c['nombre']; ?></option>
+                    <?php endwhile; ?>
+                </select>
+            </div>
+
+            <div style="margin-bottom: 15px;">
+                <label style="display: block; margin-bottom: 5px;">Asignar Grupo</label>
+                <select name="grupo_id" required class="modal-input">
+                    <option value="">Seleccione Grupo...</option>
+                    <?php 
+                    // Reiniciar el puntero si es necesario o asegurar que el query se ejecute correctamente arriba
+                    mysqli_data_seek($res_grupos, 0); 
+                    while($g = mysqli_fetch_assoc($res_grupos)): ?>
+                        <option value="<?php echo $g['id']; ?>"><?php echo $g['semestre']; ?>° <?php echo $g['nombre_grupo']; ?></option>
+                    <?php endwhile; ?>
+                </select>
+            </div>
+
             <div style="display: flex; gap: 10px; margin-top: 20px;">
                 <button type="button" class="btn-secondary" onclick="document.getElementById('modalRegistrarAlumno').style.display='none'" style="flex: 1; padding: 10px;">CANCELAR</button>
                 <button type="submit" class="btn-primary" style="flex: 1; padding: 10px; background: #3b82f6;">GUARDAR ALUMNO</button>
