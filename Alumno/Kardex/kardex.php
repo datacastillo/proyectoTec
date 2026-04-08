@@ -18,14 +18,14 @@ $alumno_id = $reg_alu['id'] ?? 0;
 $matricula = $reg_alu['matricula'] ?? 'S/N';
 
 // Hacemos el conteo real de unidades por materia y traemos todas las calificaciones
-// Hacemos el conteo real de unidades por materia y traemos todas las calificaciones
+// OJO: Si tu columna en la BD no se llama "nota_final", cámbiala en el SELECT (ej. cu.calificacion AS nota_final)
 $query_kardex = "
     SELECT 
         m.id AS materia_id, 
         m.nombre AS materia_nombre, 
         m.clave,
         u.numero_unit,
-        cu.nota_final,
+        cu.nota_final, 
         (SELECT COUNT(id) FROM unidades WHERE grupo_id = g.id) as total_unidades
     FROM materias m
     INNER JOIN grupos g ON m.id = g.materia_id
@@ -39,6 +39,7 @@ $res_kardex = mysqli_query($conexion, $query_kardex);
 $materias_notas = [];
 while ($row = mysqli_fetch_assoc($res_kardex)) {
     $m_id = $row['materia_id'];
+    
     if (!isset($materias_notas[$m_id])) {
         $materias_notas[$m_id] = [
             'nombre' => $row['materia_nombre'],
@@ -48,9 +49,13 @@ while ($row = mysqli_fetch_assoc($res_kardex)) {
             'total_unidades' => (int)$row['total_unidades']
         ];
     }
-    // Si la unidad es 1 a 6 y tiene calificación, la guardamos
-    if ($row['nota_final'] !== null && $row['numero_unit'] >= 1 && $row['numero_unit'] <= 6) {
-        $materias_notas[$m_id]['notas'][$row['numero_unit']] = $row['nota_final'];
+    
+    // EXTRACCIÓN INTELIGENTE: Si en la BD dice "U1" o "Unidad 1", esto extrae solo el número "1"
+    $numero_limpio = (int) preg_replace('/[^0-9]/', '', $row['numero_unit']);
+
+    // Si la unidad es 1 a 6 y tiene calificación válida, la guardamos
+    if ($row['nota_final'] !== null && $numero_limpio >= 1 && $numero_limpio <= 6) {
+        $materias_notas[$m_id]['notas'][$numero_limpio] = $row['nota_final'];
     }
 }
 ?>
@@ -68,7 +73,7 @@ while ($row = mysqli_fetch_assoc($res_kardex)) {
         body { background-color: #0d1b2a; color: #e0e1dd; }
         .wrapper { display: flex; min-height: 100vh; }
         
-        /* Barra Lateral (Mantenemos por si el include hereda clases) */
+        /* Barra Lateral */
         .sidebar { width: 280px; background: #142d3e; padding-top: 20px; border-right: 1px solid rgba(255,255,255,0.05); }
         .sidebar-header { text-align: center; padding-bottom: 20px; border-bottom: 1px solid rgba(255,255,255,0.05); }
         .user-info { margin-top: 15px; }

@@ -27,9 +27,12 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     }
     // ------------------------------------------
 
-    // Insertamos la unidad relacionándola con el grupo
-    // Nota: Asegúrate de que el campo en tu BD sea 'nombre_unidad' como en tu código
-    $sql = "INSERT INTO unidades (grupo_id, nombre_unidad) VALUES ('$grupo_id', '$nombre_unidad')";
+    // ¡AQUÍ ESTÁ LA SOLUCIÓN! 
+    // Calculamos qué número de unidad le toca automáticamente
+    $numero_unit = $data_check['total'] + 1;
+
+    // Insertamos la unidad guardando también el 'numero_unit'
+    $sql = "INSERT INTO unidades (grupo_id, nombre_unidad, numero_unit) VALUES ('$grupo_id', '$nombre_unidad', '$numero_unit')";
     
     if (mysqli_query($conexion, $sql)) {
         echo "success";
