@@ -242,7 +242,28 @@ $res_grupos = mysqli_query($conexion, $query);
             .then(html => { document.getElementById('tabla_alumnos_res').innerHTML = html; });
     }
 
-    // --- NUEVA FUNCIÓN PARA IMPRIMIR ---
+    // --- FUNCIÓN PARA ENVIAR ALERTA (SOLUCIÓN AL ERROR) ---
+    window.enviarAlerta = function(usuarioId, nombre) {
+        const nombreMateria = document.getElementById('titulo_materia').innerText;
+
+        if (confirm(`¿Enviar alerta de bajo rendimiento a ${nombre} en la materia ${nombreMateria}?`)) {
+            fetch(`enviar_alerta.php?id_usuario=${usuarioId}&materia=${encodeURIComponent(nombreMateria)}`)
+                .then(res => res.text())
+                .then(data => {
+                    if (data.trim() === "success") {
+                        alert("✅ Notificación enviada al alumno.");
+                    } else {
+                        alert("❌ Error: " + data);
+                    }
+                })
+                .catch(error => {
+                    console.error("Error:", error);
+                    alert("❌ Error de conexión con el servidor.");
+                });
+        }
+    };
+
+    // --- FUNCIÓN PARA IMPRIMIR ---
     function imprimirListaAsistencia() {
         if(grupoActualId !== 0) {
             // Abre el archivo imprimir_lista.php en una pestaña nueva pasándole el ID del grupo
@@ -285,7 +306,8 @@ $res_grupos = mysqli_query($conexion, $query);
             if(res.trim() === "success") {
                 alert("✅ Unidad creada correctamente.");
                 cerrarModalUnidad();
-                // Opcional: Podrías recargar algo aquí si estuvieras listando las unidades
+            } else if (res.trim() === "limite_alcanzado") {
+                alert("⚠️ No puedes agregar más de 6 unidades por materia.");
             } else {
                 alert("❌ Error al crear la unidad:\n" + res);
             }

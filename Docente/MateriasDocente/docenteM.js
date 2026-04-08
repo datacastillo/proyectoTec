@@ -1,7 +1,7 @@
 let grupoActualId = 0;
 
 // 1. Cargar alumnos desde la BD
-function verAlumnos(grupoId, materiaNombre) {
+window.verAlumnos = function(grupoId, materiaNombre) {
     grupoActualId = grupoId;
     document.getElementById('vista_principal').style.display = 'none';
     document.getElementById('vista_alumnos').style.display = 'block';
@@ -13,12 +13,17 @@ function verAlumnos(grupoId, materiaNombre) {
         .then(html => {
             document.getElementById('tabla_alumnos_res').innerHTML = html;
         });
-}
+};
 
-// 2. Sistema de Alertas (Enlace a tabla notificaciones)
-function enviarAlerta(usuarioId, nombre) {
-    if (confirm(`¿Enviar alerta de bajo rendimiento a ${nombre}?`)) {
-        fetch('enviar_alerta.php?id_usuario=' + usuarioId)
+// 2. Sistema de Alertas (Garantizado como global para evitar el ReferenceError)
+window.enviarAlerta = function(usuarioId, nombre) {
+    // Obtenemos el nombre de la materia del título para que la alerta sea específica
+    const nombreMateria = document.getElementById('titulo_materia').innerText;
+
+    if (confirm(`¿Enviar alerta de bajo rendimiento a ${nombre} en la materia ${nombreMateria}?`)) {
+        
+        // Enviamos el id_usuario y la materia
+        fetch(`enviar_alerta.php?id_usuario=${usuarioId}&materia=${encodeURIComponent(nombreMateria)}`)
             .then(res => res.text())
             .then(data => {
                 if (data.trim() === "success") {
@@ -26,58 +31,37 @@ function enviarAlerta(usuarioId, nombre) {
                 } else {
                     alert("❌ Error: " + data);
                 }
-            });
-    }
-}
-
-// 3. Regresar a la lista de materias
-function regresar() {
-    document.getElementById('vista_principal').style.display = 'block';
-    document.getElementById('vista_alumnos').style.display = 'none';
-    grupoActualId = 0;
-}
-
-// 4. Imprimir Lista (Usa el archivo que ya corregimos)
-function imprimirListaAsistencia() {
-    if(grupoActualId !== 0) {
-        window.open('imprimir_lista.php?id_grupo=' + grupoActualId, '_blank');
-    } else {
-        alert("Selecciona un grupo primero.");
-    }
-}
-
-// --- Gestión de Unidades ---
-function abrirModalUnidad() { document.getElementById('modalUnidad').style.display = 'flex'; }
-function cerrarModalUnidad() { 
-    document.getElementById('modalUnidad').style.display = 'none';
-    document.getElementById('formNuevaUnidad').reset();
-}
-
-// Función para enviar la notificación mediante AJAX
-function enviarAlerta(idAlumnoUsuario, nombre) {
-    if (confirm(`¿Deseas enviar una alerta formal a ${nombre} por bajo rendimiento?`)) {
-        
-        fetch(`enviar_alerta.php?id_usuario=${idAlumnoUsuario}`)
-            .then(response => response.text())
-            .then(data => {
-                if (data.trim() === "success") {
-                    alert("✅ La notificación ha sido enviada al alumno exitosamente.");
-                } else {
-                    alert("❌ Error al procesar la notificación: " + data);
-                }
             })
             .catch(error => {
                 console.error("Error:", error);
                 alert("❌ Error de conexión con el servidor.");
             });
     }
-}
+};
 
-// Función para imprimir (se mantiene igual pero asegura que use grupoActualId)
-function imprimirListaAsistencia() {
+// 3. Regresar a la lista de materias
+window.regresar = function() {
+    document.getElementById('vista_principal').style.display = 'block';
+    document.getElementById('vista_alumnos').style.display = 'none';
+    grupoActualId = 0;
+};
+
+// 4. Imprimir Lista de Asistencia
+window.imprimirListaAsistencia = function() {
     if(typeof grupoActualId !== 'undefined' && grupoActualId !== 0) {
         window.open('imprimir_lista.php?id_grupo=' + grupoActualId, '_blank');
     } else {
-        alert("Por favor, selecciona un grupo primero.");
+        alert("⚠️ Por favor, selecciona un grupo primero.");
     }
-}
+};
+
+// 5. Gestión de Unidades (Modales)
+window.abrirModalUnidad = function() { 
+    document.getElementById('modalUnidad').style.display = 'flex'; 
+};
+
+window.cerrarModalUnidad = function() { 
+    document.getElementById('modalUnidad').style.display = 'none';
+    const form = document.getElementById('formNuevaUnidad');
+    if(form) form.reset();
+};
