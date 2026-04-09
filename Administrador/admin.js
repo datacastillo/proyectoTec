@@ -158,41 +158,73 @@ function render() {
 }
 
 // 4. GESTIÓN DEL MODAL
+
+// 4. GESTIÓN DEL MODAL
 function abrirModal(tipo) {
     tipoActual = tipo; 
     const modal = document.getElementById("userModal");
     const emailGroup = document.getElementById("emailGroup");
     const passGroup = document.getElementById("passGroup");
     const avatarGroup = document.getElementById("avatarGroup"); 
-    
+    const inputNombre = document.getElementById("userName");
+
+    // 🔍 Búsqueda forzada del Label (buscamos por su texto para no depender del HTML)
+    let labelNombre = null;
+    if (modal) {
+        const labels = modal.getElementsByTagName("label");
+        for (let l of labels) {
+            if (l.innerText.includes("Nombre Completo") || l.innerText.includes("Nombre de la Materia")) {
+                labelNombre = l;
+                break;
+            }
+        }
+    }
+
     if (modal) {
         modal.style.display = "flex"; 
         
         if (tipo === 'MATERIA') {
             document.getElementById("modalTitle").innerText = 'Nueva Materia';
             document.getElementById("extraLabel").innerText = 'Clave';
+            
+            // 🏷️ Ajustamos textos para Materia
+            if(labelNombre) labelNombre.innerText = 'Nombre de la Materia';
+            if(inputNombre) inputNombre.placeholder = 'Ej. Cálculo Diferencial';
+
             if(emailGroup) emailGroup.style.display = "none";
             if(passGroup) passGroup.style.display = "none";
             if(avatarGroup) avatarGroup.style.display = "none";
+            
+            // 🩺 Quitamos la obligación de TODOS los campos ocultos (Evita el error en consola)
+            if(document.getElementById("userEmail")) document.getElementById("userEmail").required = false;
+            if(document.getElementById("userPass")) document.getElementById("userPass").required = false;
+            if(document.getElementById("userAvatar")) document.getElementById("userAvatar").required = false;
+
         } else {
             document.getElementById("modalTitle").innerText = tipo === 'ALUMNO' ? 'Nuevo Alumno' : 'Nuevo Docente';
             document.getElementById("extraLabel").innerText = tipo === 'ALUMNO' ? 'Matrícula' : 'Especialidad';
+            
+            // 🏷️ Restauramos textos para Usuarios
+            if(labelNombre) labelNombre.innerText = 'Nombre Completo';
+            if(inputNombre) inputNombre.placeholder = 'Ej. Juan Castillo';
+
             if(emailGroup) emailGroup.style.display = "block";
             if(passGroup) passGroup.style.display = "block";
             if(avatarGroup) avatarGroup.style.display = "block";
+
+            // 🩺 Devolvemos la obligación de llenarlos
+            if(document.getElementById("userEmail")) document.getElementById("userEmail").required = true;
+            if(document.getElementById("userPass")) document.getElementById("userPass").required = true;
         }
         
+        // Limpiamos los campos al abrir
         document.getElementById("userId").value = ""; 
-        document.getElementById("userName").value = "";
-        document.getElementById("userEmail").value = "";
-        document.getElementById("userPass").value = "";
-        document.getElementById("userExtra").value = "";
+        if(inputNombre) inputNombre.value = "";
+        if(document.getElementById("userEmail")) document.getElementById("userEmail").value = "";
+        if(document.getElementById("userPass")) document.getElementById("userPass").value = "";
+        if(document.getElementById("userExtra")) document.getElementById("userExtra").value = "";
         
         seleccionarAvatar('default.png');
-        
-        if (tipo !== 'MATERIA') {
-            document.getElementById("userPass").required = true;
-        }
     }
 }
 
