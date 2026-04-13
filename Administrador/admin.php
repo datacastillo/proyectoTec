@@ -118,7 +118,7 @@ $res_grupos = mysqli_query($conexion, "SELECT id, nombre_grupo, semestre FROM gr
                 </li>
 
                 <li class="nav-item" style="margin-top: 30px;">
-                    <a href="../../auth/logout.php" style="color: #e74c3c; text-decoration: none; display: flex; align-items: center; gap: 10px;">
+                    <a href="../auth/logout.php" style="color: #e74c3c; text-decoration: none; display: flex; align-items: center; gap: 10px;">
                         <i class="fas fa-sign-out-alt"></i> CERRAR SESIÓN
                     </a>
                 </li>
@@ -171,7 +171,7 @@ $res_grupos = mysqli_query($conexion, "SELECT id, nombre_grupo, semestre FROM gr
         <section class="content-body seccion" id="docentes" style="display:none;">
 
             <div class="page-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
-                <h2>Plantilla Docente</h2>
+                <h2>Docente</h2>
                 <div>
                     <button class="btn-primary" onclick="document.getElementById('modalRegistrarDocente').style.display='flex'" style="background: #28a745; margin-left: 10px;">+ Registro Completo</button>
                 </div>
